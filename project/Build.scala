@@ -10,6 +10,12 @@ object General {
     versionCode := 0,
     scalaVersion := "2.10.1",
     platformName in Android := "android-14",
+    resolvers             ++= Seq(
+      "spray" at "http://repo.spray.io/"
+    ),
+    libraryDependencies   ++= Seq(
+      "io.spray" %  "spray-json_2.10" % "1.2.4"
+    ),
     scalacOptions         := Seq(
       "-encoding", "utf8",
       "-target:jvm-1.6"
