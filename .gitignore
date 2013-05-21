@@ -1,4 +1,6 @@
 /target/
 /project/project
 /project/target
+/test/target
+/test/project
 *.class
