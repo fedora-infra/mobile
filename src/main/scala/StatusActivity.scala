@@ -17,10 +17,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 import scala.util.{ Failure, Try, Success }
 
-case class StatusesResponse(global_info: String, services: Map[String, Map[String, String]])
+case class StatusesResponse(
+  global_info: String,
+  global_status: String,
+  global_verbose_status: String,
+  services: Map[String, Map[String, String]])
 
 object MyJsonProtocol extends DefaultJsonProtocol {
-  implicit val f = jsonFormat2(StatusesResponse.apply)
+  implicit val f = jsonFormat4(StatusesResponse.apply)
 }
 
 import MyJsonProtocol._
@@ -97,7 +101,7 @@ class StatusActivity extends NavDrawerActivity {
           }
 
           runOnUiThread {
-            findView(TR.globalinfo).setText("All systems go")
+            findView(TR.globalinfo).setText(parsed.global_verbose_status)
           }
 
         }
