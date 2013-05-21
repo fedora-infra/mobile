@@ -10,18 +10,21 @@
       android:id="@+id/servicename"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:paddingLeft="16dp"
       android:textSize="20sp" />
 
-    <TextView
+  <!--<TextView
       android:id="@+id/serviceshortname"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_toRightOf="@id/servicename"
       android:gravity="right" />
+  -->
 
   <TextView
       android:id="@+id/servicestatus"
       android:layout_width="match_parent"
-      android:layout_height="wrap_content" />
+      android:layout_height="wrap_content"
+      android:paddingLeft="16dp" />
 
 </LinearLayout>

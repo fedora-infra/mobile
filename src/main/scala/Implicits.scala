@@ -1,7 +1,7 @@
 package org.fedoraproject.mobile
 
 package object Implicits {
-  implicit def toRunnable[F](f: => F): Runnable = new Runnable() { def run() = f }
+  implicit def toRunnable[F](f: => F): Runnable = new Runnable() { def run() = {f} }
 
    /** A rough implementation of Ruby's "tap" method.
     *

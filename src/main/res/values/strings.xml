@@ -5,4 +5,5 @@
     <string name="status_good">Up and running</string>
     <string name="status_minor">Minor issue</string>
     <string name="status_major">Major issue</string>
+    <string name="status_failure">An issue occurred while obtaining status information.</string>
 </resources>

@@ -8,7 +8,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.{ LayoutInflater, View, ViewGroup }
 import android.widget.AdapterView.OnItemClickListener
-import android.widget.{ AdapterView, ArrayAdapter, LinearLayout, TextView }
+import android.widget.{ AdapterView, ArrayAdapter, LinearLayout, TextView, Toast }
 
 import spray.json._
 
@@ -50,15 +50,22 @@ class StatusActivity extends NavDrawerActivity {
                 .inflate(R.layout.status_list_item, parent, false)
                 .asInstanceOf[LinearLayout]
 
+                layout
+                  .setBackgroundResource(service("status") match {
+                    case "good" => R.drawable.status_good
+                    case "minor" => R.drawable.status_minor
+                    case "major" => R.drawable.status_major
+                  })
+
               layout
                 .findViewById(R.id.servicename)
                 .asInstanceOf[TextView]
                 .setText(service("name"))
 
-              layout
+              /*layout
                 .findViewById(R.id.serviceshortname)
                 .asInstanceOf[TextView]
-                .setText(shortname)
+                .setText(shortname)*/
 
               layout
                 .findViewById(R.id.servicestatus)
@@ -88,8 +95,13 @@ class StatusActivity extends NavDrawerActivity {
           runOnUiThread {
             findView(TR.statuses).setAdapter(adapter)
           }
+
+          runOnUiThread {
+            findView(TR.globalinfo).setText("All systems go")
+          }
+
         }
-        case Failure(e) =>
+        case Failure(e) => Toast.makeText(this, R.string.status_failure, Toast.LENGTH_LONG).show
       }
     }
   }
