@@ -11,11 +11,7 @@ import android.widget.{ AdapterView, ArrayAdapter }
 trait NavDrawerActivity extends FragmentActivity with TypedActivity {
 
   val navMap = Map(
-    "Infrastructure Status" -> classOf[StatusActivity],
-    "Search Packages" -> classOf[StatusActivity],
-    "Tag Packages" -> classOf[StatusActivity],
-    "Badges" -> classOf[StatusActivity],
-    "Planet Fedora" -> classOf[StatusActivity]
+    "Infrastructure Status" -> classOf[StatusActivity]
   )
 
   override def onCreate(bundle: Bundle) {
