@@ -88,13 +88,27 @@ class StatusActivity extends NavDrawerActivity {
             }
           }
 
+          val orderedStatuses = parsed.services.toArray.sortBy(_._2("name")).map(_._1)
+
           val adapter = new StatusAdapter(
             this,
             android.R.layout.simple_list_item_1,
-            parsed.services.toArray.sortBy(_._2("name")).map(_._1))
+            orderedStatuses)
 
           runOnUiThread {
-            findView(TR.statuses).setAdapter(adapter)
+            findView(TR.statuses).tap { obj =>
+              obj.setAdapter(adapter)
+              obj.setOnItemClickListener(new OnItemClickListener {
+                def onItemClick(parent: AdapterView[_], view: View, position: Int, id: Long) {
+                  val shortname = orderedStatuses(position)
+                  val service = parsed.services(shortname)
+                  view
+                    .findViewById(R.id.servicename)
+                    .asInstanceOf[TextView]
+                    .setText(service("message"))
+                }
+              })
+            }
           }
 
           runOnUiThread {
