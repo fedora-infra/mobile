@@ -19,6 +19,14 @@ Some things that Fedora Mobile sets out to do:
 - [Search packages](https://apps.fedoraproject.org/packages/)
 - And more.
 
+# Screenshots
+
+Because the readme is too short and I need to fill some space. ;)
+
+## Status
+
+<img src="http://i.imgur.com/HHnvOc3.png" />
+
 # License
 
 The application is licensed under the Mozilla Public License, version 2.
