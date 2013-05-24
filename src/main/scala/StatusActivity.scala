@@ -103,9 +103,14 @@ class StatusActivity extends NavDrawerActivity {
                   val shortname = orderedStatuses(position)
                   val service = parsed.services(shortname)
                   view
-                    .findViewById(R.id.servicename)
-                    .asInstanceOf[TextView]
-                    .setText(service("message"))
+                    .findViewById(R.id.servicemessage)
+                    .asInstanceOf[TextView].tap { obj =>
+                      obj.setText(service("message"))
+                      obj.setVisibility(obj.getVisibility match {
+                        case View.GONE => View.VISIBLE
+                        case View.VISIBLE => View.GONE
+                      })
+                  }
                 }
               })
             }
