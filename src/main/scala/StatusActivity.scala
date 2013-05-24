@@ -4,7 +4,7 @@ import Implicits._
 
 import android.app.Activity
 import android.content.Context
-import android.graphics.Color
+import android.graphics.{ Color, PorterDuff }
 import android.os.Bundle
 import android.view.{ LayoutInflater, View, ViewGroup }
 import android.widget.AdapterView.OnItemClickListener
@@ -101,7 +101,14 @@ class StatusActivity extends NavDrawerActivity {
           }
 
           runOnUiThread {
-            findView(TR.globalinfo).setText(parsed.global_verbose_status)
+            findView(TR.globalinfo).tap { obj =>
+              obj.setText(parsed.global_verbose_status)
+              obj.setBackgroundColor(parsed.global_status match {
+                case "good" => Color.parseColor("#009900")
+                case "minor" => Color.parseColor("#ffcc00")
+                case "major" => Color.parseColor("#990000")
+              })
+            }
           }
 
         }
