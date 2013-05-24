@@ -19,6 +19,14 @@ Some things that Fedora Mobile sets out to do:
 - [Search packages](https://apps.fedoraproject.org/packages/)
 - And more.
 
+We target Android 3.0+ for the time being. The reason for this is that Fedora's
+mission is to "lead the **advancement** of free and open source software and
+content as a collaborative community" - advancement being key.
+
+Not having to deal with 2.x's quirks also lets us do some things more cleanly
+and take advantage of newer features like Navigation Drawers and the Action Bar
+without having to depend on thirdparty hacks/libraries.
+
 # Screenshots
 
 Because the readme is too short and I need to fill some space. ;)
