@@ -54,12 +54,12 @@ class StatusActivity extends NavDrawerActivity {
                 .inflate(R.layout.status_list_item, parent, false)
                 .asInstanceOf[LinearLayout]
 
-                layout
-                  .setBackgroundResource(service("status") match {
-                    case "good" => R.drawable.status_good
-                    case "minor" => R.drawable.status_minor
-                    case "major" => R.drawable.status_major
-                  })
+              layout
+                .setBackgroundResource(service("status") match {
+                  case "good" => R.drawable.status_good
+                  case "minor" => R.drawable.status_minor
+                  case "major" => R.drawable.status_major
+                })
 
               layout
                 .findViewById(R.id.servicename)
