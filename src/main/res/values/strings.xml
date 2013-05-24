@@ -1,9 +1,13 @@
 <resources>
     <string name="app_name">Fedora Mobile</string>
+    <string name="search">Search</string>
     <string name="open">Open</string>
     <string name="close">Close</string>
+
     <string name="status_good">Up and running</string>
     <string name="status_minor">Minor issue</string>
     <string name="status_major">Major issue</string>
     <string name="status_failure">An issue occurred while obtaining status information.</string>
+
+    <string name="packages_search_hint">Search Packages</string>
 </resources>
