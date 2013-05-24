@@ -6,7 +6,7 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.{ Color, PorterDuff }
 import android.os.Bundle
-import android.view.{ LayoutInflater, View, ViewGroup }
+import android.view.{ LayoutInflater, Menu, MenuItem, View, ViewGroup }
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.{ AdapterView, ArrayAdapter, LinearLayout, TextView, Toast }
 
@@ -30,10 +30,7 @@ object MyJsonProtocol extends DefaultJsonProtocol {
 import MyJsonProtocol._
 
 class StatusActivity extends NavDrawerActivity {
-  override def onCreate(bundle: Bundle) {
-    super.onCreate(bundle)
-    setUpNav(R.layout.statuses)
-
+  private def updateStatuses() {
     future {
       Source.fromURL("http://status.fedoraproject.org/statuses.json").mkString
     }.onComplete { result =>
@@ -116,4 +113,24 @@ class StatusActivity extends NavDrawerActivity {
       }
     }
   }
+
+  override def onCreate(bundle: Bundle) {
+    super.onCreate(bundle)
+    setUpNav(R.layout.statuses)
+    updateStatuses()
+  }
+
+  override def onCreateOptionsMenu(menu: Menu) = {
+    val inflater = getMenuInflater
+    inflater.inflate(R.menu.status, menu);
+    true
+  }
+
+  override def onOptionsItemSelected(item: MenuItem) = {
+    item.getItemId match {
+      case R.id.menu_refresh => updateStatuses()
+    }
+    true
+  }
+
 }
