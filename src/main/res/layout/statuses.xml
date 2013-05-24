@@ -11,11 +11,13 @@
       android:layout_width="fill_parent"
       android:layout_height="wrap_content"
       android:textColor="#ffffff"
+      android:background="#333333"
       android:textSize="20sp"
       android:paddingTop="10dip"
       android:paddingBottom="10dip"
       android:layout_marginBottom="1dip"
-      android:gravity="center" />
+      android:gravity="center"
+      android:text="@string/loading" />
 
   <ListView
       android:id="@+id/statuses"

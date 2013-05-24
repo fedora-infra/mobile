@@ -128,7 +128,10 @@ class StatusActivity extends NavDrawerActivity {
 
   override def onOptionsItemSelected(item: MenuItem) = {
     item.getItemId match {
-      case R.id.menu_refresh => updateStatuses()
+      case R.id.menu_refresh => {
+        findView(TR.globalinfo).setText(R.string.loading)
+        updateStatuses()
+      }
     }
     true
   }
