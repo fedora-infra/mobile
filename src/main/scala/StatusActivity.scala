@@ -140,17 +140,20 @@ class StatusActivity extends NavDrawerActivity {
   }
 
   override def onCreateOptionsMenu(menu: Menu) = {
+    super.onCreateOptionsMenu(menu)
     val inflater = getMenuInflater
     inflater.inflate(R.menu.status, menu);
     true
   }
 
   override def onOptionsItemSelected(item: MenuItem) = {
+    super.onOptionsItemSelected(item)
     item.getItemId match {
       case R.id.menu_refresh => {
         findView(TR.globalinfo).setText(R.string.loading)
         updateStatuses()
       }
+      case _ =>
     }
     true
   }
