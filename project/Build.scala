@@ -32,6 +32,7 @@ object General {
     proguardOption in Android := """
       -keep class scala.Function1
       -keep class scala.collection.SeqLike { public protected *; }
+      -keep class spray.json.*
     """
   )
 
