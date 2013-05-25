@@ -1,0 +1,88 @@
+@import url('http://fonts.googleapis.com/css?family=Open+Sans');
+
+@font-face {
+    font-family: 'Overpass';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Overpass'), url() format('woff');
+}
+
+font-face {
+    font-family: 'Overpass';
+    src: url('/rsrc/overpass-fonts/overpass_regular-web.eot');
+    src: url('/rsrc/overpass-fonts/overpass_regular-web.eot?#iefix') format('eot'),
+    url('/rsrc/overpass-fonts/overpass_regular-web.woff') format('woff'),
+    url('/rsrc/overpass-fonts/overpass_regular-web.ttf') format('truetype'),
+    url('/rsrc/overpass-fonts/overpass_regular-web.svg#webfontLTZe4IYH') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+h1, h2, h3, h4, h5 {
+    margin: 0;
+    padding: 0;
+    color: #0084c8;
+    font-family: 'Overpass', 'Open Sans', sans-serif;
+    letter-spacing: -2px;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+}
+
+.navbar {
+    margin-bottom: 0;
+    background-color: #ffffff;
+
+    a:hover {
+        color: #00578E !important;
+    }
+}
+
+.fm-front-header {
+    background-color: #00BBFF;
+    color: #f8f8f8;
+    padding: 30px 0;
+
+    h1 {
+        font-size: 4em;
+        font-weight: 300;
+        color: #f8f8f8;
+    }
+}
+
+.section {
+    padding: 30px 0;
+    min-height: 300px;
+    width: 100%;
+    clear: both;
+
+    /* Internet Explorer 10 */
+    display: -ms-flexbox;
+    -ms-flex-pack: center;
+    -ms-flex-align: center;
+
+    /* Firefox */
+    display: -moz-box;
+    -moz-box-pack: center;
+    -moz-box-align: center;
+
+    /* Safari, Chrome, and Opera */
+    display: -webkit-box;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+
+    /* W3C */
+    display: box;
+    box-pack: center;
+    box-align: center;
+
+    h1.headline {
+        padding-bottom: 10px;
+    }
+
+    +.dark {
+        background-color: #333;
+        color: #f8f8f8;
+    }
+}
