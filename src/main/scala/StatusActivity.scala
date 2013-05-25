@@ -63,11 +63,6 @@ class StatusActivity extends NavDrawerActivity {
                 .asInstanceOf[TextView]
                 .setText(service("name"))
 
-              /*layout
-                .findViewById(R.id.serviceshortname)
-                .asInstanceOf[TextView]
-                .setText(shortname)*/
-
               layout
                 .findViewById(R.id.servicestatus)
                 .asInstanceOf[TextView]
