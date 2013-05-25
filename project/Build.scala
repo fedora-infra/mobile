@@ -1,7 +1,9 @@
 import sbt._
-
 import Keys._
 import AndroidKeys._
+
+import scalariform.formatter.preferences._
+import com.typesafe.sbt.SbtScalariform._
 
 object General {
   val settings = Defaults.defaultSettings ++ Seq (
@@ -25,6 +27,12 @@ object General {
       "-source", "1.6",
       "-target", "1.6"
     )
+  ) ++
+  defaultScalariformSettings ++ Seq(
+    ScalariformKeys.preferences := FormattingPreferences().
+    setPreference(PreserveDanglingCloseParenthesis, true).
+    setPreference(MultilineScaladocCommentsStartOnFirstLine, true).
+    setPreference(PlaceScaladocAsterisksBeneathSecondAsterisk, true)
   )
 
   val proguardSettings = Seq (
