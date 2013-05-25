@@ -42,7 +42,7 @@ class StatusActivity extends NavDrawerActivity {
             context: Context,
             resource: Int,
             items: Array[String])
-          extends ArrayAdapter[String](context, resource, items) {
+            extends ArrayAdapter[String](context, resource, items) {
             override def getView(position: Int, convertView: View, parent: ViewGroup): View = {
               val shortname = getItem(position)
               val service = parsed.services(shortname)
@@ -105,7 +105,7 @@ class StatusActivity extends NavDrawerActivity {
                         case View.GONE => View.VISIBLE
                         case View.VISIBLE => View.GONE
                       })
-                  }
+                    }
                 }
               })
             }

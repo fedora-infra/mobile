@@ -27,10 +27,9 @@ trait NavDrawerActivity extends FragmentActivity with TypedActivity {
     R.drawable.ic_drawer,
     R.string.open,
     R.string.close) {
-      override def onDrawerClosed(view: View) = invalidateOptionsMenu
-      override def onDrawerOpened(view: View) = invalidateOptionsMenu
-    }
-
+    override def onDrawerClosed(view: View) = invalidateOptionsMenu
+    override def onDrawerOpened(view: View) = invalidateOptionsMenu
+  }
 
   def setUpNav(layout: Int) {
     val fragment = new RootFragment(layout)
