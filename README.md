@@ -27,6 +27,15 @@ Not having to deal with 2.x's quirks also lets us do some things more cleanly
 and take advantage of newer features like Navigation Drawers and the Action Bar
 without having to depend on thirdparty hacks/libraries.
 
+# Trying it out
+
+You can get the latest working HEAD build from the Fedora Infrastructure
+Jenkins instance at
+http://jenkins.cloud.fedoraproject.org/job/fedora-mobile/ws/target/fedora-mobile-0.1.apk
+
+A short URL that goes to the same thing (easier for typing on phones and
+tablets) is http://da.gd/j
+
 # Screenshots
 
 Because the readme is too short and I need to fill some space. ;)
