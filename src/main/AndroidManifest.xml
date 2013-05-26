@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.fedoraproject.mobile">
   <application
     android:icon="@drawable/fedoraicon"
-    android:label="Fedora Mobile"
+    android:label="@string/app_name"
     android:debuggable="true"
     android:theme="@android:style/Theme.Holo.Light">
 
