@@ -32,7 +32,7 @@ trait NavDrawerActivity extends FragmentActivity with TypedActivity {
   }
 
   def setUpNav(layout: Int) {
-    val fragment = new RootFragment(layout)
+    val fragment = new RootFragment(Option(layout))
     getSupportFragmentManager
       .beginTransaction
       .replace(R.id.content_frame, fragment)
