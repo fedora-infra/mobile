@@ -6,6 +6,7 @@
     <string name="refresh">Refresh</string>
     <string name="loading">Loading...</string>
 
+    <string name="fedora_status">Fedora Status</string>
     <string name="status_good">Up and running</string>
     <string name="status_minor">Minor issue</string>
     <string name="status_major">Major issue</string>

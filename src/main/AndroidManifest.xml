@@ -12,7 +12,9 @@
       </intent-filter>
     </activity>
 
-    <activity android:name=".StatusActivity" />
+    <activity
+        android:name=".StatusActivity"
+        android:label="@string/fedora_status" />
 
     <activity
         android:name=".PackageSearchActivity"
