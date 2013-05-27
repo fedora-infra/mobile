@@ -91,37 +91,44 @@ class StatusActivity extends NavDrawerActivity {
             orderedStatuses)
 
           runOnUiThread {
-            findView(TR.statuses).tap { obj =>
-              obj.setAdapter(adapter)
-              obj.setOnItemClickListener(new OnItemClickListener {
-                def onItemClick(parent: AdapterView[_], view: View, position: Int, id: Long) {
-                  val shortname = orderedStatuses(position)
-                  val service = parsed.services(shortname)
-                  view
-                    .findViewById(R.id.servicemessage)
-                    .asInstanceOf[TextView].tap { obj =>
-                      obj.setText(service("message"))
-                      obj.setVisibility(obj.getVisibility match {
-                        case View.GONE => View.VISIBLE
-                        case View.VISIBLE => View.GONE
-                      })
+            val statusesView = Option(findView(TR.statuses))
+            statusesView match {
+              case Some(statusesView) => statusesView.tap { obj =>
+                obj.setAdapter(adapter)
+                obj.setOnItemClickListener(new OnItemClickListener {
+                  def onItemClick(parent: AdapterView[_], view: View, position: Int, id: Long) {
+                    val shortname = orderedStatuses(position)
+                    val service = parsed.services(shortname)
+                    view
+                      .findViewById(R.id.servicemessage)
+                      .asInstanceOf[TextView].tap { obj =>
+                        obj.setText(service("message"))
+                        obj.setVisibility(obj.getVisibility match {
+                          case View.GONE => View.VISIBLE
+                          case View.VISIBLE => View.GONE
+                        })
+                      }
                     }
-                }
-              })
+                  })
+              }
+              case None =>
             }
           }
 
           runOnUiThread {
-            findView(TR.globalinfo).tap { obj =>
-              obj.setText(parsed.global_verbose_status)
-              obj.setBackgroundColor(parsed.global_status match {
-                case "good" => Color.parseColor("#009900")
-                case "minor" => Color.parseColor("#ff6103")
-                case "major" => Color.parseColor("#990000")
-              })
+            val globalInfoView = Option(findView(TR.globalinfo))
+            globalInfoView match {
+              case Some(globalInfoView) => globalInfoView.tap { obj =>
+                obj.setText(parsed.global_verbose_status)
+                obj.setBackgroundColor(parsed.global_status match {
+                  case "good" => Color.parseColor("#009900")
+                  case "minor" => Color.parseColor("#ff6103")
+                  case "major" => Color.parseColor("#990000")
+                })
+              }
+              case None =>
             }
           }
-
         }
         case Failure(e) => Toast.makeText(this, R.string.status_failure, Toast.LENGTH_LONG).show
       }
