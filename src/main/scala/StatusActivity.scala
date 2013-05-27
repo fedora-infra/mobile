@@ -108,8 +108,8 @@ class StatusActivity extends NavDrawerActivity {
                           case View.VISIBLE => View.GONE
                         })
                       }
-                    }
-                  })
+                  }
+                })
               }
               case None =>
             }

@@ -10,7 +10,7 @@ class RootFragment(layout: Option[Int]) extends Fragment {
     inflater: LayoutInflater,
     container: ViewGroup,
     savedInstanceState: Bundle): View = layout match {
-      case Some(layout) => inflater.inflate(layout, container, false)
-      case _ => null
-    }
+    case Some(layout) => inflater.inflate(layout, container, false)
+    case _ => null
+  }
 }

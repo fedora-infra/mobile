@@ -50,26 +50,26 @@ trait NavDrawerActivity extends FragmentActivity with TypedActivity {
       resource: Int,
       items: Array[String])
       extends ArrayAdapter[String](context, resource, items) {
-        override def getView(position: Int, convertView: View, parent: ViewGroup): View = {
-          val key = getItem(position)
-          val value = navMap(key)
+      override def getView(position: Int, convertView: View, parent: ViewGroup): View = {
+        val key = getItem(position)
+        val value = navMap(key)
 
-          val layout = LayoutInflater.from(context)
-            .inflate(R.layout.drawer_list_item, parent, false)
-            .asInstanceOf[LinearLayout]
+        val layout = LayoutInflater.from(context)
+          .inflate(R.layout.drawer_list_item, parent, false)
+          .asInstanceOf[LinearLayout]
 
-          layout
-            .findViewById(R.id.icon)
-            .asInstanceOf[ImageView]
-            .setImageResource(value._2)
+        layout
+          .findViewById(R.id.icon)
+          .asInstanceOf[ImageView]
+          .setImageResource(value._2)
 
-          layout
-            .findViewById(R.id.title)
-            .asInstanceOf[TextView]
-            .setText(key)
+        layout
+          .findViewById(R.id.title)
+          .asInstanceOf[TextView]
+          .setText(key)
 
-          layout
-        }
+        layout
+      }
     }
 
     drawerList.setAdapter(
