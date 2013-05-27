@@ -16,7 +16,6 @@
         android:layout_width="240dip"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:choiceMode="singleChoice"
         android:divider="#444"
         android:dividerHeight="0.5dip"
         android:background="#222"/>
