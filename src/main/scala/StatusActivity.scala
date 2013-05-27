@@ -74,7 +74,7 @@ class StatusActivity extends NavDrawerActivity {
                   })
                   obj.setTextColor(service("status") match {
                     case "good" => Color.parseColor("#009900")
-                    case "minor" => Color.parseColor("#ffcc00")
+                    case "minor" => Color.parseColor("#ff6103")
                     case "major" => Color.parseColor("#990000")
                   })
                 }
@@ -116,7 +116,7 @@ class StatusActivity extends NavDrawerActivity {
               obj.setText(parsed.global_verbose_status)
               obj.setBackgroundColor(parsed.global_status match {
                 case "good" => Color.parseColor("#009900")
-                case "minor" => Color.parseColor("#ffcc00")
+                case "minor" => Color.parseColor("#ff6103")
                 case "major" => Color.parseColor("#990000")
               })
             }
