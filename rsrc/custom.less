@@ -53,37 +53,37 @@ body {
 }
 
 .section {
-    padding: 30px 0;
+    padding: 100px 0;
     min-height: 300px;
     width: 100%;
-    clear: both;
 
-    /* Internet Explorer 10 */
-    display: -ms-flexbox;
-    -ms-flex-pack: center;
-    -ms-flex-align: center;
-
-    /* Firefox */
-    display: -moz-box;
-    -moz-box-pack: center;
-    -moz-box-align: center;
-
-    /* Safari, Chrome, and Opera */
-    display: -webkit-box;
-    -webkit-box-pack: center;
-    -webkit-box-align: center;
-
-    /* W3C */
-    display: box;
-    box-pack: center;
-    box-align: center;
+    p {
+        font-size: 1.4em
+    }
 
     h1.headline {
         padding-bottom: 10px;
     }
 
-    +.dark {
+    .darken {
+        background-color:rgba(0,0,0,0.7);
+        color: #f8f8f8;
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    &.dark {
         background-color: #333;
         color: #f8f8f8;
     }
+
+    &.fm-community {
+        background: black url('/rsrc/images/community.jpg') center;
+    }
+}
+
+.fm-drop {
+    -moz-box-shadow: 3px 3px 5px #000;
+    -webkit-box-shadow: 3px 3px 5px #888;
+    box-shadow: 3px 3px 5px #000;
 }
