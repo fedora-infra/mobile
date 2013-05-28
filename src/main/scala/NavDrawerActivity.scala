@@ -11,8 +11,8 @@ import android.widget.{ AdapterView, ArrayAdapter, ImageView, LinearLayout, Text
 trait NavDrawerActivity extends FragmentActivity with TypedActivity {
 
   val navMap = Map(
-    "Infrastructure Status" -> (classOf[StatusActivity], R.drawable.ic_menu_star),
-    "Package Search" -> (classOf[PackageSearchActivity], R.drawable.ic_menu_search)
+    "Infrastructure Status" -> (classOf[StatusActivity], R.drawable.ic_status),
+    "Package Search" -> (classOf[PackageSearchActivity], R.drawable.ic_search)
   )
 
   override def onCreate(bundle: Bundle) {
