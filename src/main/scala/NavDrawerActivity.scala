@@ -5,7 +5,7 @@ import android.content.{ Context, Intent }
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.app.{ ActionBarDrawerToggle, FragmentActivity }
-import android.view.{ LayoutInflater, View, ViewGroup }
+import android.view.{ LayoutInflater, MenuItem, View, ViewGroup }
 import android.widget.{ AdapterView, ArrayAdapter, ImageView, LinearLayout, TextView }
 
 trait NavDrawerActivity extends FragmentActivity with TypedActivity {
@@ -85,6 +85,14 @@ trait NavDrawerActivity extends FragmentActivity with TypedActivity {
         startActivity(intent)
       }
     })
+  }
+
+  override def onOptionsItemSelected(item: MenuItem): Boolean = {
+    if (drawerToggle.onOptionsItemSelected(item)) {
+      true
+    } else {
+      super.onOptionsItemSelected(item)
+    }
   }
 
   override def onPostCreate(bundle: Bundle) {
