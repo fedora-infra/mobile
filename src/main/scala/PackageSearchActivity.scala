@@ -149,6 +149,7 @@ class PackageSearchActivity extends NavDrawerActivity {
                           .asInstanceOf[ImageView]
                           .setImageBitmap(icon)
                       }
+                      notifyDataSetChanged
                     }
                     case Failure(error) => {
                       runOnUiThread {
@@ -157,6 +158,7 @@ class PackageSearchActivity extends NavDrawerActivity {
                           .asInstanceOf[ImageView]
                           .setImageResource(R.drawable.ic_search)
                       }
+                      notifyDataSetChanged
                     }
                   }
                 }
