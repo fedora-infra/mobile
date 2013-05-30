@@ -114,71 +114,71 @@ class PackageSearchActivity extends NavDrawerActivity {
           0,
           Map("search" -> query)))
 
-        future {
-          Source.fromURL(jsonURL).mkString
-        } onComplete { result =>
-          result match {
-            case Success(content) => {
-              val result = JsonParser(content.replaceAll("""<\/?.*?>""", "")).convertTo[APIResults[Package]]
-              val packages = result.rows.toArray
+      future {
+        Source.fromURL(jsonURL).mkString
+      } onComplete { result =>
+        result match {
+          case Success(content) => {
+            val result = JsonParser(content.replaceAll("""<\/?.*?>""", "")).convertTo[APIResults[Package]]
+            val packages = result.rows.toArray
 
-              class PackageAdapter(
-                context: Context,
-                resource: Int,
-                items: Array[Package])
-                extends ArrayAdapter[Package](context, resource, items) {
-                  override def getView(position: Int, convertView: View, parent: ViewGroup): View = {
-                    val pkg = getItem(position)
+            class PackageAdapter(
+              context: Context,
+              resource: Int,
+              items: Array[Package])
+              extends ArrayAdapter[Package](context, resource, items) {
+              override def getView(position: Int, convertView: View, parent: ViewGroup): View = {
+                val pkg = getItem(position)
 
-                    val layout = LayoutInflater.from(context)
-                      .inflate(R.layout.package_list_item, parent, false)
-                      .asInstanceOf[LinearLayout]
+                val layout = LayoutInflater.from(context)
+                  .inflate(R.layout.package_list_item, parent, false)
+                  .asInstanceOf[LinearLayout]
 
-                    getCachedIcon(pkg.icon) onComplete { result =>
-                      result match {
-                        case Success(icon) => {
-                          runOnUiThread {
-                            layout
-                              .findViewById(R.id.icon)
-                              .asInstanceOf[ImageView]
-                              .setImageBitmap(icon)
-                          }
-                        }
-                        case Failure(error) => {
-                          runOnUiThread {
-                            layout
-                              .findViewById(R.id.icon)
-                              .asInstanceOf[ImageView]
-                              .setImageResource(R.drawable.ic_search)
-                          }
-                        }
+                getCachedIcon(pkg.icon) onComplete { result =>
+                  result match {
+                    case Success(icon) => {
+                      runOnUiThread {
+                        layout
+                          .findViewById(R.id.icon)
+                          .asInstanceOf[ImageView]
+                          .setImageBitmap(icon)
                       }
                     }
-
-                    layout
-                      .findViewById(R.id.title)
-                      .asInstanceOf[TextView]
-                      .setText(pkg.name)
-
-                    layout
+                    case Failure(error) => {
+                      runOnUiThread {
+                        layout
+                          .findViewById(R.id.icon)
+                          .asInstanceOf[ImageView]
+                          .setImageResource(R.drawable.ic_search)
+                      }
+                    }
                   }
-              }
-
-              val adapter = new PackageAdapter(
-                this,
-                android.R.layout.simple_list_item_1,
-                packages)
-
-              runOnUiThread {
-                val packagesView = Option(findView(TR.packages))
-                packagesView match {
-                  case Some(packagesView) => packagesView.asInstanceOf[ListView].setAdapter(adapter)
-                  case None => // ...
                 }
+
+                layout
+                  .findViewById(R.id.title)
+                  .asInstanceOf[TextView]
+                  .setText(pkg.name)
+
+                layout
               }
             }
-            case Failure(e) => Toast.makeText(this, R.string.packages_search_failure, Toast.LENGTH_LONG).show
+
+            val adapter = new PackageAdapter(
+              this,
+              android.R.layout.simple_list_item_1,
+              packages)
+
+            runOnUiThread {
+              val packagesView = Option(findView(TR.packages))
+              packagesView match {
+                case Some(packagesView) => packagesView.asInstanceOf[ListView].setAdapter(adapter)
+                case None => // ...
+              }
+            }
           }
+          case Failure(e) => Toast.makeText(this, R.string.packages_search_failure, Toast.LENGTH_LONG).show
+        }
       }
     }
   }

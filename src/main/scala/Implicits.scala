@@ -15,8 +15,8 @@ package object Implicits {
     *
     * {{{
     * val et = new EditText(context).tap { obj =>
-    *  obj.setHint(R.string.hint)
-    *  obj.setSingleLine(true)
+    * obj.setHint(R.string.hint)
+    * obj.setSingleLine(true)
     * }
     * // et is now an EditText, but those setters have been invoked on it.
     * }}}
