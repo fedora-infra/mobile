@@ -5,6 +5,10 @@
     android:debuggable="true"
     android:theme="@android:style/Theme.Holo.Light">
 
+    <meta-data
+        android:name="android.app.default_searchable"
+        android:value=".PackageSearchActivity" />
+
     <activity android:name=".MainActivity">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
