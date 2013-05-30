@@ -4,22 +4,23 @@ import Implicits._
 
 import android.app.{ Activity, SearchManager }
 import android.content.{ Context, Intent }
-import android.graphics.BitmapFactory
+import android.graphics.{ Bitmap, BitmapFactory }
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.{ LayoutInflater, Menu, View, ViewGroup }
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.{ AdapterView, ArrayAdapter, ImageView, LinearLayout, ListView, TextView, Toast, SearchView }
 
 import spray.json._
-import java.net.{ URL, URLEncoder }
 
-import scala.concurrent.future
+import scala.concurrent.{ future, Future }
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 import scala.util.{ Failure, Try, Success }
 
-import java.io.InputStream
+import java.io.{ File, BufferedInputStream, BufferedOutputStream, FileInputStream, FileOutputStream, InputStream }
+import java.net.{ URL, URLEncoder }
 
 case class APIResults[T](
   visibleRows: Int,
@@ -69,6 +70,40 @@ class PackageSearchActivity extends NavDrawerActivity {
       URLEncoder.encode(json, "utf8")).mkString("/")
   }
 
+  /** Returns a [[Future[Bitmap]]] containing the icon for a package.
+    *
+    * This method will check to see if the image is cached. If it is, it will
+    * not bother making an HTTP request for the image. If it is not, it will
+    * get the image, save it to cache, then load it from cache.
+    *
+    * @param path The name of the image on the server (and in cache).
+    */
+  private def getCachedIcon(path: String): Future[Bitmap] = {
+    future {
+      val cache = getCacheDir
+      val iconsDir = new File(cache.toString + "/package_icons")
+      iconsDir.mkdir
+      val iconFile = new File(iconsDir.toString + "/" + path)
+      val inputStream = if (iconFile.exists) {
+        Log.v("PackageSearchActivity", "Icon pulled from cache.")
+        new BufferedInputStream(new FileInputStream(iconFile))
+      } else {
+        Log.v("PackageSearchActivity", "Icon pulled from HTTP.")
+        val url = new URL(s"https://apps.fedoraproject.org/packages/images/icons/${path}.png")
+          .getContent
+          .asInstanceOf[InputStream]
+        val outputStream = new BufferedOutputStream(new FileOutputStream(iconFile))
+        Iterator
+          .continually(url.read)
+          .takeWhile(-1 !=)
+          .foreach(outputStream.write)
+        outputStream.flush
+        url
+      }
+      BitmapFactory.decodeStream(inputStream)
+    }
+  }
+
   def handleIntent(intent: Intent) {
     if (intent.getAction == Intent.ACTION_SEARCH) {
       val query = intent.getStringExtra(SearchManager.QUERY)
@@ -99,10 +134,7 @@ class PackageSearchActivity extends NavDrawerActivity {
                       .inflate(R.layout.package_list_item, parent, false)
                       .asInstanceOf[LinearLayout]
 
-                    future {
-                      val url = new URL(s"https://apps.fedoraproject.org/packages/images/icons/${pkg.icon}.png")
-                      BitmapFactory.decodeStream(url.getContent.asInstanceOf[InputStream])
-                    } onComplete { result =>
+                    getCachedIcon(pkg.icon) onComplete { result =>
                       result match {
                         case Success(icon) => {
                           runOnUiThread {
