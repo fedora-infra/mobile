@@ -16,6 +16,7 @@ trait NavDrawerActivity extends FragmentActivity with TypedActivity {
   )
 
   override def onCreate(bundle: Bundle) {
+    System.setProperty("java.net.preferIPv4Stack", "true")
     super.onCreate(bundle)
     setContentView(R.layout.navdrawer)
   }
