@@ -106,6 +106,12 @@ class PackageSearchActivity extends NavDrawerActivity {
 
   def handleIntent(intent: Intent) {
     if (intent.getAction == Intent.ACTION_SEARCH) {
+
+      Option(findView(TR.packages)) match {
+        case Some(packagesListView) => packagesListView.asInstanceOf[ListView].setAdapter(null)
+        case None =>
+      }
+
       val query = intent.getStringExtra(SearchManager.QUERY)
       val jsonURL = constructURL(
         "xapian/query/search_packages",
