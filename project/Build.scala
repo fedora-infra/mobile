@@ -14,12 +14,11 @@ object General {
     platformName in Android := "android-17",
     resolvers             ++= Seq(
       "spray" at "http://repo.spray.io/",
-      "relrod @ FedoraPeople" at "http://codeblock.fedorapeople.org/maven/",
-      "sonatype pkgwat stage" at "https://oss.sonatype.org/content/repositories/meelrod-1001/"
+      "relrod @ FedoraPeople" at "http://codeblock.fedorapeople.org/maven/"
     ),
     libraryDependencies   ++= Seq(
       "org.fedorapeople.codeblock" %% "spray-json" % "1.2.5-SNAPSHOT",
-      "me.elrod" %% "pkgwat" % "1.0.1",
+      //"me.elrod" %% "pkgwat" % "1.0.0",
       "org.scalatest" %% "scalatest" % "1.9.1" % "test"
     ),
     scalacOptions         := Seq(
