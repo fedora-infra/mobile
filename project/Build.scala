@@ -13,10 +13,13 @@ object General {
     scalaVersion := "2.10.1",
     platformName in Android := "android-17",
     resolvers             ++= Seq(
-      "spray" at "http://repo.spray.io/"
+      "spray" at "http://repo.spray.io/",
+      "relrod @ FedoraPeople" at "http://codeblock.fedorapeople.org/maven/"
     ),
     libraryDependencies   ++= Seq(
-      "io.spray" %  "spray-json_2.10" % "1.2.4"
+      "org.fedorapeople.codeblock" %% "spray-json" % "1.2.5-SNAPSHOT",
+      "me.elrod" %% "pkgwat" % "1.0.0",
+      "org.scalatest" %% "scalatest" % "1.9.1" % "test"
     ),
     scalacOptions         := Seq(
       "-encoding", "utf8",
@@ -51,8 +54,7 @@ object General {
     proguardSettings ++
     AndroidManifestGenerator.settings ++
     AndroidMarketPublish.settings ++ Seq (
-      keyalias in Android := "change-me",
-      libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.1" % "test"
+      keyalias in Android := "change-me"
     )
 }
 
