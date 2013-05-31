@@ -84,9 +84,8 @@ class PackageSearchActivity extends NavDrawerActivity {
       val iconsDir = new File(cache.toString + "/package_icons")
       iconsDir.mkdir
       val iconFile = new File(iconsDir.toString + "/" + path)
-      val inputStream = if (iconFile.exists) {
-        Log.v("PackageSearchActivity", "Icon pulled from cache.")
-        new BufferedInputStream(new FileInputStream(iconFile))
+      if (iconFile.exists) {
+        Log.v("PackageSearchActivity", "Icon already cached.")
       } else {
         Log.v("PackageSearchActivity", "Icon pulled from HTTP.")
         val url = new URL(s"https://apps.fedoraproject.org/packages/images/icons/${path}.png")
@@ -98,8 +97,8 @@ class PackageSearchActivity extends NavDrawerActivity {
           .takeWhile(-1 !=)
           .foreach(outputStream.write)
         outputStream.flush
-        url
       }
+      val inputStream = new BufferedInputStream(new FileInputStream(iconFile))
       BitmapFactory.decodeStream(inputStream)
     }
   }
@@ -140,22 +139,20 @@ class PackageSearchActivity extends NavDrawerActivity {
                   .inflate(R.layout.package_list_item, parent, false)
                   .asInstanceOf[LinearLayout]
 
+                val iconView = layout
+                  .findViewById(R.id.icon)
+                  .asInstanceOf[ImageView]
+
                 getCachedIcon(pkg.icon) onComplete { result =>
                   result match {
                     case Success(icon) => {
                       runOnUiThread {
-                        layout
-                          .findViewById(R.id.icon)
-                          .asInstanceOf[ImageView]
-                          .setImageBitmap(icon)
+                        iconView.setImageBitmap(icon)
                       }
                     }
                     case Failure(error) => {
                       runOnUiThread {
-                        layout
-                          .findViewById(R.id.icon)
-                          .asInstanceOf[ImageView]
-                          .setImageResource(R.drawable.ic_search)
+                        iconView.setImageResource(R.drawable.ic_search)
                       }
                     }
                   }
