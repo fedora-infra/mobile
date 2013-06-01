@@ -5,6 +5,7 @@ import android.content.{ Context, Intent }
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.app.{ ActionBarDrawerToggle, FragmentActivity }
+import android.support.v4.view.GravityCompat
 import android.view.{ LayoutInflater, MenuItem, View, ViewGroup }
 import android.widget.{ AdapterView, ArrayAdapter, ImageView, LinearLayout, TextView }
 
@@ -41,7 +42,7 @@ trait NavDrawerActivity extends FragmentActivity with TypedActivity {
 
     val drawerList = findView(TR.left_drawer)
 
-    //drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+    drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
     getActionBar.setDisplayHomeAsUpEnabled(true);
     getActionBar.setHomeButtonEnabled(true);
