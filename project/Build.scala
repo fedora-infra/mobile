@@ -17,7 +17,7 @@ object General {
       "relrod @ FedoraPeople" at "http://codeblock.fedorapeople.org/maven/"
     ),
     libraryDependencies   ++= Seq(
-      "org.fedorapeople.codeblock" %% "spray-json" % "1.2.5-SNAPSHOT",
+      "io.spray" %% "spray-json" % "1.2.5",
       //"me.elrod" %% "pkgwat" % "1.0.0",
       "org.scalatest" %% "scalatest" % "1.9.1" % "test"
     ),
