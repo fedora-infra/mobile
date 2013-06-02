@@ -52,7 +52,7 @@ class PackageSearchActivity extends NavDrawerActivity {
 
   override def onCreate(bundle: Bundle) {
     super.onCreate(bundle)
-    setUpNav(R.layout.package_search)
+    setUpNav(R.layout.package_search_activity)
     handleIntent(getIntent())
   }
 

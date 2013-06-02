@@ -138,7 +138,7 @@ class StatusActivity extends NavDrawerActivity {
 
   override def onCreate(bundle: Bundle) {
     super.onCreate(bundle)
-    setUpNav(R.layout.statuses)
+    setUpNav(R.layout.status_activity)
     updateStatuses()
   }
 
