@@ -4,7 +4,7 @@
     <string name="open">Open</string>
     <string name="close">Close</string>
     <string name="refresh">Refresh</string>
-    <string name="loading">Loading...</string>
+    <string name="loading">Loading…</string>
 
     <string name="fedora_status">Fedora Status</string>
     <string name="status_good">Up and running</string>
