@@ -74,7 +74,15 @@ class PackageSearchActivity extends NavDrawerActivity {
     if (intent.getAction == Intent.ACTION_SEARCH) {
 
       Option(findView(TR.packages)) match {
-        case Some(packagesListView) => packagesListView.asInstanceOf[ListView].setAdapter(null)
+        case Some(packagesListView) => packagesListView.asInstanceOf[ListView].tap { obj =>
+          obj.setAdapter(null)
+          obj.setVisibility(View.GONE)
+        }
+        case None =>
+      }
+
+      Option(findView(TR.progress)) match {
+        case Some(progressBar) => progressBar.setVisibility(View.VISIBLE)
         case None =>
       }
 
@@ -140,10 +148,18 @@ class PackageSearchActivity extends NavDrawerActivity {
               packages)
 
             runOnUiThread {
+              Option(findView(TR.progress)) match {
+                case Some(progressBar) => progressBar.setVisibility(View.GONE)
+                case None =>
+              }
+            }
+
+            runOnUiThread {
               val packagesView = Option(findView(TR.packages)).map(_.asInstanceOf[ListView])
               packagesView match {
                 case Some(packagesView) => packagesView.tap { obj =>
                   obj.setAdapter(adapter)
+                  obj.setVisibility(View.VISIBLE)
                   obj.setOnItemClickListener(new OnItemClickListener {
                     def onItemClick(parent: AdapterView[_], view: View, position: Int, id: Long) {
                       val pkg = packages(position)
