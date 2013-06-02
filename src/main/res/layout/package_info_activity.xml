@@ -5,7 +5,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:padding="10dip"
+    android:padding="10dp"
     android:background="#dddddd">
 
   <LinearLayout
@@ -18,7 +18,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="15sp"
-        android:padding="10dip"
+        android:padding="10dp"
         android:textStyle="bold"
         android:text="@string/package_summary" />
 
@@ -31,7 +31,7 @@
         android:id="@+id/summary"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="10dip"
+        android:padding="10dp"
         android:textSize="15sp" />
   </LinearLayout>
 
@@ -40,13 +40,13 @@
       android:layout_height="wrap_content"
       android:background="#ffffff"
       android:orientation="vertical"
-      android:layout_marginTop="10dip">
+      android:layout_marginTop="10dp">
 
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="15sp"
-        android:padding="10dip"
+        android:padding="10dp"
         android:textStyle="bold"
         android:text="@string/description" />
 
@@ -59,7 +59,7 @@
         android:id="@+id/description"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="10dip"
+        android:padding="10dp"
         android:textSize="15sp" />
   </LinearLayout>
 

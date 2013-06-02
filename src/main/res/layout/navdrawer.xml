@@ -13,11 +13,11 @@
 
     <ListView
         android:id="@+id/left_drawer"
-        android:layout_width="240dip"
+        android:layout_width="240dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:divider="#444"
-        android:dividerHeight="0.5dip"
+        android:dividerHeight="0.5dp"
         android:background="#222"/>
 
 </android.support.v4.widget.DrawerLayout>

@@ -12,4 +12,4 @@
     android:textColor="#bbb"
     android:background="?android:attr/activatedBackgroundIndicator"
     android:minHeight="?android:attr/listPreferredItemHeightSmall"
-    android:drawablePadding="5dip" />
+    android:drawablePadding="5dp" />
