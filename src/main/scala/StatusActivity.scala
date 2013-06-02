@@ -23,13 +23,14 @@ case class StatusesResponse(
   global_verbose_status: String,
   services: Map[String, Map[String, String]])
 
-object MyJsonProtocol extends DefaultJsonProtocol {
-  implicit val f = jsonFormat4(StatusesResponse.apply)
-}
-
-import MyJsonProtocol._
-
 class StatusActivity extends NavDrawerActivity {
+
+  object StatusJsonProtocol extends DefaultJsonProtocol {
+    implicit val f = jsonFormat4(StatusesResponse.apply)
+  }
+
+  import StatusJsonProtocol._
+
   private def updateStatuses() {
     future {
       Source.fromURL("http://status.fedoraproject.org/statuses.json").mkString
