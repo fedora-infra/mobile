@@ -1,5 +1,7 @@
 package org.fedoraproject.mobile
 
+import Implicits._
+
 import android.app.Activity
 import android.content.{ Context, Intent }
 import android.content.res.Configuration
@@ -59,17 +61,12 @@ trait NavDrawerActivity extends FragmentActivity with TypedActivity {
 
         val layout = LayoutInflater.from(context)
           .inflate(R.layout.drawer_list_item, parent, false)
-          .asInstanceOf[LinearLayout]
-
-        layout
-          .findViewById(R.id.icon)
-          .asInstanceOf[ImageView]
-          .setImageResource(value._2)
-
-        layout
-          .findViewById(R.id.title)
           .asInstanceOf[TextView]
-          .setText(key)
+
+        layout.tap { obj =>
+          obj.setCompoundDrawablesWithIntrinsicBounds(value._2, 0, 0, 0)
+          obj.setText(key)
+        }
 
         layout
       }
