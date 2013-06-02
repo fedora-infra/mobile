@@ -20,6 +20,9 @@
         android:name=".StatusActivity"
         android:label="@string/fedora_status" />
 
+    <activity android:name=".PackageInfoActivity" />
+
+
     <activity
         android:name=".PackageSearchActivity"
         android:launchMode="singleTop">

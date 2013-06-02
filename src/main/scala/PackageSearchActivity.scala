@@ -70,39 +70,6 @@ class PackageSearchActivity extends NavDrawerActivity {
       URLEncoder.encode(json, "utf8")).mkString("/")
   }
 
-  /** Returns a [[Future[Bitmap]]] containing the icon for a package.
-    *
-    * This method will check to see if the image is cached. If it is, it will
-    * not bother making an HTTP request for the image. If it is not, it will
-    * get the image, save it to cache, then load it from cache.
-    *
-    * @param path The name of the image on the server (and in cache).
-    */
-  private def getCachedIcon(path: String): Future[Bitmap] = {
-    future {
-      val cache = getCacheDir
-      val iconsDir = new File(cache.toString + "/package_icons")
-      iconsDir.mkdir
-      val iconFile = new File(iconsDir.toString + "/" + path)
-      if (iconFile.exists) {
-        Log.v("PackageSearchActivity", "Icon already cached.")
-      } else {
-        Log.v("PackageSearchActivity", "Icon pulled from HTTP.")
-        val url = new URL(s"https://apps.fedoraproject.org/packages/images/icons/${path}.png")
-          .getContent
-          .asInstanceOf[InputStream]
-        val outputStream = new BufferedOutputStream(new FileOutputStream(iconFile))
-        Iterator
-          .continually(url.read)
-          .takeWhile(-1 !=)
-          .foreach(outputStream.write)
-        outputStream.flush
-      }
-      val inputStream = new BufferedInputStream(new FileInputStream(iconFile))
-      BitmapFactory.decodeStream(inputStream)
-    }
-  }
-
   def handleIntent(intent: Intent) {
     if (intent.getAction == Intent.ACTION_SEARCH) {
 
@@ -143,7 +110,7 @@ class PackageSearchActivity extends NavDrawerActivity {
                   .findViewById(R.id.icon)
                   .asInstanceOf[ImageView]
 
-                getCachedIcon(pkg.icon) onComplete { result =>
+                Cache.getPackageIcon(PackageSearchActivity.this, pkg.icon) onComplete { result =>
                   result match {
                     case Success(icon) => {
                       runOnUiThread {
@@ -173,9 +140,19 @@ class PackageSearchActivity extends NavDrawerActivity {
               packages)
 
             runOnUiThread {
-              val packagesView = Option(findView(TR.packages))
+              val packagesView = Option(findView(TR.packages)).map(_.asInstanceOf[ListView])
               packagesView match {
-                case Some(packagesView) => packagesView.asInstanceOf[ListView].setAdapter(adapter)
+                case Some(packagesView) => packagesView.tap { obj =>
+                  obj.setAdapter(adapter)
+                  obj.setOnItemClickListener(new OnItemClickListener {
+                    def onItemClick(parent: AdapterView[_], view: View, position: Int, id: Long) {
+                      val pkg = packages(position)
+                      val intent = new Intent(PackageSearchActivity.this, classOf[PackageInfoActivity])
+                      intent.putExtra("package", pkg)
+                      startActivity(intent)
+                    }
+                  })
+                }
                 case None => // ...
               }
             }

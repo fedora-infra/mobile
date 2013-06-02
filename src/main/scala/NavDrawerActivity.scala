@@ -39,10 +39,11 @@ trait NavDrawerActivity extends FragmentActivity with TypedActivity {
       .beginTransaction
       .replace(R.id.content_frame, fragment)
       .commit
+    getSupportFragmentManager.executePendingTransactions
 
     val drawerList = findView(TR.left_drawer)
 
-    drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+    drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START)
 
     getActionBar.setDisplayHomeAsUpEnabled(true);
     getActionBar.setHomeButtonEnabled(true);
