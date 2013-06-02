@@ -2,7 +2,6 @@ package org.fedoraproject.mobile
 
 import Implicits._
 
-import android.app.Activity
 import android.content.Context
 import android.graphics.{ Color, PorterDuff }
 import android.os.Bundle

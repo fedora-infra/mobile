@@ -4,10 +4,7 @@ import Implicits._
 
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
-import android.widget.TextView
 
-import scala.io.Source
-import scala.concurrent.future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{ Failure, Try, Success }
 

@@ -2,12 +2,9 @@ package org.fedoraproject.mobile
 
 import Implicits._
 
-import android.app.{ Activity, SearchManager }
+import android.app.SearchManager
 import android.content.{ Context, Intent }
-import android.graphics.{ Bitmap, BitmapFactory }
-import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
 import android.view.{ LayoutInflater, Menu, View, ViewGroup }
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.{ AdapterView, ArrayAdapter, ImageView, LinearLayout, ListView, TextView, Toast, SearchView }
@@ -19,8 +16,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 import scala.util.{ Failure, Try, Success }
 
-import java.io.{ File, BufferedInputStream, BufferedOutputStream, FileInputStream, FileOutputStream, InputStream }
-import java.net.{ URL, URLEncoder }
+import java.net.URLEncoder
 
 case class APIResults[T](
   visibleRows: Int,

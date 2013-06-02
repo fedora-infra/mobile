@@ -2,7 +2,6 @@ package org.fedoraproject.mobile
 
 import Implicits._
 
-import android.app.Activity
 import android.content.{ Context, Intent }
 import android.content.res.Configuration
 import android.os.Bundle
