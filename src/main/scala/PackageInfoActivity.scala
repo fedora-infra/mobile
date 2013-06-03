@@ -41,13 +41,15 @@ class PackageInfoActivity extends NavDrawerActivity {
 
     pkg.develOwner match {
       case Some(owner) => {
+        val ownerView = findView(TR.owner)
+        ownerView.setText(owner)
         Cache.getGravatar(
           this,
           Hashing.md5.hashBytes(s"$owner@fedoraproject.org".getBytes("utf8")).toString).onComplete { result =>
             result match {
               case Success(gravatar) => {
                 runOnUiThread {
-                  findView(TR.owner_icon).setImageBitmap(gravatar)
+                  ownerView.setCompoundDrawablesWithIntrinsicBounds(new BitmapDrawable(getResources, gravatar), null, null, null)
                 }
               }
               case _ =>
