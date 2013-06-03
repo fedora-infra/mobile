@@ -8,6 +8,8 @@ import android.os.Bundle
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{ Failure, Try, Success }
 
+import com.google.common.hash.Hashing
+
 class PackageInfoActivity extends NavDrawerActivity {
   override def onPostCreate(bundle: Bundle) {
     super.onPostCreate(bundle)
@@ -36,5 +38,23 @@ class PackageInfoActivity extends NavDrawerActivity {
 
     findView(TR.summary).setText(pkg.summary)
     findView(TR.description).setText(pkg.description.replaceAll("\n", " "))
+
+    pkg.develOwner match {
+      case Some(owner) => {
+        Cache.getGravatar(
+          this,
+          Hashing.md5.hashBytes(s"$owner@fedoraproject.org".getBytes("utf8")).toString).onComplete { result =>
+            result match {
+              case Success(gravatar) => {
+                runOnUiThread {
+                  findView(TR.owner_icon).setImageBitmap(gravatar)
+                }
+              }
+              case _ =>
+            }
+        }
+      }
+      case None =>
+    }
   }
 }

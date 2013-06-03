@@ -19,6 +19,7 @@ object General {
     libraryDependencies   ++= Seq(
       "io.spray" %% "spray-json" % "1.2.5",
       //"me.elrod" %% "pkgwat" % "1.0.0",
+      "com.google.guava" % "guava" % "14.0.1",
       "org.scalatest" %% "scalatest" % "1.9.1" % "test"
     ),
     scalacOptions         := Seq(
