@@ -1,97 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:padding="10dp"
-    android:background="#dddddd">
+    android:background="#dddddd"
+    android:padding="10dp">
 
   <LinearLayout
       android:layout_width="fill_parent"
-      android:layout_height="wrap_content"
-      android:background="#ffffff"
-      android:orientation="vertical"
-      android:layout_marginTop="10dp">
+      android:layout_height="fill_parent"
+      android:orientation="vertical">
 
-    <TextView
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="15sp"
-        android:padding="10dp"
-        android:textStyle="bold"
-        android:text="Package owner" />
+        android:background="#ffffff"
+        android:orientation="vertical">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="#cccccc" />
+      <TextView
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:textSize="15sp"
+          android:padding="10dp"
+          android:textStyle="bold"
+          android:text="Package owner" />
 
-    <TextView
-        android:id="@+id/owner"
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="0.5dp"
+          android:background="#cccccc" />
+
+      <TextView
+          android:id="@+id/owner"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:textSize="15sp"
+          android:padding="10dp"
+          android:textStyle="bold"
+          android:drawablePadding="5dp" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="15sp"
-        android:padding="10dp"
-        android:textStyle="bold"
-        android:drawablePadding="5dp" />
+        android:background="#ffffff"
+        android:orientation="vertical"
+        android:layout_marginTop="10dp">
+
+      <TextView
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:textSize="15sp"
+          android:padding="10dp"
+          android:textStyle="bold"
+          android:text="@string/package_summary" />
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="0.5dp"
+          android:background="#cccccc" />
+
+      <TextView
+          android:id="@+id/summary"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:padding="10dp"
+          android:textSize="15sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="#ffffff"
+        android:orientation="vertical"
+        android:layout_marginTop="10dp">
+
+      <TextView
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:textSize="15sp"
+          android:padding="10dp"
+          android:textStyle="bold"
+          android:text="@string/description" />
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="0.5dp"
+          android:background="#cccccc" />
+
+      <TextView
+          android:id="@+id/description"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:padding="10dp"
+          android:textSize="15sp" />
+    </LinearLayout>
+
   </LinearLayout>
 
-  <LinearLayout
-      android:layout_width="fill_parent"
-      android:layout_height="wrap_content"
-      android:background="#ffffff"
-      android:orientation="vertical"
-      android:layout_marginTop="10dp">
-
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textSize="15sp"
-        android:padding="10dp"
-        android:textStyle="bold"
-        android:text="@string/package_summary" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="#cccccc" />
-
-    <TextView
-        android:id="@+id/summary"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:textSize="15sp" />
-  </LinearLayout>
-
-  <LinearLayout
-      android:layout_width="fill_parent"
-      android:layout_height="wrap_content"
-      android:background="#ffffff"
-      android:orientation="vertical"
-      android:layout_marginTop="10dp">
-
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textSize="15sp"
-        android:padding="10dp"
-        android:textStyle="bold"
-        android:text="@string/description" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="#cccccc" />
-
-    <TextView
-        android:id="@+id/description"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:textSize="15sp" />
-  </LinearLayout>
-
-</LinearLayout>
+</ScrollView>
