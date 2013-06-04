@@ -8,8 +8,8 @@
     android:textAppearance="?android:attr/textAppearanceListItemSmall"
     android:gravity="center_vertical"
     android:paddingRight="16dp"
-    android:paddingLeft="5dp"
+    android:paddingLeft="10dp"
     android:textColor="#bbb"
     android:background="?android:attr/activatedBackgroundIndicator"
     android:minHeight="?android:attr/listPreferredItemHeightSmall"
-    android:drawablePadding="5dp" />
+    android:drawablePadding="10dp" />
