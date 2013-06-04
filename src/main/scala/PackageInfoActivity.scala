@@ -1,6 +1,7 @@
 package org.fedoraproject.mobile
 
 import Implicits._
+import JSONParsing._
 
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
