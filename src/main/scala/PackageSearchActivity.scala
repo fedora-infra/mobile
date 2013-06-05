@@ -31,15 +31,6 @@ class PackageSearchActivity extends NavDrawerActivity {
     handleIntent(intent)
   }
 
-  private def constructURL(path: String, query: FilteredQuery): String = {
-    val json = query.toJson.compactPrint
-    Seq(
-      "https://apps.fedoraproject.org/packages/",
-      "fcomm_connector",
-      path,
-      URLEncoder.encode(json, "utf8")).mkString("/")
-  }
-
   def handleIntent(intent: Intent) {
     if (intent.getAction == Intent.ACTION_SEARCH) {
 

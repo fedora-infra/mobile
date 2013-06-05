@@ -3,10 +3,17 @@ package org.fedoraproject.mobile
 import Implicits._
 import JSONParsing._
 
+import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
+import android.view.View
+import android.widget.{ TableRow, TextView, Toast }
 
+import spray.json._
+
+import scala.concurrent.future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.io.Source
 import scala.util.{ Failure, Try, Success }
 
 import com.google.common.hash.Hashing
@@ -59,5 +66,77 @@ class PackageInfoActivity extends NavDrawerActivity {
       }
       case None =>
     }
+
+    val jsonURL = constructURL(
+      "bodhi/query/query_active_releases",
+      FilteredQuery(
+        20,
+        0,
+        Map("package" -> pkg.name)))
+
+      future {
+        Source.fromURL(jsonURL).mkString
+      } onComplete { result =>
+
+        runOnUiThread {
+          findView(TR.progress).setVisibility(View.GONE)
+        }
+
+        result match {
+          case Success(content) => {
+            // This is *really* hacky, but blocked on
+            // https://github.com/fedora-infra/fedora-packages/issues/24.
+            // The issue is that right now Fedora Packages (the app)'s API
+            // returns strings of HTML in some of its responses. We have to
+            // strip out the HTML in most cases, but in one case here, we
+            // want to use the HTML to split on, so that we can nuke the karma
+            // that we also get back in testing_version, since we only care
+            // about the version number. Ideally we'd actually get an object
+            // back in JSON, and we could split that into a Version object
+            // locally, here in Scala-land. This object would have: version,
+            // karma, and karma_icon. But for now, life isn't ideal.
+            def stripHTML(s: String) = s.replaceAll("""<\/?.*?>""", "")
+
+            val result = JsonParser(content).convertTo[APIResults[Release]]
+
+            val releasesTable = findView(TR.releases)
+
+            val header = new TableRow(this)
+
+            header.addView(
+              new TextView(this).tap { obj =>
+                obj.setText(R.string.release)
+                obj.setTypeface(null, Typeface.BOLD)
+              })
+
+              header.addView(
+              new TextView(this).tap { obj =>
+                obj.setText(R.string.stable)
+                obj.setTypeface(null, Typeface.BOLD)
+              })
+
+            header.addView(
+              new TextView(this).tap { obj =>
+                obj.setText(R.string.testing)
+                obj.setTypeface(null, Typeface.BOLD)
+              })
+
+            runOnUiThread {
+              releasesTable.addView(header)
+            }
+
+            result.rows.foreach { release =>
+              val row = new TableRow(this)
+              row.addView(new TextView(this).tap(_.setText(stripHTML(release.release))))
+              row.addView(new TextView(this).tap(_.setText(stripHTML(release.stableVersion))))
+              row.addView(new TextView(this).tap(_.setText(stripHTML(release.testingVersion.split("<div").head)))) // HACK
+              runOnUiThread {
+                releasesTable.addView(row)
+              }
+            }
+          }
+          case Failure(error) => Toast.makeText(this, R.string.packages_release_failure, Toast.LENGTH_LONG).show
+        }
+      }
   }
 }

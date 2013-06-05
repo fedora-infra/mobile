@@ -14,6 +14,12 @@
 
     <string name="packages_search_hint">Search Packages</string>
     <string name="packages_search_failure">An issue occurred while searching.</string>
+
+    <string name="packages_release_failure">An issue occurred while looking up release information.</string>
+    <string name="release">Release</string>
+    <string name="stable">Stable</string>
+    <string name="testing">Testing</string>
     <string name="package_summary">Package summary</string>
     <string name="description">Description</string>
+    <string name="package_versions">Package Versions</string>
 </resources>

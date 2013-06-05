@@ -12,6 +12,7 @@
       android:layout_height="fill_parent"
       android:orientation="vertical">
 
+    <!-- Package Owner -->
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -41,6 +42,7 @@
           android:drawablePadding="5dp" />
     </LinearLayout>
 
+    <!-- Package Summary -->
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -69,6 +71,7 @@
           android:textSize="15sp" />
     </LinearLayout>
 
+    <!-- Package Description -->
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -95,6 +98,44 @@
           android:layout_height="wrap_content"
           android:padding="10dp"
           android:textSize="15sp" />
+    </LinearLayout>
+
+    <!-- Package Versions -->
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="#ffffff"
+        android:orientation="vertical"
+        android:layout_marginTop="10dp">
+
+      <TextView
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:textSize="15sp"
+          android:padding="10dp"
+          android:textStyle="bold"
+          android:text="Releases in Fedora/EPEL" />
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="0.5dp"
+          android:background="#cccccc" />
+
+      <ProgressBar
+          android:id="@+id/progress"
+          style="?android:attr/progressBarStyleLarge"
+          android:layout_width="wrap_content"
+          android:layout_height="fill_parent"
+          android:layout_gravity="center" />
+
+      <TableLayout
+          android:id="@+id/releases"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:padding="10dp"
+          android:stretchColumns="*" />
+
     </LinearLayout>
 
   </LinearLayout>
