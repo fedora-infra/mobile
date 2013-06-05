@@ -1,6 +1,8 @@
 import sbt._
 import Keys._
-import AndroidKeys._
+
+import sbtandroid._
+import sbtandroid.AndroidKeys._
 
 import scalariform.formatter.preferences._
 import com.typesafe.sbt.SbtScalariform._
