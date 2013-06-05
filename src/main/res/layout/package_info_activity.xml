@@ -16,7 +16,7 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="#ffffff"
+        android:background="@drawable/drop_shadow"
         android:orientation="vertical">
 
       <TextView
@@ -46,7 +46,7 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="#ffffff"
+        android:background="@drawable/drop_shadow"
         android:orientation="vertical"
         android:layout_marginTop="10dp">
 
@@ -75,7 +75,7 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="#ffffff"
+        android:background="@drawable/drop_shadow"
         android:orientation="vertical"
         android:layout_marginTop="10dp">
 
@@ -104,7 +104,7 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="#ffffff"
+        android:background="@drawable/drop_shadow"
         android:orientation="vertical"
         android:layout_marginTop="10dp">
 
