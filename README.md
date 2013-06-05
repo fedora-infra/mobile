@@ -121,18 +121,6 @@ $ANDROID_HOME/tools/android
 Once it comes up, select at least everything under API Level 11 and API Level
 17, and click Install. This will take some time.
 
-## Make some symlinks
-
-The latest SDK moved some tools around and the build tools and plugins that we
-use aren't aware of the change yet. A way to work around this is to do the
-following:
-
-```
-ln -s $ANDROID_HOME/build-tools/17.0.0/{aapt,aidl,dx,lib} $ANDROID_HOME/platform-tools/
-```
-
-As of right now, the compile **will not work** until those symlinks are made. :(
-
 ## The Emulator
 
 Android provides a nice emulator that we can use for testing the app as we
