@@ -79,7 +79,7 @@ class PackageInfoActivity extends NavDrawerActivity {
       } onComplete { result =>
 
         runOnUiThread {
-          findView(TR.progress).setVisibility(View.GONE)
+          Option(findView(TR.progress)).map(_.setVisibility(View.GONE))
         }
 
         result match {
