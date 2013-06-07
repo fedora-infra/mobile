@@ -12,7 +12,7 @@ object General {
     name := "Fedora Mobile",
     version := "0.1",
     versionCode := 0,
-    scalaVersion := "2.10.1",
+    scalaVersion := "2.10.2",
     platformName in Android := "android-17",
     resolvers             ++= Seq(
       "spray" at "http://repo.spray.io/",
