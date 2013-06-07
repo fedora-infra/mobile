@@ -34,18 +34,14 @@ class PackageSearchActivity extends NavDrawerActivity {
   def handleIntent(intent: Intent) {
     if (intent.getAction == Intent.ACTION_SEARCH) {
 
-      Option(findView(TR.packages)) match {
-        case Some(packagesListView) => packagesListView.asInstanceOf[ListView].tap { obj =>
+      Option(findView(TR.packages)).map {
+        _.tap { obj =>
           obj.setAdapter(null)
           obj.setVisibility(View.GONE)
         }
-        case None =>
       }
 
-      Option(findView(TR.progress)) match {
-        case Some(progressBar) => progressBar.setVisibility(View.VISIBLE)
-        case None =>
-      }
+      Option(findView(TR.progress)).map(_.setVisibility(View.VISIBLE))
 
       val query = intent.getStringExtra(SearchManager.QUERY)
       val jsonURL = constructURL(
@@ -109,10 +105,7 @@ class PackageSearchActivity extends NavDrawerActivity {
               packages)
 
             runOnUiThread {
-              Option(findView(TR.progress)) match {
-                case Some(progressBar) => progressBar.setVisibility(View.GONE)
-                case None =>
-              }
+              Option(findView(TR.progress)).map(_.setVisibility(View.GONE))
             }
 
             runOnUiThread {
