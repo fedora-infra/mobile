@@ -99,7 +99,7 @@ class PackageInfoActivity extends NavDrawerActivity {
 
             val result = JsonParser(content).convertTo[APIResults[Release]]
 
-            val releasesTable = findView(TR.releases)
+            val releasesTable = Option(findView(TR.releases))
 
             val header = new TableRow(this)
 
@@ -109,7 +109,7 @@ class PackageInfoActivity extends NavDrawerActivity {
                 obj.setTypeface(null, Typeface.BOLD)
               })
 
-              header.addView(
+            header.addView(
               new TextView(this).tap { obj =>
                 obj.setText(R.string.stable)
                 obj.setTypeface(null, Typeface.BOLD)
@@ -122,7 +122,7 @@ class PackageInfoActivity extends NavDrawerActivity {
               })
 
             runOnUiThread {
-              releasesTable.addView(header)
+              releasesTable.map(_.addView(header))
             }
 
             result.rows.foreach { release =>
@@ -131,7 +131,7 @@ class PackageInfoActivity extends NavDrawerActivity {
               row.addView(new TextView(this).tap(_.setText(stripHTML(release.stableVersion))))
               row.addView(new TextView(this).tap(_.setText(stripHTML(release.testingVersion.split("<div").head)))) // HACK
               runOnUiThread {
-                releasesTable.addView(row)
+                releasesTable.map(_.addView(row))
               }
             }
           }
