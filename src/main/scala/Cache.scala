@@ -75,11 +75,11 @@ object Cache {
     md5sum: String,
     size: Int = 64,
     default: String = "https://fedoraproject.org/static/images/fedora_infinity_64x64.png"): Future[Bitmap] = {
-      val defaultEncoded = URLEncoder.encode(default, "utf8")
-      cacheImage(
-        context,
-        new URL(s"https://secure.gravatar.com/avatar/$md5sum?s=$size&d=$defaultEncoded"),
-        "gravatar",
-        md5sum)
+    val defaultEncoded = URLEncoder.encode(default, "utf8")
+    cacheImage(
+      context,
+      new URL(s"https://secure.gravatar.com/avatar/$md5sum?s=$size&d=$defaultEncoded"),
+      "gravatar",
+      md5sum)
   }
 }
