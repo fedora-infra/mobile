@@ -1,25 +1,30 @@
 <resources>
-    <string name="app_name">Fedora Mobile</string>
-    <string name="search">Search</string>
-    <string name="open">Open</string>
-    <string name="close">Close</string>
-    <string name="refresh">Refresh</string>
-    <string name="loading">Loading…</string>
+  <!-- Navigation Drawer -->
+  <string name="infrastructure_status">Infrastructure Status</string>
+  <string name="package_search">Package Search</string>
+  <string name="upcoming_events">Upcoming Events</string>
 
-    <string name="fedora_status">Fedora Status</string>
-    <string name="status_good">Up and running</string>
-    <string name="status_minor">Minor issue</string>
-    <string name="status_major">Major issue</string>
-    <string name="status_failure">An issue occurred while obtaining status information.</string>
+  <string name="app_name">Fedora Mobile</string>
+  <string name="search">Search</string>
+  <string name="open">Open</string>
+  <string name="close">Close</string>
+  <string name="refresh">Refresh</string>
+  <string name="loading">Loading…</string>
 
-    <string name="packages_search_hint">Search Packages</string>
-    <string name="packages_search_failure">An issue occurred while searching.</string>
+  <string name="fedora_status">Fedora Status</string>
+  <string name="status_good">Up and running</string>
+  <string name="status_minor">Minor issue</string>
+  <string name="status_major">Major issue</string>
+  <string name="status_failure">An issue occurred while obtaining status information.</string>
 
-    <string name="packages_release_failure">An issue occurred while looking up release information.</string>
-    <string name="release">Release</string>
-    <string name="stable">Stable</string>
-    <string name="testing">Testing</string>
-    <string name="package_summary">Package summary</string>
-    <string name="description">Description</string>
-    <string name="package_versions">Package Versions</string>
+  <string name="packages_search_hint">Search Packages</string>
+  <string name="packages_search_failure">An issue occurred while searching.</string>
+
+  <string name="packages_release_failure">An issue occurred while looking up release information.</string>
+  <string name="release">Release</string>
+  <string name="stable">Stable</string>
+  <string name="testing">Testing</string>
+  <string name="package_summary">Package summary</string>
+  <string name="description">Description</string>
+  <string name="package_versions">Package Versions</string>
 </resources>

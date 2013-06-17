@@ -12,10 +12,12 @@ import android.widget.{ AdapterView, ArrayAdapter, ImageView, LinearLayout, Text
 
 trait NavDrawerActivity extends FragmentActivity with TypedActivity {
 
-  val navMap = Map(
-    "Infrastructure Status" -> (classOf[StatusActivity], R.drawable.ic_status),
-    "Package Search" -> (classOf[PackageSearchActivity], R.drawable.ic_search),
-    "Upcoming Events" -> (classOf[FedocalActivity], R.drawable.ic_fedocal)
+  // This must be lazy because we won't have an activity initialized yet, and
+  // our resources will be null.
+  lazy val navMap = Map(
+    getString(R.string.infrastructure_status) -> (classOf[StatusActivity], R.drawable.ic_status),
+    getString(R.string.package_search) -> (classOf[PackageSearchActivity], R.drawable.ic_search),
+    getString(R.string.upcoming_events) -> (classOf[FedocalActivity], R.drawable.ic_fedocal)
   )
 
   override def onCreate(bundle: Bundle) {
