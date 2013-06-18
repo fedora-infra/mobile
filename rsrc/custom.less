@@ -22,12 +22,12 @@ h1, h2, h3, h4, h5 {
     margin: 0;
     padding: 0;
     color: #0084c8;
-    font-family: 'Overpass', 'Open Sans', sans-serif;
+    font-family: 'Proxima Nova', 'proxima-nova', 'Overpass', 'Open Sans', sans-serif;
     letter-spacing: -2px;
 }
 
 body {
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Proxima Nova Condensed', 'proxima-nova-condensed', 'Open Sans', sans-serif;
 }
 
 .navbar {
@@ -58,15 +58,31 @@ body {
     .fm-download-link a {
         font-size: 1.5em;
         color: #f8f8f8 !important;
-        background-color:rgba(0,0,0,0.7);
-        color: #f8f8f8;
         padding: 15px;
         border-radius: 8px;
         text-shadow: none;
+        background-color: #005d7f;
+        /*float: left;
 
-        &:hover { text-decoration: none; }
+        &:first-child {
+            border-top-right-radius: 0 0;
+            border-bottom-right-radius: 0 0;
+            background-color: #005d7f;
+        }
+
+        &:last-child {
+            border-top-left-radius: 0 0;
+            border-bottom-left-radius: 0 0;
+            background-color: #db6700;
+        }*/
+
+        &:hover {
+            text-decoration: none;
+        }
     }
 }
+
+.fm-push25 { margin-top: 25px; }
 
 .section {
     padding: 100px 0;
