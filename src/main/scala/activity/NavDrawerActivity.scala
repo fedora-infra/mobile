@@ -17,7 +17,8 @@ trait NavDrawerActivity extends FragmentActivity with TypedActivity {
   lazy val navMap = Map(
     getString(R.string.infrastructure_status) -> (classOf[StatusActivity], R.drawable.ic_status),
     getString(R.string.package_search) -> (classOf[PackageSearchActivity], R.drawable.ic_search),
-    getString(R.string.upcoming_events) -> (classOf[FedocalActivity], R.drawable.ic_fedocal)
+    getString(R.string.upcoming_events) -> (classOf[FedocalActivity], R.drawable.ic_fedocal),
+    getString(R.string.fedmsg_gcm_demo) -> (classOf[GCMDemoActivity], R.drawable.ic_fedmsg)
   )
 
   override def onCreate(bundle: Bundle) {

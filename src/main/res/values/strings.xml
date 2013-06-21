@@ -3,6 +3,7 @@
   <string name="infrastructure_status">Infrastructure Status</string>
   <string name="package_search">Package Search</string>
   <string name="upcoming_events">Upcoming Events</string>
+  <string name="fedmsg_gcm_demo">Fedmsg GCM Demo (horrible)</string>
 
   <string name="app_name">Fedora Mobile</string>
   <string name="search">Search</string>
@@ -10,6 +11,7 @@
   <string name="close">Close</string>
   <string name="refresh">Refresh</string>
   <string name="loading">Loading…</string>
+  <string name="submit">Submit</string>
 
   <string name="fedora_status">Fedora Status</string>
   <string name="status_good">Up and running</string>
