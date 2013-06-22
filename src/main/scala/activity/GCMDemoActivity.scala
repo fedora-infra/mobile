@@ -33,17 +33,15 @@ class GCMDemoActivity extends NavDrawerActivity {
   }
 
   // POSTing is so much fun with Java's stdlib.
-  private def sprungeRegistrationId(id: String): Future[String] = {
-    future {
-      val connection = new URL("http://sprunge.us/").openConnection.asInstanceOf[HttpURLConnection]
-      connection setDoOutput true
-      connection setRequestMethod "POST"
-      val os = new DataOutputStream(connection.getOutputStream)
-      val encodedID = URLEncoder.encode(id, "utf8")
-      os.writeBytes(s"sprunge=${encodedID}")
-      os.close
-      CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
-    }
+  private def sprungeRegistrationId(id: String): Future[String] = future {
+    val connection = new URL("http://sprunge.us/").openConnection.asInstanceOf[HttpURLConnection]
+    connection setDoOutput true
+    connection setRequestMethod "POST"
+    val os = new DataOutputStream(connection.getOutputStream)
+    val encodedID = URLEncoder.encode(id, "utf8")
+    os.writeBytes(s"sprunge=${encodedID}")
+    os.close
+    CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
   }
 
   def register(view: View): Unit = {
