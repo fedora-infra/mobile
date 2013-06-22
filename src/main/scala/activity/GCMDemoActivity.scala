@@ -9,11 +9,11 @@ import android.widget.Toast
 import com.google.android.gms.gcm.GoogleCloudMessaging
 import com.google.common.io.CharStreams
 
-import scala.concurrent.{Future, future}
+import scala.concurrent.{ Future, future }
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import java.io.{DataOutputStream, InputStreamReader}
-import java.net.{HttpURLConnection, URL, URLEncoder}
+import java.io.{ DataOutputStream, InputStreamReader }
+import java.net.{ HttpURLConnection, URL, URLEncoder }
 
 class GCMDemoActivity extends NavDrawerActivity {
   override def onPostCreate(bundle: Bundle) {
@@ -23,12 +23,14 @@ class GCMDemoActivity extends NavDrawerActivity {
     future {
       val gcm = GoogleCloudMessaging.getInstance(this)
       gcm.register("677116861562")
-    } onSuccess { case result =>
-      sprungeRegistrationId(result) onSuccess { case sprungeURL =>
-        runOnUiThread {
-          Toast.makeText(this, sprungeURL, Toast.LENGTH_LONG).show
+    } onSuccess {
+      case result =>
+        sprungeRegistrationId(result) onSuccess {
+          case sprungeURL =>
+            runOnUiThread {
+              Toast.makeText(this, sprungeURL, Toast.LENGTH_LONG).show
+            }
         }
-      }
     }
   }
 
