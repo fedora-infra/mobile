@@ -23,8 +23,8 @@
       android:id="@+id/sender_id" />
 
   <Button
-      android:layout_height="fill_parent"
-      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_width="fill_parent"
       android:text="@string/submit"
       android:onClick="register" />
 
