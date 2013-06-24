@@ -1,4 +1,4 @@
-@import url('http://fonts.googleapis.com/css?family=Open+Sans');
+@import url('http://fonts.googleapis.com/css?family=Open+Sans:400,300|Crimson+Text:400,400italic');
 
 @font-face {
     font-family: 'Overpass';
@@ -21,13 +21,15 @@ font-face {
 h1, h2, h3, h4, h5 {
     margin: 0;
     padding: 0;
-    color: #0084c8;
-    font-family: 'Proxima Nova', 'proxima-nova', 'Overpass', 'Open Sans', sans-serif;
+    color: #f8f8f8;
+    font-family: 'Open Sans', 'Overpass', sans-serif;
     letter-spacing: -2px;
+    font-weight: 300;
 }
 
 body {
-    font-family: 'Proxima Nova Condensed', 'proxima-nova-condensed', 'Open Sans', sans-serif;
+    font-family: 'Open Sans', sans-serif;
+    background-color: #e5554d;
 }
 
 .navbar {
@@ -43,7 +45,6 @@ body {
     background-color: #00BBFF;
     color: #f8f8f8;
     padding: 30px 0;
-    text-shadow: 2px 2px #888888;
 
     h1 {
         font-size: 4em;
@@ -88,6 +89,7 @@ body {
     padding: 100px 0;
     min-height: 300px;
     width: 100%;
+    color: #f8f8f8;
 
     p {
         font-size: 1.4em
@@ -98,19 +100,40 @@ body {
     }
 
     .darken {
-        background-color:rgba(0,0,0,0.7);
-        color: #f8f8f8;
+        background-color: rgba(0,0,0,0.7);
         padding: 15px;
         border-radius: 8px;
     }
 
-    &.dark {
-        background-color: #333;
-        color: #f8f8f8;
+    p.quote {
+        font-family: 'Crimson Text', Georgia, serif;
+        text-align: center;
+        font-size: 3.5em;
+        font-style: italic;
+    }
+
+    p.attribute {
+        font-family: 'Crimson Text', Georgia, serif;
+        text-align: right;
+        font-size: 1.5em;
+        font-style: italic;
+    }
+
+    p.tldr {
+        font-style: italic;
+    }
+
+    &.dark { background-color: #34495e; }
+
+    &.light {
+        background-color: #ccc;
+        color: #555;
     }
 
     &.fm-community {
-        background: black url('/rsrc/images/community.jpg') center;
+        background: black url('/rsrc/images/community.jpg') fixed;
+        background-repeat: no-repeat;
+        background-size: cover;
     }
 }
 
@@ -118,4 +141,29 @@ body {
     -moz-box-shadow: 3px 3px 5px #000;
     -webkit-box-shadow: 3px 3px 5px #888;
     box-shadow: 3px 3px 5px #000;
+}
+
+.fm-separator {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    text-align: center;
+    font-size: 2em;
+
+    &:before, &:after {
+        position: absolute;
+        top: 51%;
+        overflow: hidden;
+        width: 50%;
+        height: 2px;
+        content: '\a0';
+        background-color: #f8f8f8;
+    }
+
+    &:before {
+        margin-left: -52%;
+        text-align: right;
+    }
+
+    &:after { margin-left: 2%; }
 }
