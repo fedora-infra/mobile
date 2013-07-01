@@ -4,7 +4,7 @@ import spray.json._
 
 import java.net.URLEncoder
 
-case class APIResults[T](
+case class PkgwatResults[T](
   visibleRows: Int,
   totalRows: Int,
   rowsPerPage: Int,
@@ -32,10 +32,10 @@ object JSONParsing extends DefaultJsonProtocol {
   implicit val filteredQueryFormat = jsonFormat(FilteredQuery, "rows_per_page", "start_row", "filters")
 
   implicit val packageFormat: JsonFormat[Package] = lazyFormat(jsonFormat(Package, "icon", "description", "link", "sub_pkgs", "summary", "name", "upstream_url", "devel_owner"))
-  implicit val packageResultFormat = jsonFormat(APIResults[Package], "visible_rows", "total_rows", "rows_per_page", "start_row", "rows")
+  implicit val packageResultFormat = jsonFormat(PkgwatResults[Package], "visible_rows", "total_rows", "rows_per_page", "start_row", "rows")
 
   implicit val releaseFormat = jsonFormat(Release, "release", "stable_version", "testing_version")
-  implicit val releaseResultFormat = jsonFormat(APIResults[Release], "visible_rows", "total_rows", "rows_per_page", "start_row", "rows")
+  implicit val releaseResultFormat = jsonFormat(PkgwatResults[Release], "visible_rows", "total_rows", "rows_per_page", "start_row", "rows")
 
   def constructURL(path: String, query: FilteredQuery): String = {
     val json = query.toJson.compactPrint

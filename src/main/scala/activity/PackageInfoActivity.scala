@@ -97,7 +97,7 @@ class PackageInfoActivity extends NavDrawerActivity {
           // karma, and karma_icon. But for now, life isn't ideal.
           def stripHTML(s: String) = s.replaceAll("""<\/?.*?>""", "")
 
-          val result = JsonParser(content).convertTo[APIResults[Release]]
+          val result = JsonParser(content).convertTo[PkgwatResults[Release]]
 
           val releasesTable = Option(findView(TR.releases))
 

@@ -56,7 +56,7 @@ class PackageSearchActivity extends NavDrawerActivity {
       } onComplete { result =>
         result match {
           case Success(content) => {
-            val result = JsonParser(content.replaceAll("""<\/?.*?>""", "")).convertTo[APIResults[Package]]
+            val result = JsonParser(content.replaceAll("""<\/?.*?>""", "")).convertTo[PkgwatResults[Package]]
             val packages = result.rows.toArray
 
             class PackageAdapter(
