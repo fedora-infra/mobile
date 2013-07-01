@@ -2,8 +2,8 @@ package org.fedoraproject.mobile
 
 import Implicits._
 
-import pkgwat._
-import pkgwat.JSONParsing._
+import Pkgwat._
+import Pkgwat.JSONParsing._
 
 import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
@@ -99,7 +99,7 @@ class PackageInfoActivity extends NavDrawerActivity {
           // karma, and karma_icon. But for now, life isn't ideal.
           def stripHTML(s: String) = s.replaceAll("""<\/?.*?>""", "")
 
-          val result = JsonParser(content).convertTo[pkgwat.APIResults[Release]]
+          val result = JsonParser(content).convertTo[Pkgwat.APIResults[Release]]
 
           val releasesTable = Option(findView(TR.releases))
 
