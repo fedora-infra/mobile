@@ -1,7 +1,9 @@
 package org.fedoraproject.mobile
 
 import Implicits._
-import JSONParsing._
+
+import pkgwat._
+import pkgwat.JSONParsing._
 
 import android.app.SearchManager
 import android.content.{ Context, Intent }
@@ -56,7 +58,7 @@ class PackageSearchActivity extends NavDrawerActivity {
       } onComplete { result =>
         result match {
           case Success(content) => {
-            val result = JsonParser(content.replaceAll("""<\/?.*?>""", "")).convertTo[PkgwatResults[Package]]
+            val result = JsonParser(content.replaceAll("""<\/?.*?>""", "")).convertTo[pkgwat.APIResults[Package]]
             val packages = result.rows.toArray
 
             class PackageAdapter(
