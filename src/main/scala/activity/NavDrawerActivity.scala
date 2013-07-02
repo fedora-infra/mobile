@@ -85,6 +85,7 @@ trait NavDrawerActivity extends FragmentActivity with TypedActivity {
       def onItemClick(parent: AdapterView[_], view: View, position: Int, id: Long) {
         val keys = navMap.keys.toArray
         val intent = new Intent(NavDrawerActivity.this, navMap(keys(position))._1)
+        drawerLayout.closeDrawer
         startActivity(intent)
       }
     })
