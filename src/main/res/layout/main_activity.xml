@@ -11,9 +11,10 @@
     android:paddingBottom="5dp"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Welcome to Fedora Mobile!"
-        android:id="@+id/textView"/>
+  <ListView
+      android:id="@+id/newsfeed"
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"
+      android:divider="#cccccc"
+      android:dividerHeight="0.5dp" />
 </RelativeLayout>

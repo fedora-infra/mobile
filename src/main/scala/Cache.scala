@@ -109,6 +109,19 @@ object Cache {
       path,
       3600 * 12).get()
 
+  /** Returns a [[Future[Bitmap]]] containing the icon for a service.
+    *
+    * @param context The context on which to act.
+    * @param path The name of the image on the server (and in cache).
+    */
+  def getServiceIcon(context: Context, iconUrl: String, topic: String): Future[Bitmap] =
+    new BitmapCache(
+      context,
+      new URL(iconUrl).openConnection.asInstanceOf[HttpURLConnection],
+      "service_icons",
+      topic,
+      3600 * 24 * 7).get()
+
   /** Returns a [[Future[Bitmap]]] containing a Gravatar.
     *
     * @param context The context on which to act.
