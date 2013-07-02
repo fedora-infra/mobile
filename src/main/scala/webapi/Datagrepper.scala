@@ -34,12 +34,12 @@ object Datagrepper {
   case class Response(
     count: Int,
     pages: Int,
-    messages: JsValue
-  )
+    messages: JsValue)
 
   private def constructURL(arguments: List[(String, String)]): String = {
-    arguments foreach { case (key, value) =>
-      uri.appendQueryParameter(key, value)
+    arguments foreach {
+      case (key, value) =>
+        uri.appendQueryParameter(key, value)
     }
     uri.build.toString
   }
@@ -55,7 +55,6 @@ object Datagrepper {
     implicit val datagrepperResponse = jsonFormat(Response, "count", "pages", "raw_messages")
   }
 }
-
 
 object HRF {
   val url = "http://hrf.cloud.fedoraproject.org/all"
@@ -73,7 +72,7 @@ object HRF {
     timestamp: Map[String, String],
     title: String,
     usernames: List[String] // TODO: When we have FAS integration, make this a List[FAS.User] or similar.
-  )
+    )
 
   object JSONParsing extends DefaultJsonProtocol {
     implicit val messageFormat = jsonFormat(Result, "icon", "secondary_icon", "link", "objects", "packages", "repr", "subtitle", "timestamp", "title", "usernames")
