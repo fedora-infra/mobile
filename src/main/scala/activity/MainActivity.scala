@@ -4,7 +4,7 @@ import Implicits._
 
 import android.content.Context
 import android.os.Bundle
-import android.view.{ LayoutInflater, View, ViewGroup }
+import android.view.{ LayoutInflater, Menu, MenuItem, View, ViewGroup }
 import android.widget.{ ArrayAdapter, ImageView, LinearLayout, ListView, TextView, Toast }
 
 import spray.json._
@@ -35,7 +35,10 @@ class MainActivity extends NavDrawerActivity {
   override def onPostCreate(bundle: Bundle) {
     super.onPostCreate(bundle)
     setUpNav(R.layout.main_activity)
+    updateNewsfeed()
+  }
 
+  private def updateNewsfeed() {
     val newsfeed = findView(TR.newsfeed)
     val messages = getLatestMessages map { res =>
       HRF(res.messages.toString)
@@ -123,5 +126,23 @@ class MainActivity extends NavDrawerActivity {
             throw utoh
         }
     }
+  }
+
+  override def onCreateOptionsMenu(menu: Menu) = {
+    super.onCreateOptionsMenu(menu)
+    val inflater = getMenuInflater
+    inflater.inflate(R.menu.main_activity, menu);
+    true
+  }
+
+  override def onOptionsItemSelected(item: MenuItem) = {
+    super.onOptionsItemSelected(item)
+    item.getItemId match {
+      case R.id.menu_refresh => {
+        updateNewsfeed()
+      }
+      case _ =>
+    }
+    true
   }
 }
