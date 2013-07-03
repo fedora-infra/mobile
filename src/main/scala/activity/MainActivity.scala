@@ -18,6 +18,7 @@ import Datagrepper.JSONParsing._
 import com.google.common.hash.Hashing
 
 import java.text.SimpleDateFormat
+import java.util.TimeZone
 
 class MainActivity extends NavDrawerActivity {
 
@@ -43,7 +44,7 @@ class MainActivity extends NavDrawerActivity {
 
     val newsfeed = findView(TR.newsfeed)
     val messages = getLatestMessages map { res =>
-      HRF(res.messages.toString)
+      HRF(res.messages.toString, TimeZone.getDefault)
     }
 
     class NewsfeedAdapter(

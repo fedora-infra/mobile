@@ -13,6 +13,7 @@ import scala.util.{ Failure, Try, Success }
 
 import java.io.{ DataOutputStream, InputStreamReader }
 import java.net.{ HttpURLConnection, URL, URLEncoder }
+import java.util.TimeZone
 
 /** This is a general purpose way to interact with the Datagrepper API.
   *
@@ -81,13 +82,15 @@ object HRF {
 
   import JSONParsing._
 
-  def apply(messages: String): Future[List[Result]] =
-    post(messages) map { res =>
+  def apply(messages: String, timezone: TimeZone): Future[List[Result]] =
+    post(messages, timezone.getDisplayName) map { res =>
       JsonParser(res).convertTo[Response].results
     }
 
-  def post(json: String): Future[String] = future {
-    val connection = new URL(url).openConnection.asInstanceOf[HttpURLConnection]
+  def post(json: String, timezone: String): Future[String] = future {
+    val connection = new URL(url + "?timezone=" + URLEncoder.encode(timezone, "utf8"))
+      .openConnection
+      .asInstanceOf[HttpURLConnection]
     connection setDoOutput true
     connection setRequestMethod "POST"
     connection.setRequestProperty("Content-Type", "application/json");
