@@ -101,7 +101,7 @@ class MainActivity extends NavDrawerActivity {
         layout
           .findViewById(R.id.timestamp)
           .asInstanceOf[TextView]
-          .setText("- " + item.timestamp("fulldate") + " at " + item.timestamp("time"))
+          .setText(item.timestamp("usadate") + " at " + item.timestamp("time"))
 
         layout
       }
