@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:paddingLeft="5dp"
     android:paddingRight="5dp"
     android:paddingTop="5dp"
     android:paddingBottom="5dp"
-    tools:context=".MainActivity">
+    android:orientation="vertical">
+
+  <ProgressBar
+      android:id="@+id/progress"
+      style="?android:attr/progressBarStyleLarge"
+      android:layout_width="wrap_content"
+      android:layout_height="fill_parent"
+      android:layout_gravity="center"
+      android:visibility="gone" />
 
   <ListView
       android:id="@+id/newsfeed"
@@ -17,4 +24,4 @@
       android:layout_height="fill_parent"
       android:divider="#cccccc"
       android:dividerHeight="0.5dp" />
-</RelativeLayout>
+</LinearLayout>

@@ -39,6 +39,8 @@ class MainActivity extends NavDrawerActivity {
   }
 
   private def updateNewsfeed() {
+    findView(TR.progress).setVisibility(View.VISIBLE)
+
     val newsfeed = findView(TR.newsfeed)
     val messages = getLatestMessages map { res =>
       HRF(res.messages.toString)
@@ -110,7 +112,10 @@ class MainActivity extends NavDrawerActivity {
         // Yo dawg. I heard you like futures. So I put futures in your future.
         // For web-scale concurrency.
         res onSuccess {
-          case hrfResult =>
+          case hrfResult => {
+            runOnUiThread {
+              findView(TR.progress).setVisibility(View.GONE)
+            }
             val adapter = new NewsfeedAdapter(
               this,
               android.R.layout.simple_list_item_1,
@@ -120,6 +125,7 @@ class MainActivity extends NavDrawerActivity {
                 obj.setAdapter(adapter)
               }
             }
+          }
         }
         res onFailure {
           case utoh =>
