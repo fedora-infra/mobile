@@ -1,19 +1,18 @@
 package org.fedoraproject.mobile
 
+import Datagrepper.JSONParsing._
+
 import Implicits._
 
 import android.os.Bundle
 import android.view.{ Menu, MenuItem, View }
 
 import spray.json._
+
 import scala.concurrent.{ future, Future }
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 
-
-import Datagrepper.JSONParsing._
-
-import java.text.SimpleDateFormat
 import java.util.TimeZone
 
 class MainActivity extends NavDrawerActivity {

@@ -7,11 +7,11 @@ import android.content.Context
 import android.view.{ LayoutInflater, View, ViewGroup }
 import android.widget.{ ArrayAdapter, ImageView, LinearLayout, ListView, TextView, Toast }
 
+import com.google.common.hash.Hashing
+
 import scala.concurrent.{ future, Future }
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{ Failure, Try, Success }
-
-import com.google.common.hash.Hashing
 
 class FedmsgAdapter(
   context: Context,

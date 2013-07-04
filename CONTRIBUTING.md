@@ -48,14 +48,28 @@ to the top line of the file.
 Consistent import ordering helps developers know where to look to find where a
 specific import might be, at the top of a file.
 
-Our ordering should work like this, with each group separated by a blank line:
+Our ordering should work like this, with each group separated by a blank line
+and each group in alphabetical order:
 
-- Our local imports (e.g., `Implicits._`)
+- Our local imports (e.g., `Implicits._`), with each designator
+  (e.g., `Implicits.`) separated by a blank line.
 - Android APIs
 - Third-party APIs (each designator (e.g., `com.` and `net.`) separated by a
   blank line)
 - Scala APIs
 - Java APIs
+
+Scala lets you import multiple things from a designator in one line. For
+example:
+
+```scala
+import android.view.{ Menu, MenuItem, View }
+```
+
+When you do this, the things inside the brackets should be padded with spaces
+and in alphabetical order. Scalariform will enforce this.
+
+Also: **Nuke all unused imports.**
 
 ---
 
