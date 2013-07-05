@@ -29,4 +29,6 @@
   <string name="package_summary">Package summary</string>
   <string name="description">Description</string>
   <string name="package_versions">Package Versions</string>
+
+  <string name="newsfeed_failure">An issue occurred while updating newsfeed data.</string>
 </resources>

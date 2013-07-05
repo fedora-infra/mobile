@@ -6,6 +6,7 @@ import Implicits._
 
 import android.os.Bundle
 import android.view.{ Menu, MenuItem, View }
+import android.widget.Toast
 
 import spray.json._
 
@@ -63,8 +64,8 @@ class MainActivity extends NavDrawerActivity {
           }
         }
         res onFailure {
-          case utoh =>
-            throw utoh
+          case failure =>
+            Toast.makeText(this, R.string.newsfeed_failure, Toast.LENGTH_LONG).show
         }
     }
   }
