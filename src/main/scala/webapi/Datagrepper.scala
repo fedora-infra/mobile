@@ -48,7 +48,11 @@ object Datagrepper {
   /** Returns a [[Future[String]]] of JSON after completing the query. */
   def query(arguments: List[(String, String)]) = {
     future {
-      Source.fromURL(constructURL(arguments)).mkString
+      val connection = new URL(constructURL(arguments))
+        .openConnection
+        .asInstanceOf[HttpURLConnection]
+      connection setRequestMethod "GET"
+      CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
     }
   }
 
