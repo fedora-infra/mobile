@@ -65,7 +65,9 @@ class MainActivity extends NavDrawerActivity {
         }
         res onFailure {
           case failure =>
-            Toast.makeText(this, R.string.newsfeed_failure, Toast.LENGTH_LONG).show
+            runOnUiThread {
+              Toast.makeText(this, R.string.newsfeed_failure, Toast.LENGTH_LONG).show
+            }
         }
     }
   }
