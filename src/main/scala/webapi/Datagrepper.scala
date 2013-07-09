@@ -87,7 +87,7 @@ object HRF {
   import JSONParsing._
 
   def apply(messages: String, timezone: TimeZone): Future[List[Result]] =
-    post(messages, timezone.getDisplayName) map { res =>
+    post(messages, timezone.getID) map { res =>
       JsonParser(res).convertTo[Response].results
     }
 
