@@ -1,6 +1,7 @@
 package org.fedoraproject.mobile
 
 import android.net.Uri
+import android.util.Log
 
 import com.google.common.io.CharStreams
 
@@ -47,6 +48,7 @@ object Datagrepper {
 
   /** Returns a [[Future[String]]] of JSON after completing the query. */
   def query(arguments: List[(String, String)]) = {
+    Log.v("Datagrepper", "Beginning query")
     future {
       val connection = new URL(constructURL(arguments))
         .openConnection
@@ -92,6 +94,7 @@ object HRF {
     }
 
   def post(json: String, timezone: String): Future[String] = future {
+    Log.v("HRF", "Beginning POST")
     val connection = new URL(url + "?timezone=" + URLEncoder.encode(timezone, "utf8"))
       .openConnection
       .asInstanceOf[HttpURLConnection]
