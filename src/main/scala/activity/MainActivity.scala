@@ -6,7 +6,8 @@ import Implicits._
 
 import android.os.Bundle
 import android.view.{ Menu, MenuItem, View }
-import android.widget.Toast
+import android.widget.AbsListView.OnScrollListener
+import android.widget.{ AbsListView, Toast }
 
 import spray.json._
 
@@ -33,6 +34,16 @@ class MainActivity extends NavDrawerActivity {
     super.onPostCreate(bundle)
     setUpNav(R.layout.main_activity)
     updateNewsfeed()
+    val newsfeed = findView(TR.newsfeed)
+    newsfeed.setOnScrollListener(new OnScrollListener {
+      def onScrollStateChanged(view: AbsListView, scrollState: Int) { /* ... */ }
+
+      override def onScroll(view: AbsListView, firstVisible: Int, visibleCount: Int, totalCount: Int) {
+        if (firstVisible + visibleCount == totalCount && totalCount != 0) {
+          updateNewsfeed() // TODO: Append to it instead.
+        }
+      }
+    })
   }
 
   private def updateNewsfeed() {
