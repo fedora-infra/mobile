@@ -1,8 +1,16 @@
 package org.fedoraproject.mobile
 
+import android.util.Log
+
+import com.google.common.io.CharStreams
+
 import spray.json._
 
-import java.net.URLEncoder
+import scala.concurrent.{ future, Future }
+import scala.concurrent.ExecutionContext.Implicits.global
+
+import java.io.{ InputStreamReader }
+import java.net.{ HttpURLConnection, URL, URLEncoder }
 
 object Pkgwat {
   case class APIResults[T](
@@ -37,14 +45,27 @@ object Pkgwat {
 
     implicit val releaseFormat = jsonFormat(Release, "release", "stable_version", "testing_version")
     implicit val releaseResultFormat = jsonFormat(APIResults[Release], "visible_rows", "total_rows", "rows_per_page", "start_row", "rows")
+  }
 
-    def constructURL(path: String, query: FilteredQuery): String = {
-      val json = query.toJson.compactPrint
-      Seq(
-        "https://apps.fedoraproject.org/packages/",
-        "fcomm_connector",
-        path,
-        URLEncoder.encode(json, "utf8")).mkString("/")
+  import JSONParsing._
+
+  def constructURL(path: String, query: FilteredQuery): String = {
+    val json = query.toJson.compactPrint
+    Seq(
+      "https://apps.fedoraproject.org/packages/",
+      "fcomm_connector",
+      path,
+      URLEncoder.encode(json, "utf8")).mkString("/")
+  }
+
+  def query(query: FilteredQuery) = {
+    Log.v("Pkgwat", "Beginning query")
+    future {
+      val connection = new URL(constructURL("xapian/query/search_packages", query))
+        .openConnection
+        .asInstanceOf[HttpURLConnection]
+      connection setRequestMethod "GET"
+      CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
     }
   }
 }

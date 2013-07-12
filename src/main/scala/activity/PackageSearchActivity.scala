@@ -45,17 +45,13 @@ class PackageSearchActivity extends NavDrawerActivity {
 
       Option(findView(TR.progress)).map(_.setVisibility(View.VISIBLE))
 
-      val query = intent.getStringExtra(SearchManager.QUERY)
-      val jsonURL = constructURL(
-        "xapian/query/search_packages",
-        FilteredQuery(
-          500, // TODO: Pagination...and, well, unhacking this.
-          0,
-          Map("search" -> query)))
+      val queryText = intent.getStringExtra(SearchManager.QUERY)
+      val queryObject = FilteredQuery(
+        500, // TODO: Pagination...and, well, unhacking this.
+        0,
+        Map("search" -> queryText))
 
-      future {
-        Source.fromURL(jsonURL).mkString
-      } onComplete { result =>
+      Pkgwat.query(queryObject) onComplete { result =>
         result match {
           case Success(content) => {
             val result = JsonParser(content.replaceAll("""<\/?.*?>""", "")).convertTo[Pkgwat.APIResults[Package]]
