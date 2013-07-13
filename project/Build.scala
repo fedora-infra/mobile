@@ -22,7 +22,8 @@ object General {
       "io.spray" %% "spray-json" % "1.2.5",
       //"me.elrod" %% "pkgwat" % "1.0.0",
       "com.google.guava" % "guava" % "14.0.1",
-      "org.scalatest" %% "scalatest" % "1.9.1" % "test"
+      "org.scalatest" %% "scalatest" % "1.9.1" % "test",
+      "com.github.chrisbanes.actionbarpulltorefresh" % "library" % "0.5"
     ),
     scalacOptions         := Seq(
       "-encoding", "utf8",

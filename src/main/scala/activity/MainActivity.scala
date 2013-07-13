@@ -11,13 +11,15 @@ import android.widget.{ AbsListView, Toast }
 
 import spray.json._
 
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
+
 import scala.concurrent.{ future, Future }
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 
 import java.util.TimeZone
 
-class MainActivity extends NavDrawerActivity {
+class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefreshListener {
 
   private def getLatestMessages(): Future[Datagrepper.Response] = {
     Datagrepper.query(
@@ -30,11 +32,17 @@ class MainActivity extends NavDrawerActivity {
       }
   }
 
+  def onRefreshStarted(view: View): Unit = updateNewsfeed()
+
   override def onPostCreate(bundle: Bundle) {
     super.onPostCreate(bundle)
     setUpNav(R.layout.main_activity)
     updateNewsfeed()
     val newsfeed = findView(TR.newsfeed)
+
+    val refreshAdapter = new PullToRefreshAttacher(this)
+    refreshAdapter.setRefreshableView(newsfeed, this)
+
     newsfeed.setOnScrollListener(new OnScrollListener {
       def onScrollStateChanged(view: AbsListView, scrollState: Int) { /* ... */ }
 
@@ -81,23 +89,5 @@ class MainActivity extends NavDrawerActivity {
             }
         }
     }
-  }
-
-  override def onCreateOptionsMenu(menu: Menu) = {
-    super.onCreateOptionsMenu(menu)
-    val inflater = getMenuInflater
-    inflater.inflate(R.menu.main_activity, menu);
-    true
-  }
-
-  override def onOptionsItemSelected(item: MenuItem) = {
-    super.onOptionsItemSelected(item)
-    item.getItemId match {
-      case R.id.menu_refresh => {
-        updateNewsfeed()
-      }
-      case _ =>
-    }
-    true
   }
 }
