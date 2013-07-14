@@ -7,7 +7,7 @@ import Implicits._
 import android.os.Bundle
 import android.view.{ Menu, MenuItem, View }
 import android.widget.AbsListView.OnScrollListener
-import android.widget.{ AbsListView, Toast }
+import android.widget.{ AbsListView, ArrayAdapter, Toast }
 
 import spray.json._
 
@@ -17,14 +17,17 @@ import scala.concurrent.{ future, Future }
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 
+import java.util.ArrayList // TODO: Do something about this.
 import java.util.TimeZone
 
 class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefreshListener {
 
+  lazy val refreshAdapter = new PullToRefreshAttacher(this)
+
   private def getLatestMessages(): Future[Datagrepper.Response] = {
     Datagrepper.query(
       List(
-        "delta" -> "604800",
+        "delta" -> "7200",
         "order" -> "desc"
       )
     ) map { res =>
@@ -32,7 +35,29 @@ class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefres
       }
   }
 
-  def onRefreshStarted(view: View): Unit = updateNewsfeed()
+  def onRefreshStarted(view: View): Unit = {
+    val newsfeed = findView(TR.newsfeed)
+    val messages = getLatestMessages map { res =>
+      HRF(res.messages.toString, TimeZone.getDefault)
+    }
+    messages onSuccess {
+      case res =>
+        res onSuccess {
+          case hrfResult => {
+            val adapter = newsfeed.getAdapter.asInstanceOf[ArrayAdapter[HRF.Result]]
+            runOnUiThread(hrfResult.reverse.foreach { result => adapter.insert(result, 0) })
+            runOnUiThread(adapter.notifyDataSetChanged)
+            runOnUiThread(refreshAdapter.setRefreshComplete)
+          }
+        }
+        res onFailure {
+          case failure =>
+            runOnUiThread {
+              Toast.makeText(this, R.string.newsfeed_failure, Toast.LENGTH_LONG).show
+            }
+        }
+    }
+  }
 
   override def onPostCreate(bundle: Bundle) {
     super.onPostCreate(bundle)
@@ -40,7 +65,6 @@ class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefres
     updateNewsfeed()
     val newsfeed = findView(TR.newsfeed)
 
-    val refreshAdapter = new PullToRefreshAttacher(this)
     refreshAdapter.setRefreshableView(newsfeed, this)
 
     newsfeed.setOnScrollListener(new OnScrollListener {
@@ -71,14 +95,14 @@ class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefres
             runOnUiThread {
               findView(TR.progress).setVisibility(View.GONE)
             }
+            val arrayList = new ArrayList[HRF.Result]
+            hrfResult.foreach { result => arrayList.add(result) }
             val adapter = new FedmsgAdapter(
               this,
               android.R.layout.simple_list_item_1,
-              hrfResult.toArray)
+              arrayList)
             runOnUiThread {
-              newsfeed.tap { obj =>
-                obj.setAdapter(adapter)
-              }
+              newsfeed.setAdapter(adapter)
             }
           }
         }

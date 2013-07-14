@@ -13,10 +13,12 @@ import scala.concurrent.{ future, Future }
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{ Failure, Try, Success }
 
+import java.util.ArrayList // TODO: Do something about this.
+
 class FedmsgAdapter(
   context: Context,
   resource: Int,
-  items: Array[HRF.Result])
+  items: ArrayList[HRF.Result])
   extends ArrayAdapter[HRF.Result](context, resource, items) {
 
   val activity = context.asInstanceOf[Activity]
