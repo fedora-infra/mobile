@@ -47,7 +47,7 @@ class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefres
       def onScrollStateChanged(view: AbsListView, scrollState: Int) { /* ... */ }
 
       override def onScroll(view: AbsListView, firstVisible: Int, visibleCount: Int, totalCount: Int) {
-        if (firstVisible + visibleCount == totalCount && totalCount != 0) {
+        if (firstVisible + visibleCount == totalCount && totalCount != 0 && totalCount > visibleCount) {
           updateNewsfeed() // TODO: Append to it instead.
         }
       }
