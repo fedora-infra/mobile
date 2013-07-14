@@ -35,9 +35,21 @@ class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefres
       }
   }
 
+  private def getMessagesSince(since: Double): Future[Datagrepper.Response] = {
+    Datagrepper.query(
+      List(
+        "start" -> (since + 0.1).toString,
+        "order" -> "desc"
+      )
+    ) map { res =>
+        JsonParser(res).convertTo[Datagrepper.Response]
+      }
+  }
+
   def onRefreshStarted(view: View): Unit = {
     val newsfeed = findView(TR.newsfeed)
-    val messages = getLatestMessages map { res =>
+    val newestTimestamp = newsfeed.getAdapter.getItem(0).asInstanceOf[HRF.Result].timestamp("epoch").toDouble
+    val messages = getMessagesSince(newestTimestamp) map { res =>
       HRF(res.messages.toString, TimeZone.getDefault)
     }
     messages onSuccess {
