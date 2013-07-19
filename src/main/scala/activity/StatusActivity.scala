@@ -30,6 +30,14 @@ class StatusActivity extends NavDrawerActivity {
 
   import StatusJsonProtocol._
 
+  private def getColorFor(status: String) =
+    status match {
+      case "good" => Some(Color.parseColor("#009900"))
+      case "minor" | "scheduled" => Some(Color.parseColor("#ff6103"))
+      case "major" => Some(Color.parseColor("#990000"))
+      case _ => None
+    }
+
   private def updateStatuses() {
     future {
       Source.fromURL("http://status.fedoraproject.org/statuses.json").mkString
@@ -63,20 +71,20 @@ class StatusActivity extends NavDrawerActivity {
                 .asInstanceOf[TextView]
                 .setText(service("name"))
 
+              val status = service("status") match {
+                case "good" => R.string.status_good
+                case "minor" => R.string.status_minor
+                case "scheduled" => R.string.status_scheduled
+                case "major" => R.string.status_major
+                case _ => R.string.status_unknown
+              }
+
               layout
                 .findViewById(R.id.servicestatus)
                 .asInstanceOf[TextView]
                 .tap { obj =>
-                  obj.setText(service("status") match {
-                    case "good" => R.string.status_good
-                    case "minor" => R.string.status_minor
-                    case "major" => R.string.status_major
-                  })
-                  obj.setTextColor(service("status") match {
-                    case "good" => Color.parseColor("#009900")
-                    case "minor" => Color.parseColor("#ff6103")
-                    case "major" => Color.parseColor("#990000")
-                  })
+                  obj.setText(status)
+                  getColorFor(service("status")).map { c => obj.setTextColor(c) }
                 }
 
               layout
@@ -120,11 +128,7 @@ class StatusActivity extends NavDrawerActivity {
             globalInfoView match {
               case Some(globalInfoView) => globalInfoView.tap { obj =>
                 obj.setText(parsed.global_verbose_status)
-                obj.setBackgroundColor(parsed.global_status match {
-                  case "good" => Color.parseColor("#009900")
-                  case "minor" => Color.parseColor("#ff6103")
-                  case "major" => Color.parseColor("#990000")
-                })
+                getColorFor(parsed.global_status).map { c => obj.setBackgroundColor(c) }
               }
               case None =>
             }
