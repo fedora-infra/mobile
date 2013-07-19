@@ -62,8 +62,9 @@ class StatusActivity extends NavDrawerActivity {
               layout
                 .setBackgroundResource(service("status") match {
                   case "good" => R.drawable.status_good
-                  case "minor" => R.drawable.status_minor
+                  case "minor" | "scheduled" => R.drawable.status_minor
                   case "major" => R.drawable.status_major
+                  case _ => R.drawable.status_unknown
                 })
 
               layout
