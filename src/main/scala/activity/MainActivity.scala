@@ -113,9 +113,7 @@ class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefres
               this,
               android.R.layout.simple_list_item_1,
               arrayList)
-            runOnUiThread {
-              newsfeed.setAdapter(adapter)
-            }
+            runOnUiThread(newsfeed.setAdapter(adapter))
           }
         }
         res onFailure {

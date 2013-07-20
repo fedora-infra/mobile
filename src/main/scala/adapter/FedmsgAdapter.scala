@@ -3,8 +3,10 @@ package org.fedoraproject.mobile
 import Implicits._
 
 import android.app.Activity
-import android.content.Context
+import android.content.{ Context, Intent }
+import android.net.Uri
 import android.view.{ LayoutInflater, View, ViewGroup }
+import android.view.View.OnClickListener
 import android.widget.{ ArrayAdapter, ImageView, LinearLayout, ListView, TextView, Toast }
 
 import com.google.common.hash.Hashing
@@ -73,6 +75,15 @@ class FedmsgAdapter(
       .findViewById(R.id.timestamp)
       .asInstanceOf[TextView]
       .setText(item.timestamp("usadate") + " at " + item.timestamp("time"))
+
+    layout.setOnClickListener(new OnClickListener() {
+      override def onClick(view: View): Unit = {
+        item.link.map { link =>
+          val intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link))
+          activity.startActivity(intent)
+        }
+      }
+    })
 
     layout
   }
