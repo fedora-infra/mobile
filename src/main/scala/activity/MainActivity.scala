@@ -23,12 +23,14 @@ import java.util.TimeZone
 class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefreshListener {
 
   lazy val refreshAdapter = new PullToRefreshAttacher(this)
+  private var page = 1
 
   private def getLatestMessages(): Future[Datagrepper.Response] = {
     Datagrepper.query(
       List(
         "delta" -> "7200",
-        "order" -> "desc"
+        "order" -> "desc",
+        "page" -> page.toString
       )
     ) map { res =>
         JsonParser(res).convertTo[Datagrepper.Response]
@@ -71,6 +73,30 @@ class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefres
     }
   }
 
+  def getNextPage(): Unit = {
+    val newsfeed = findView(TR.newsfeed)
+    page += 1
+    val messages = getLatestMessages() map { res =>
+      HRF(res.messages.toString, TimeZone.getDefault)
+    }
+    messages onSuccess {
+      case res =>
+        res onSuccess {
+          case hrfResult => {
+            val adapter = newsfeed.getAdapter.asInstanceOf[ArrayAdapter[HRF.Result]]
+            runOnUiThread(hrfResult.foreach { result => adapter.add(result) })
+            runOnUiThread(adapter.notifyDataSetChanged)
+          }
+        }
+        res onFailure {
+          case failure =>
+            runOnUiThread {
+              Toast.makeText(this, R.string.newsfeed_failure, Toast.LENGTH_LONG).show
+            }
+        }
+    }
+  }
+
   override def onPostCreate(bundle: Bundle) {
     super.onPostCreate(bundle)
     setUpNav(R.layout.main_activity)
@@ -84,7 +110,7 @@ class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefres
 
       override def onScroll(view: AbsListView, firstVisible: Int, visibleCount: Int, totalCount: Int) {
         if (firstVisible + visibleCount == totalCount && totalCount != 0 && totalCount > visibleCount) {
-          updateNewsfeed() // TODO: Append to it instead.
+          getNextPage()
         }
       }
     })
