@@ -22,7 +22,7 @@ import java.util.TimeZone
 
 class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefreshListener {
 
-  lazy val refreshAdapter = new PullToRefreshAttacher(this)
+  private lazy val refreshAdapter = new PullToRefreshAttacher(this)
   private var page = 1
 
   private def getLatestMessages(): Future[Datagrepper.Response] = {
@@ -73,7 +73,7 @@ class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefres
     }
   }
 
-  def getNextPage(): Unit = {
+  private def getNextPage(): Unit = {
     val newsfeed = findView(TR.newsfeed)
     page += 1
     val messages = getLatestMessages() map { res =>
