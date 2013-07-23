@@ -5,6 +5,7 @@ import Datagrepper.JSONParsing._
 import Implicits._
 
 import android.os.Bundle
+import android.util.Log
 import android.view.{ Menu, MenuItem, View }
 import android.widget.AbsListView.OnScrollListener
 import android.widget.{ AbsListView, ArrayAdapter, Toast }
@@ -16,6 +17,7 @@ import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
 import scala.concurrent.{ future, Future }
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
+import scala.util.{ Failure, Success }
 
 import java.util.ArrayList // TODO: Do something about this.
 import java.util.TimeZone
@@ -23,24 +25,23 @@ import java.util.TimeZone
 class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefreshListener {
 
   private lazy val refreshAdapter = new PullToRefreshAttacher(this)
-  private var page = 1
 
-  private def getLatestMessages(): Future[Datagrepper.Response] = {
-    Datagrepper.query(
-      List(
-        "delta" -> "7200",
-        "order" -> "desc",
-        "page" -> page.toString
-      )
-    ) map { res =>
+  private def getLatestMessages(before: Option[Long] = None): Future[Datagrepper.Response] = {
+    // TODO: This is dirty like zebra.
+    val query = List(
+      "delta" -> "7200",
+      "order" -> "desc"
+    ) ::: (if (before.isDefined) List("start" -> before.get.toString) else Nil)
+
+    Datagrepper.query(query) map { res =>
         JsonParser(res).convertTo[Datagrepper.Response]
       }
   }
 
-  private def getMessagesSince(since: Double): Future[Datagrepper.Response] = {
+  private def getMessagesSince(since: Long): Future[Datagrepper.Response] = {
     Datagrepper.query(
       List(
-        "start" -> (since + 0.1).toString,
+        "start" -> (since + 1).toString,
         "order" -> "desc"
       )
     ) map { res =>
@@ -50,33 +51,37 @@ class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefres
 
   def onRefreshStarted(view: View): Unit = {
     val newsfeed = findView(TR.newsfeed)
-    val newestTimestamp = newsfeed.getAdapter.getItem(0).asInstanceOf[HRF.Result].timestamp("epoch").toDouble
-    val messages = getMessagesSince(newestTimestamp) map { res =>
+    val newestTimestamp = newsfeed.getAdapter.getItem(0).asInstanceOf[HRF.Result].timestamp("epoch")
+    val messages = getMessagesSince(newestTimestamp.replace(".0", "").toLong) map { res =>
       HRF(res.messages.toString, TimeZone.getDefault)
     }
-    messages onSuccess {
-      case res =>
-        res onSuccess {
-          case hrfResult => {
+    messages onComplete {
+      case Success(res) => {
+        res onComplete {
+          case Success(hrfResult) => {
             val adapter = newsfeed.getAdapter.asInstanceOf[ArrayAdapter[HRF.Result]]
             runOnUiThread(hrfResult.reverse.foreach { result => adapter.insert(result, 0) })
             runOnUiThread(adapter.notifyDataSetChanged)
             runOnUiThread(refreshAdapter.setRefreshComplete)
           }
+          case Failure(failure) => {
+            runOnUiThread(Toast.makeText(this, R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
+            Log.e("MainActivity", "Error refreshing: " + failure.toString)
+            runOnUiThread(refreshAdapter.setRefreshComplete)
+          }
         }
-        res onFailure {
-          case failure =>
-            runOnUiThread {
-              Toast.makeText(this, R.string.newsfeed_failure, Toast.LENGTH_LONG).show
-            }
-        }
+      }
+      case Failure(failure) => {
+        runOnUiThread(Toast.makeText(this, R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
+        Log.e("MainActivity", "Error refreshing: " + failure.toString)
+        runOnUiThread(refreshAdapter.setRefreshComplete)
+      }
     }
   }
 
-  private def getNextPage(): Unit = {
+  private def getNextPage(lastTimeStamp: Long): Unit = {
     val newsfeed = findView(TR.newsfeed)
-    page += 1
-    val messages = getLatestMessages() map { res =>
+    val messages = getLatestMessages(Option(lastTimeStamp)) map { res =>
       HRF(res.messages.toString, TimeZone.getDefault)
     }
     messages onSuccess {
@@ -110,7 +115,8 @@ class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefres
 
       override def onScroll(view: AbsListView, firstVisible: Int, visibleCount: Int, totalCount: Int) {
         if (firstVisible + visibleCount == totalCount && totalCount != 0 && totalCount > visibleCount) {
-          getNextPage()
+          val last = view.getItemAtPosition(totalCount - 1).asInstanceOf[HRF.Result]
+          getNextPage(last.timestamp("epoch").replace(".0", "").toLong)
         }
       }
     })
@@ -120,7 +126,7 @@ class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefres
     findView(TR.progress).setVisibility(View.VISIBLE)
 
     val newsfeed = findView(TR.newsfeed)
-    val messages = getLatestMessages map { res =>
+    val messages = getLatestMessages() map { res =>
       HRF(res.messages.toString, TimeZone.getDefault)
     }
 
