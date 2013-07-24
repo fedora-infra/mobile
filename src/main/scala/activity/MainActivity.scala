@@ -34,8 +34,8 @@ class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefres
     ) ::: (if (before.isDefined) List("start" -> before.get.toString) else Nil)
 
     Datagrepper.query(query) map { res =>
-        JsonParser(res).convertTo[Datagrepper.Response]
-      }
+      JsonParser(res).convertTo[Datagrepper.Response]
+    }
   }
 
   private def getMessagesSince(since: Long): Future[Datagrepper.Response] = {
@@ -45,8 +45,8 @@ class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefres
         "order" -> "desc"
       )
     ) map { res =>
-      JsonParser(res).convertTo[Datagrepper.Response]
-    }
+        JsonParser(res).convertTo[Datagrepper.Response]
+      }
   }
 
   def onRefreshStarted(view: View): Unit = {
