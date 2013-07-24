@@ -31,7 +31,6 @@ import java.util.TimeZone
   */
 object Datagrepper {
   val url = "https://apps.fedoraproject.org/datagrepper/raw/"
-  val uri = Uri.parse(url).buildUpon
 
   case class Response(
     count: Int,
@@ -39,7 +38,7 @@ object Datagrepper {
     messages: JsValue)
 
   private def constructURL(arguments: List[(String, String)]): String = {
-    uri.clearQuery()
+    val uri = Uri.parse(url).buildUpon
     arguments foreach {
       case (key, value) =>
         uri.appendQueryParameter(key, value)
