@@ -45,8 +45,8 @@ class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefres
         "order" -> "desc"
       )
     ) map { res =>
-        JsonParser(res).convertTo[Datagrepper.Response]
-      }
+      JsonParser(res).convertTo[Datagrepper.Response]
+    }
   }
 
   def onRefreshStarted(view: View): Unit = {
@@ -66,14 +66,14 @@ class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefres
           }
           case Failure(failure) => {
             runOnUiThread(Toast.makeText(this, R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
-            Log.e("MainActivity", "Error refreshing: " + failure.toString)
+            Log.e("MainActivity", "Error refreshing [inner]: " + failure.toString)
             runOnUiThread(refreshAdapter.setRefreshComplete)
           }
         }
       }
       case Failure(failure) => {
         runOnUiThread(Toast.makeText(this, R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
-        Log.e("MainActivity", "Error refreshing: " + failure.toString)
+        Log.e("MainActivity", "Error refreshing [outer]: " + failure.toString)
         runOnUiThread(refreshAdapter.setRefreshComplete)
       }
     }

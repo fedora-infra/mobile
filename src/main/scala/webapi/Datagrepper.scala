@@ -39,6 +39,7 @@ object Datagrepper {
     messages: JsValue)
 
   private def constructURL(arguments: List[(String, String)]): String = {
+    uri.clearQuery()
     arguments foreach {
       case (key, value) =>
         uri.appendQueryParameter(key, value)
