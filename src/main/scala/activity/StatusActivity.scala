@@ -30,7 +30,8 @@ class StatusActivity extends NavDrawerActivity {
 
   import StatusJsonProtocol._
 
-  private def getColorFor(status: String) =
+  // TODO: Move this somewhere.
+  def getColorFor(status: String) =
     status match {
       case "good" => Some(Color.parseColor("#009900"))
       case "minor" | "scheduled" => Some(Color.parseColor("#ff6103"))
@@ -46,68 +47,23 @@ class StatusActivity extends NavDrawerActivity {
         case Success(e) => {
           val parsed = JsonParser(e).convertTo[StatusesResponse]
 
-          class StatusAdapter(
-            context: Context,
-            resource: Int,
-            items: Array[String])
-            extends ArrayAdapter[String](context, resource, items) {
-            override def getView(position: Int, convertView: View, parent: ViewGroup): View = {
-              val shortname = getItem(position)
-              val service = parsed.services(shortname)
-
-              val layout = LayoutInflater.from(context)
-                .inflate(R.layout.status_list_item, parent, false)
-                .asInstanceOf[LinearLayout]
-
-              layout
-                .setBackgroundResource(service("status") match {
-                  case "good" => R.drawable.status_good
-                  case "minor" | "scheduled" => R.drawable.status_minor
-                  case "major" => R.drawable.status_major
-                  case _ => R.drawable.status_unknown
-                })
-
-              layout
-                .findViewById(R.id.servicename)
-                .asInstanceOf[TextView]
-                .setText(service("name"))
-
-              val status = service("status") match {
-                case "good" => R.string.status_good
-                case "minor" => R.string.status_minor
-                case "scheduled" => R.string.status_scheduled
-                case "major" => R.string.status_major
-                case _ => R.string.status_unknown
-              }
-
-              layout
-                .findViewById(R.id.servicestatus)
-                .asInstanceOf[TextView]
-                .tap { obj =>
-                  obj.setText(status)
-                  getColorFor(service("status")).map { c => obj.setTextColor(c) }
-                }
-
-              layout
-            }
-          }
-
-          val orderedStatuses = parsed.services.toArray.sortBy(_._2("name")).map(_._1)
+          //val orderedStatuses = parsed.services.sortBy(_._2("name"))
 
           val adapter = new StatusAdapter(
             this,
             android.R.layout.simple_list_item_1,
-            orderedStatuses)
+            parsed.services.toArray)
 
           runOnUiThread {
             val statusesView = Option(findView(TR.statuses))
             statusesView match {
               case Some(statusesView) => statusesView.tap { obj =>
                 obj.setAdapter(adapter)
-                obj.setOnItemClickListener(new OnItemClickListener {
+                /*obj.setOnItemClickListener(new OnItemClickListener {
                   def onItemClick(parent: AdapterView[_], view: View, position: Int, id: Long) {
                     val shortname = orderedStatuses(position)
-                    val service = parsed.services(shortname)
+                    val service = parsed
+                      .services(shortname)
                     view
                       .findViewById(R.id.servicemessage)
                       .asInstanceOf[TextView].tap { obj =>
@@ -118,7 +74,7 @@ class StatusActivity extends NavDrawerActivity {
                         })
                       }
                   }
-                })
+                })*/
               }
               case None =>
             }
@@ -135,7 +91,7 @@ class StatusActivity extends NavDrawerActivity {
             }
           }
         }
-        case Failure(e) => Toast.makeText(this, R.string.status_failure, Toast.LENGTH_LONG).show
+        case Failure(e) => runOnUiThread(Toast.makeText(this, R.string.status_failure, Toast.LENGTH_LONG).show)
       }
     }
   }
