@@ -6,7 +6,6 @@ import android.content.Context
 import android.graphics.{ Color, PorterDuff }
 import android.os.Bundle
 import android.view.{ LayoutInflater, Menu, MenuItem, View, ViewGroup }
-import android.widget.AdapterView.OnItemClickListener
 import android.widget.{ AdapterView, ArrayAdapter, LinearLayout, TextView, Toast }
 
 import spray.json._
@@ -47,38 +46,12 @@ class StatusActivity extends NavDrawerActivity {
         case Success(e) => {
           val parsed = JsonParser(e).convertTo[StatusesResponse]
 
-          //val orderedStatuses = parsed.services.sortBy(_._2("name"))
-
           val adapter = new StatusAdapter(
             this,
             android.R.layout.simple_list_item_1,
             parsed.services.toArray)
 
-          runOnUiThread {
-            val statusesView = Option(findView(TR.statuses))
-            statusesView match {
-              case Some(statusesView) => statusesView.tap { obj =>
-                obj.setAdapter(adapter)
-                /*obj.setOnItemClickListener(new OnItemClickListener {
-                  def onItemClick(parent: AdapterView[_], view: View, position: Int, id: Long) {
-                    val shortname = orderedStatuses(position)
-                    val service = parsed
-                      .services(shortname)
-                    view
-                      .findViewById(R.id.servicemessage)
-                      .asInstanceOf[TextView].tap { obj =>
-                        obj.setText(service("message"))
-                        obj.setVisibility(obj.getVisibility match {
-                          case View.GONE => View.VISIBLE
-                          case View.VISIBLE => View.GONE
-                        })
-                      }
-                  }
-                })*/
-              }
-              case None =>
-            }
-          }
+          runOnUiThread(Option(findView(TR.statuses)).map(_.setAdapter(adapter)))
 
           runOnUiThread {
             val globalInfoView = Option(findView(TR.globalinfo))
@@ -91,7 +64,8 @@ class StatusActivity extends NavDrawerActivity {
             }
           }
         }
-        case Failure(e) => runOnUiThread(Toast.makeText(this, R.string.status_failure, Toast.LENGTH_LONG).show)
+        case Failure(e) =>
+          runOnUiThread(Toast.makeText(this, R.string.status_failure, Toast.LENGTH_LONG).show)
       }
     }
   }

@@ -5,6 +5,7 @@ import Implicits._
 import android.app.Activity
 import android.content.Context
 import android.view.{ LayoutInflater, View, ViewGroup }
+import android.view.View.OnClickListener
 import android.widget.{ ArrayAdapter, LinearLayout, TextView }
 
 class StatusAdapter(
@@ -49,6 +50,20 @@ class StatusAdapter(
         obj.setText(status)
         activity.getColorFor(service("status")).map { c => obj.setTextColor(c) }
       }
+
+    layout.setOnClickListener(new OnClickListener() {
+      override def onClick(view: View): Unit = {
+        view
+          .findViewById(R.id.servicemessage)
+          .asInstanceOf[TextView].tap { obj =>
+          obj.setText(service("message"))
+          obj.setVisibility(obj.getVisibility match {
+            case View.GONE => View.VISIBLE
+            case View.VISIBLE => View.GONE
+          })
+        }
+      }
+    })
 
     layout
   }
