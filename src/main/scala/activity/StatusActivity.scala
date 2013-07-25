@@ -10,6 +10,8 @@ import android.widget.{ AdapterView, ArrayAdapter, LinearLayout, TextView, Toast
 
 import spray.json._
 
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
+
 import scala.concurrent.future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
@@ -21,7 +23,11 @@ case class StatusesResponse(
   global_verbose_status: String,
   services: Map[String, Map[String, String]])
 
-class StatusActivity extends NavDrawerActivity {
+class StatusActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefreshListener {
+
+  private lazy val refreshAdapter = new PullToRefreshAttacher(this)
+
+  def onRefreshStarted(view: View): Unit = updateStatuses()
 
   object StatusJsonProtocol extends DefaultJsonProtocol {
     implicit val f = jsonFormat4(StatusesResponse.apply)
@@ -63,6 +69,8 @@ class StatusActivity extends NavDrawerActivity {
               case None =>
             }
           }
+
+          runOnUiThread(refreshAdapter.setRefreshComplete)
         }
         case Failure(e) =>
           runOnUiThread(Toast.makeText(this, R.string.status_failure, Toast.LENGTH_LONG).show)
@@ -73,26 +81,8 @@ class StatusActivity extends NavDrawerActivity {
   override def onPostCreate(bundle: Bundle) {
     super.onPostCreate(bundle)
     setUpNav(R.layout.status_activity)
+    val view = findView(TR.statuses)
+    refreshAdapter.setRefreshableView(view, this)
     updateStatuses()
   }
-
-  override def onCreateOptionsMenu(menu: Menu) = {
-    super.onCreateOptionsMenu(menu)
-    val inflater = getMenuInflater
-    inflater.inflate(R.menu.status, menu);
-    true
-  }
-
-  override def onOptionsItemSelected(item: MenuItem) = {
-    super.onOptionsItemSelected(item)
-    item.getItemId match {
-      case R.id.menu_refresh => {
-        findView(TR.globalinfo).setText(R.string.loading)
-        updateStatuses()
-      }
-      case _ =>
-    }
-    true
-  }
-
 }
