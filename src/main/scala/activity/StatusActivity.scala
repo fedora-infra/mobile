@@ -49,7 +49,7 @@ class StatusActivity extends NavDrawerActivity {
           val adapter = new StatusAdapter(
             this,
             android.R.layout.simple_list_item_1,
-            parsed.services.toArray)
+            parsed.services.toArray.sortBy(_._2("name")))
 
           runOnUiThread(Option(findView(TR.statuses)).map(_.setAdapter(adapter)))
 
