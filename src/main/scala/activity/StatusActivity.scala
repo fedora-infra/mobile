@@ -45,9 +45,12 @@ class StatusActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefr
     }
 
   private def updateStatuses() {
+    Option(findView(TR.progress)).map(_.setVisibility(View.VISIBLE))
+
     future {
       Source.fromURL("http://status.fedoraproject.org/statuses.json").mkString
     }.onComplete { result =>
+      Option(findView(TR.progress)).map(v => runOnUiThread(v.setVisibility(View.GONE)))
       result match {
         case Success(e) => {
           val parsed = JsonParser(e).convertTo[StatusesResponse]
