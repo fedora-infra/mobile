@@ -45,8 +45,8 @@ class PackageInfoActivity extends NavDrawerActivity {
       }
     }
     actionbar.setTitle(pkg.name)
+    actionbar.setSubtitle(pkg.summary)
 
-    findView(TR.summary).setText(pkg.summary)
     findView(TR.description).setText(pkg.description.replaceAll("\n", " "))
 
     pkg.develOwner match {

@@ -42,35 +42,6 @@
           android:drawablePadding="5dp" />
     </LinearLayout>
 
-    <!-- Package Summary -->
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/drop_shadow"
-        android:orientation="vertical"
-        android:layout_marginTop="10dp">
-
-      <TextView
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:textSize="15sp"
-          android:padding="10dp"
-          android:textStyle="bold"
-          android:text="@string/package_summary" />
-
-      <View
-          android:layout_width="match_parent"
-          android:layout_height="0.5dp"
-          android:background="#cccccc" />
-
-      <TextView
-          android:id="@+id/summary"
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:padding="10dp"
-          android:textSize="15sp" />
-    </LinearLayout>
-
     <!-- Package Description -->
     <LinearLayout
         android:layout_width="fill_parent"
