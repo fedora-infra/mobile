@@ -2,8 +2,9 @@
   <!-- Navigation Drawer -->
   <string name="infrastructure_status">Infrastructure Status</string>
   <string name="package_search">Package Search</string>
-  <string name="upcoming_events">Upcoming Events</string>
+  <string name="badges">Badges</string>
   <string name="fedmsg_gcm_demo">Fedmsg GCM Demo (horrible)</string>
+  <string name="preferences">Preferences</string>
 
   <string name="app_name">Fedora Mobile</string>
   <string name="search">Search</string>
@@ -33,4 +34,8 @@
   <string name="package_versions">Package Versions</string>
 
   <string name="newsfeed_failure">An issue occurred while updating newsfeed data.</string>
+
+  <string name="pref_fas">Fedora Account System (FAS)</string>
+  <string name="pref_fas_username">Username</string>
+  <string name="pref_fas_username_summary">Currently only used for Badges integration.</string>
 </resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+  <PreferenceCategory
+      android:title="@string/pref_fas"
+      android:key="pref_fas">
+    <EditTextPreference
+        android:key="pref_fas_username"
+        android:title="@string/pref_fas_username"
+        android:summary="@string/pref_fas_username_summary" />
+  </PreferenceCategory>
+</PreferenceScreen>
