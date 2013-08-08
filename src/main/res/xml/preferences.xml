@@ -5,7 +5,7 @@
       android:key="pref_fas">
     <EditTextPreference
         android:key="pref_fas_username"
-        android:title="@string/pref_fas_username"
+        android:title="@string/username"
         android:summary="@string/pref_fas_username_summary" />
   </PreferenceCategory>
 </PreferenceScreen>
