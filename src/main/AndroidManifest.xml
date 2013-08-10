@@ -32,7 +32,7 @@
     <activity android:name=".PackageInfoActivity" />
     <activity android:name=".FedocalActivity" />
     <activity android:name=".GCMDemoActivity" />
-    <activity android:name=".BadgesActivity" />
+    <activity android:name=".BadgesLeaderboardActivity" />
     <activity android:name=".PreferencesActivity" />
 
     <activity

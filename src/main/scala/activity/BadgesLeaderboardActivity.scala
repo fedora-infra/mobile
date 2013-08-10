@@ -15,9 +15,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 import scala.util.{ Failure, Success }
 
-class BadgesActivity extends NavDrawerActivity {
+class BadgesLeaderboardActivity extends NavDrawerActivity {
   override def onPostCreate(bundle: Bundle) {
     super.onPostCreate(bundle)
-    setUpNav(R.layout.badges_activity)
+    setUpNav(R.layout.badges_leaderboard_activity)
   }
 }
