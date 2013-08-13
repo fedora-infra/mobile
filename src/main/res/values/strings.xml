@@ -38,4 +38,9 @@
 
   <string name="pref_fas">Fedora Account System (FAS)</string>
   <string name="pref_fas_username_summary">Currently only used for Badges integration.</string>
+
+  <string name="fedora_badges">Fedora Badges</string>
+  <string name="badges_lb_failure">An issue occurred while loading the Badges leaderboard.</string>
+  <string name="badges_lb_rank">Rank:</string>
+  <string name="badges_lb_badges">badge(s)</string>
 </resources>

@@ -6,14 +6,8 @@
     android:layout_height="fill_parent"
     android:orientation="vertical">
 
-  <TextView
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/username"
-      android:id="@+id/badges_username" />
-
   <ListView
-      android:id="@+id/badges"
+      android:id="@+id/leaderboard"
       android:layout_width="fill_parent"
       android:layout_height="fill_parent"
       android:divider="#666666"

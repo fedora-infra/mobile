@@ -32,7 +32,11 @@
     <activity android:name=".PackageInfoActivity" />
     <activity android:name=".FedocalActivity" />
     <activity android:name=".GCMDemoActivity" />
-    <activity android:name=".BadgesLeaderboardActivity" />
+
+    <activity
+        android:name=".BadgesLeaderboardActivity"
+        android:label="@string/fedora_badges" />
+
     <activity android:name=".PreferencesActivity" />
 
     <activity

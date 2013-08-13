@@ -16,7 +16,7 @@ import java.io.{ DataOutputStream, InputStreamReader }
 import java.net.{ HttpURLConnection, URL, URLEncoder }
 
 object Badges {
-  val url = "http://10.10.10.125:8000/"
+  val url = "http://badges.stg.fedoraproject.org/"
 
   case class Badge(
     id: String,
@@ -29,7 +29,7 @@ object Badges {
     percentEarned: Float,
     timesAwarded: Int,
     description: String,
-    issued: Option[String] = None // Only in the 'user' JSON.
+    issued: Option[Float] = None // Only in the 'user' JSON.
   )
 
   case class User(
@@ -37,10 +37,18 @@ object Badges {
     user: String,
     assertions: List[Badge])
 
+  case class LeaderboardUser(
+    nickname: String,
+    badges: Int,
+    rank: Int)
+
+  case class Leaderboard(leaderboard: List[LeaderboardUser])
 
   object JSONParsing extends DefaultJsonProtocol {
     implicit val badgeResponse = jsonFormat(Badge, "id", "name", "image", "first_awarded", "first_awarded_person", "last_awarded", "last_awarded_person", "percent_earned", "times_awarded", "description", "issued")
     implicit val userResponse = jsonFormat(User, "percent_earned", "user", "assertions")
+    implicit val leaderboardUserResponse = jsonFormat(LeaderboardUser, "nickname", "badges", "rank")
+    implicit val leaderboardResponse = jsonFormat(Leaderboard, "leaderboard")
   }
 
    /** Returns a [[Future[String]]] of JSON after completing the query. */
