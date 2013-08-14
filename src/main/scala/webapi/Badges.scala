@@ -16,7 +16,7 @@ import java.io.{ DataOutputStream, InputStreamReader }
 import java.net.{ HttpURLConnection, URL, URLEncoder }
 
 object Badges {
-  val url = "http://badges.stg.fedoraproject.org/"
+  val url = "https://badges.stg.fedoraproject.org/"
 
   case class Badge(
     id: String,
