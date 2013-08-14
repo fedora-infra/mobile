@@ -5,6 +5,7 @@ import Badges.JSONParsing._
 import Implicits._
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 
 import spray.json._
@@ -32,6 +33,7 @@ class BadgesLeaderboardActivity extends NavDrawerActivity {
       }
       case Failure(err) => {
         runOnUiThread(Toast.makeText(this, R.string.badges_lb_failure, Toast.LENGTH_LONG).show)
+        Log.e("BadgesLeaderboardActivity", err.toString)
       }
     }
   }
