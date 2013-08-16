@@ -41,6 +41,7 @@
 
   <string name="fedora_badges">Fedora Badges</string>
   <string name="badges_lb_failure">An issue occurred while loading the Badges leaderboard.</string>
+  <string name="badges_user_failure">An issue occurred while loading user information.</string>
   <string name="badges_lb_rank">Rank:</string>
   <string name="badges_lb_badges">badge(s)</string>
 </resources>

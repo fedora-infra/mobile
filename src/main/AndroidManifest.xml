@@ -36,7 +36,7 @@
     <activity
         android:name=".BadgesLeaderboardActivity"
         android:label="@string/fedora_badges" />
-
+    <activity android:name=".BadgesUserActivity" />
     <activity android:name=".PreferencesActivity" />
 
     <activity

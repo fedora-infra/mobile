@@ -67,14 +67,13 @@ class BadgesLeaderboardAdapter(
       .asInstanceOf[TextView]
       .setText(item.badges + " " + context.getString(R.string.badges_lb_badges))
 
-    /*layout.setOnClickListener(new OnClickListener() {
+    layout.setOnClickListener(new OnClickListener() {
       override def onClick(view: View): Unit = {
-        item.link.map { link =>
-          val intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link))
-          activity.startActivity(intent)
-        }
+        val intent = new Intent(context, classOf[BadgesUserActivity])
+        intent.putExtra("nickname", item.nickname)
+        activity.startActivity(intent)
       }
-    })*/
+    })
 
     layout
   }

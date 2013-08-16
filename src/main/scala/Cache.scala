@@ -122,6 +122,19 @@ object Cache {
       topic,
       3600 * 24 * 7).get()
 
+  /** Returns a [[Future[Bitmap]]] containing the image for a badge.
+    *
+    * @param context The context on which to act.
+    * @param iconUrl The complete URL at which the badge image resides.
+    */
+  def getBadgeImage(context: Context, iconUrl: String, name: String): Future[Bitmap] =
+    new BitmapCache(
+      context,
+      new URL(iconUrl).openConnection.asInstanceOf[HttpURLConnection],
+      "badges",
+      name,
+      3600 * 24 * 7).get()
+
   /** Returns a [[Future[Bitmap]]] containing a Gravatar.
     *
     * @param context The context on which to act.
