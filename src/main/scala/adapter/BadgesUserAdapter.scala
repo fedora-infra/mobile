@@ -38,7 +38,7 @@ class BadgesUserAdapter(
 
     val badgeImageFuture = Cache.getBadgeImage(
       context,
-      s"http://infrastructure.fedoraproject.org/infra/badges/pngs/${item.image}",
+      item.image,
       item.name)
 
     badgeImageFuture onComplete { result =>
