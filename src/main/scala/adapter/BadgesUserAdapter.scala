@@ -39,7 +39,7 @@ class BadgesUserAdapter(
     val badgeImageFuture = Cache.getBadgeImage(
       context,
       item.image,
-      item.name)
+      item.id)
 
     badgeImageFuture onComplete { result =>
       result match {
