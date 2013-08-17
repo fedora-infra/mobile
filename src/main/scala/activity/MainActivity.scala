@@ -4,7 +4,8 @@ import Datagrepper.JSONParsing._
 
 import Implicits._
 
-import android.os.Bundle
+import android.os.{ Build, Bundle }
+import android.preference.PreferenceManager
 import android.util.Log
 import android.view.{ Menu, MenuItem, View }
 import android.widget.AbsListView.OnScrollListener
@@ -105,6 +106,22 @@ class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefres
   override def onPostCreate(bundle: Bundle) {
     super.onPostCreate(bundle)
     setUpNav(R.layout.main_activity)
+
+    val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
+    val checkUpdates = sharedPref.getBoolean("check_updates", true)
+
+    // If we're not in the emulator and the user hasn't disabled updates...
+    if (checkUpdates) {
+      val versionCompare: Future[Boolean] = Updates.compareVersion(this)
+      versionCompare onComplete {
+        case Success(currentHead) =>
+          if (!currentHead) {
+            runOnUiThread(Updates.presentDialog(MainActivity.this))
+          }
+        case Failure(err) => Log.e("MainActivity", err.toString)
+      }
+    }
+
     updateNewsfeed()
     val newsfeed = findView(TR.newsfeed)
 

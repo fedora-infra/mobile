@@ -13,7 +13,12 @@
   <string name="refresh">Refresh</string>
   <string name="loading">Loading…</string>
   <string name="submit">Submit</string>
+  <string name="update">Update</string>
+  <string name="not_now">Not now</string>
   <string name="username">Username</string>
+
+  <string name="update_available">Update available</string>
+  <string name="update_available_desc">A new commit has been made to Fedora Mobile. Would you like to update to it?</string>
 
   <string name="fedora_status">Fedora Status</string>
   <string name="status_good">Up and running</string>
@@ -38,6 +43,8 @@
 
   <string name="pref_fas">Fedora Account System (FAS)</string>
   <string name="pref_fas_username_summary">Currently only used for Badges integration.</string>
+  <string name="check_updates">Check for updates</string>
+  <string name="pref_check_updates_summary">Call out to GitHub on application start, to see if we are running the latest commit.</string>
 
   <string name="fedora_badges">Fedora Badges</string>
   <string name="badges_lb_failure">An issue occurred while loading the Badges leaderboard.</string>
