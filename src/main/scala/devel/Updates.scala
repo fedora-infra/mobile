@@ -54,7 +54,7 @@ object Updates {
   }
 
   def compareVersion(context: Context): Future[Boolean] = {
-    val version = context.getPackageManager.getPackageInfo(context.getPackageName, 0).versionName
+    val version = context.getString(R.string.git_sha)
     val c: Future[Commit] = getLatestCommit()
     c map { commit => commit.sha == version }
   }

@@ -1,0 +1,6 @@
+<resources>
+  <!-- This gets changed by Jenkins to reflect the current git commit sha. -->
+  <!-- Don't change the name of this string without updating Jenkins -->
+  <!-- (although the value doesn't matter much). -->
+  <string name="git_sha">HEAD</string>
+</resources>
