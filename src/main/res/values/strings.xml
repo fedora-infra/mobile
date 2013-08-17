@@ -18,7 +18,8 @@
   <string name="username">Username</string>
 
   <string name="update_available">Update available</string>
-  <string name="update_available_desc">A new commit has been made to Fedora Mobile. Would you like to update to it?</string>
+  <string name="update_available_desc">A new commit has been made to Fedora Mobile. Would you like to update to it? (You can disable auto-checking via Preferences)</string>
+  <string name="update_failure">Ut oh! Something went wrong while trying to update. :(</string>
 
   <string name="fedora_status">Fedora Status</string>
   <string name="status_good">Up and running</string>

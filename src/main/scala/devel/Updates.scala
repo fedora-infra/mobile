@@ -3,7 +3,7 @@ package org.fedoraproject.mobile
 import Implicits._
 
 import android.app.AlertDialog
-import android.content.{ Context, DialogInterface }
+import android.content.{ Context, DialogInterface, Intent }
 import android.net.Uri
 import android.util.Log
 
@@ -64,6 +64,8 @@ object Updates {
 
     builder.setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
       def onClick(dialog: DialogInterface, id: Int): Unit = {
+        val intent = new Intent(context, classOf[DownloadHeadActivity])
+        context.startActivity(intent)
       }
     });
 
