@@ -56,12 +56,12 @@ class StatusAdapter(
         view
           .findViewById(R.id.servicemessage)
           .asInstanceOf[TextView].tap { obj =>
-          obj.setText(service("message"))
-          obj.setVisibility(obj.getVisibility match {
-            case View.GONE => View.VISIBLE
-            case View.VISIBLE => View.GONE
-          })
-        }
+            obj.setText(service("message"))
+            obj.setVisibility(obj.getVisibility match {
+              case View.GONE => View.VISIBLE
+              case View.VISIBLE => View.GONE
+            })
+          }
       }
     })
 

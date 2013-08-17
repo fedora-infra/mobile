@@ -29,7 +29,7 @@ class BadgesLeaderboardActivity extends NavDrawerActivity {
           this,
           android.R.layout.simple_list_item_1,
           lb.leaderboard.toArray)
-          runOnUiThread(Option(findView(TR.leaderboard)).map(_.setAdapter(adapter)))
+        runOnUiThread(Option(findView(TR.leaderboard)).map(_.setAdapter(adapter)))
       }
       case Failure(err) => {
         runOnUiThread(Toast.makeText(this, R.string.badges_lb_failure, Toast.LENGTH_LONG).show)

@@ -30,7 +30,7 @@ object Badges {
     timesAwarded: Int,
     description: String,
     issued: Option[Float] = None // Only in the 'user' JSON.
-  )
+    )
 
   case class User(
     percentEarned: Float,
@@ -51,7 +51,7 @@ object Badges {
     implicit val leaderboardResponse = jsonFormat(Leaderboard, "leaderboard")
   }
 
-   /** Returns a [[Future[String]]] of JSON after completing the query. */
+  /** Returns a [[Future[String]]] of JSON after completing the query. */
   def query(path: String) = {
     Log.v("Badges", "Beginning query")
     val uri = Uri.parse(url + path.dropWhile(_ == '/'))

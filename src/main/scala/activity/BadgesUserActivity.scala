@@ -44,7 +44,7 @@ class BadgesUserActivity extends NavDrawerActivity {
             runOnUiThread(actionbar.setIcon(new BitmapDrawable(getResources, gravatar)))
           case _ =>
         }
-    }
+      }
 
     Badges.query(s"/user/${nickname}/json") onComplete {
       case Success(res) => {
@@ -53,7 +53,7 @@ class BadgesUserActivity extends NavDrawerActivity {
           this,
           android.R.layout.simple_list_item_1,
           user.assertions.toArray)
-          runOnUiThread(Option(findView(TR.user_badges)).map(_.setAdapter(adapter)))
+        runOnUiThread(Option(findView(TR.user_badges)).map(_.setAdapter(adapter)))
       }
       case Failure(err) => {
         runOnUiThread(Toast.makeText(this, R.string.badges_user_failure, Toast.LENGTH_LONG).show)
