@@ -31,7 +31,7 @@ class DownloadHeadActivity extends NavDrawerActivity {
     }
     path.mkdirs()
 
-    val file = new File(path, "fedora-mobile-head.apk")
+    val file = new File(path, "fedora-mobile-0.1.apk")
     if (file.exists) file.delete()
 
     future {
@@ -51,7 +51,6 @@ class DownloadHeadActivity extends NavDrawerActivity {
         val intent = new Intent(Intent.ACTION_VIEW)
         intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive")
         startActivity(intent)
-        file.delete()
       }
       case Failure(err) => {
         runOnUiThread(Toast.makeText(this, R.string.update_failure, Toast.LENGTH_LONG).show)
