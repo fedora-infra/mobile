@@ -17,6 +17,7 @@ Some things that Fedora Mobile sets out to do:
   Fedora services.
 - [Tag packages](https://apps.fedoraproject.org/tagger/)
 - [Search packages](https://apps.fedoraproject.org/packages/)
+- View the [Fedora Badges](https://badges.fedoraproject.org/) leaderboard.
 - And more.
 
 We target Android 3.0+ for the time being. The reason for this is that Fedora's
