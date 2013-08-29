@@ -51,5 +51,8 @@
   <string name="badges_lb_failure">An issue occurred while loading the Badges leaderboard.</string>
   <string name="badges_user_failure">An issue occurred while loading user information.</string>
   <string name="badges_lb_rank">Rank:</string>
-  <string name="badges_lb_badges">badge(s)</string>
+  <plurals name="badges_lb_badges">
+    <item quantity="one">One badge</item>
+    <item quantity="other">%d badges</item>
+  </plurals>
 </resources>

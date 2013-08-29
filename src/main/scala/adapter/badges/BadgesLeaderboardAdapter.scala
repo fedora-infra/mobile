@@ -32,6 +32,11 @@ class BadgesLeaderboardAdapter(
       .inflate(R.layout.badges_leaderboard_item, parent, false)
       .asInstanceOf[LinearLayout]
 
+    layout
+      .findViewById(R.id.rank)
+      .asInstanceOf[TextView]
+      .setText("#%02d".format(item.rank))
+
     val iconView = layout
       .findViewById(R.id.icon)
       .asInstanceOf[ImageView]
@@ -57,15 +62,18 @@ class BadgesLeaderboardAdapter(
       .asInstanceOf[TextView]
       .setText(item.nickname)
 
-    layout
-      .findViewById(R.id.rank)
-      .asInstanceOf[TextView]
-      .setText(context.getString(R.string.badges_lb_rank) + " " + item.rank)
+    // Use type ascriptions to work around Int <-> Integer annoyances.
+    // Blame Java for this. Or blame Scala if you want. Either way, it's
+    // annoying.
+    val badgesQuantity = context.getResources.getQuantityString(
+      R.plurals.badges_lb_badges,
+      item.badges: java.lang.Integer,
+      item.badges: java.lang.Integer)
 
     layout
       .findViewById(R.id.badges)
       .asInstanceOf[TextView]
-      .setText(item.badges + " " + context.getString(R.string.badges_lb_badges))
+      .setText(badgesQuantity)
 
     layout.setOnClickListener(new OnClickListener() {
       override def onClick(view: View): Unit = {
