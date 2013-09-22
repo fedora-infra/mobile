@@ -48,6 +48,8 @@
   <string name="pref_check_updates_summary">Call out to GitHub on application start, to see if we are running the latest commit.</string>
 
   <string name="fedora_badges">Fedora Badges</string>
+  <string name="leaderboard">Leaderboard</string>
+  <string name="badge">Badge</string>
   <string name="badges_lb_failure">An issue occurred while loading the Badges leaderboard.</string>
   <string name="badges_user_failure">An issue occurred while loading user information.</string>
   <string name="badges_lb_rank">Rank:</string>
@@ -55,4 +57,5 @@
     <item quantity="one">One badge</item>
     <item quantity="other">%d badges</item>
   </plurals>
+  <string name="earned_on">You earned this badge %s.</string>
 </resources>

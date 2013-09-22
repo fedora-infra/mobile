@@ -62,14 +62,13 @@ class BadgesUserAdapter(
       .asInstanceOf[TextView]
       .setText(item.description)
 
-    /*layout.setOnClickListener(new OnClickListener() {
+    layout.setOnClickListener(new OnClickListener() {
       override def onClick(view: View): Unit = {
-        item.link.map { link =>
-          val intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link))
-          activity.startActivity(intent)
-        }
+        val intent = new Intent(context, classOf[BadgeInfoActivity])
+        intent.putExtra("badge", item)
+        activity.startActivity(intent)
       }
-    })*/
+    })
 
     layout
   }

@@ -22,8 +22,12 @@
     </receiver>
 
     <activity
+        android:name=".BadgeInfoActivity"
+        android:label="@string/badge" />
+
+    <activity
         android:name=".BadgesLeaderboardActivity"
-        android:label="@string/fedora_badges" />
+        android:label="@string/leaderboard" />
 
     <activity android:name=".BadgesUserActivity" />
 
