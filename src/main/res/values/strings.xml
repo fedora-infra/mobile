@@ -57,5 +57,5 @@
     <item quantity="one">One badge</item>
     <item quantity="other">%d badges</item>
   </plurals>
-  <string name="earned_on">You earned this badge %s.</string>
+  <string name="earned_on">Awarded %s.</string>
 </resources>
