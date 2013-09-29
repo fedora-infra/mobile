@@ -148,11 +148,10 @@ object Cache {
     size: Int = 64,
     default: String = "https://fedoraproject.org/static/images/fedora_infinity_64x64.png"): Future[Bitmap] = {
     val defaultEncoded = URLEncoder.encode(default, "utf8")
-    new BitmapCache(
-      context,
-      new URL(s"https://secure.gravatar.com/avatar/$md5sum?s=$size&d=$defaultEncoded").openConnection.asInstanceOf[HttpURLConnection],
-      "gravatar",
-      md5sum,
-      3600 * 12).get()
+    val url = new URL(s"https://seccdn.libravatar.org/avatar/$md5sum?s=$size&d=$defaultEncoded")
+      .openConnection
+      .asInstanceOf[HttpURLConnection]
+    url.setInstanceFollowRedirects(true)
+    new BitmapCache(context, url, "gravatar", md5sum, 3600 * 12).get()
   }
 }
