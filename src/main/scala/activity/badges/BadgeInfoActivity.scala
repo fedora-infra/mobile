@@ -55,7 +55,8 @@ class BadgeInfoActivity extends NavDrawerActivity {
 
 
     timeAgo.map { t =>
-      val earned: String = getResources.getString(R.string.earned_on).format(t)
+      val earned: String =
+        getResources.getString(R.string.badges_earned_on).format(t)
       findView(TR.issued).setText(earned)
     }
   }
