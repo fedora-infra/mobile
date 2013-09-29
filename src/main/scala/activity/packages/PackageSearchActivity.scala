@@ -21,7 +21,7 @@ import scala.util.{ Failure, Try, Success }
 
 import java.net.URLEncoder
 
-class PackageSearchActivity extends NavDrawerActivity {
+class PackageSearchActivity extends NavDrawerActivity with util.Views {
   override def onCreate(bundle: Bundle) {
     super.onCreate(bundle)
     setUpNav(R.layout.package_search_activity)
@@ -36,14 +36,14 @@ class PackageSearchActivity extends NavDrawerActivity {
   def handleIntent(intent: Intent) {
     if (intent.getAction == Intent.ACTION_SEARCH) {
 
-      Option(findView(TR.packages)).map {
+      findViewOpt(TR.packages).map {
         _.tap { obj =>
           obj.setAdapter(null)
           obj.setVisibility(View.GONE)
         }
       }
 
-      Option(findView(TR.progress)).map(_.setVisibility(View.VISIBLE))
+      findViewOpt(TR.progress).map(_.setVisibility(View.VISIBLE))
 
       val queryText = intent.getStringExtra(SearchManager.QUERY)
       val queryObject = FilteredQuery(
@@ -103,11 +103,11 @@ class PackageSearchActivity extends NavDrawerActivity {
               packages)
 
             runOnUiThread {
-              Option(findView(TR.progress)).map(_.setVisibility(View.GONE))
+              findViewOpt(TR.progress).map(_.setVisibility(View.GONE))
             }
 
             runOnUiThread {
-              val packagesView = Option(findView(TR.packages)).map(_.asInstanceOf[ListView])
+              val packagesView = findViewOpt(TR.packages).map(_.asInstanceOf[ListView])
               packagesView match {
                 case Some(packagesView) => packagesView.tap { obj =>
                   obj.setAdapter(adapter)

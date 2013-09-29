@@ -20,7 +20,7 @@ import scala.util.{ Failure, Try, Success }
 
 import com.google.common.hash.Hashing
 
-class PackageInfoActivity extends NavDrawerActivity {
+class PackageInfoActivity extends NavDrawerActivity with util.Views {
   override def onPostCreate(bundle: Bundle) {
     super.onPostCreate(bundle)
     setUpNav(R.layout.package_info_activity)
@@ -80,9 +80,7 @@ class PackageInfoActivity extends NavDrawerActivity {
       Source.fromURL(jsonURL).mkString
     } onComplete { result =>
 
-      runOnUiThread {
-        Option(findView(TR.progress)).map(_.setVisibility(View.GONE))
-      }
+      findViewOpt(TR.progress).map(v => runOnUiThread(v.setVisibility(View.GONE)))
 
       result match {
         case Success(content) => {
@@ -101,7 +99,7 @@ class PackageInfoActivity extends NavDrawerActivity {
 
           val result = JsonParser(content).convertTo[Pkgwat.APIResults[Release]]
 
-          val releasesTable = Option(findView(TR.releases))
+          val releasesTable = findViewOpt(TR.releases)
 
           val header = new TableRow(this)
 

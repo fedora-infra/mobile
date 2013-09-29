@@ -23,7 +23,10 @@ case class StatusesResponse(
   global_verbose_status: String,
   services: Map[String, Map[String, String]])
 
-class StatusActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefreshListener {
+class StatusActivity
+  extends NavDrawerActivity
+  with PullToRefreshAttacher.OnRefreshListener
+  with util.Views {
 
   private lazy val refreshAdapter = new PullToRefreshAttacher(this)
 
@@ -45,12 +48,12 @@ class StatusActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefr
     }
 
   private def updateStatuses() {
-    Option(findView(TR.progress)).map(_.setVisibility(View.VISIBLE))
+    findViewOpt(TR.progress).map(_.setVisibility(View.VISIBLE))
 
     future {
       Source.fromURL("http://status.fedoraproject.org/statuses.json").mkString
     }.onComplete { result =>
-      Option(findView(TR.progress)).map(v => runOnUiThread(v.setVisibility(View.GONE)))
+      findViewOpt(TR.progress).map(v => runOnUiThread(v.setVisibility(View.GONE)))
       result match {
         case Success(e) => {
           val parsed = JsonParser(e).convertTo[StatusesResponse]
@@ -60,10 +63,10 @@ class StatusActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefr
             android.R.layout.simple_list_item_1,
             parsed.services.toArray.sortBy(_._2("name")))
 
-          runOnUiThread(Option(findView(TR.statuses)).map(_.setAdapter(adapter)))
+          findViewOpt(TR.statuses).map(v => runOnUiThread(v.setAdapter(adapter)))
 
           runOnUiThread {
-            val globalInfoView = Option(findView(TR.globalinfo))
+            val globalInfoView = findViewOpt(TR.globalinfo)
             globalInfoView match {
               case Some(globalInfoView) => globalInfoView.tap { obj =>
                 obj.setText(parsed.global_verbose_status)

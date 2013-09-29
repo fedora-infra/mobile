@@ -20,7 +20,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 import scala.util.{ Failure, Success }
 
-class BadgesUserActivity extends NavDrawerActivity {
+class BadgesUserActivity extends NavDrawerActivity with util.Views {
   override def onPostCreate(bundle: Bundle) {
     super.onPostCreate(bundle)
     setUpNav(R.layout.badges_user_activity)
@@ -53,7 +53,7 @@ class BadgesUserActivity extends NavDrawerActivity {
           this,
           android.R.layout.simple_list_item_1,
           user.assertions.toArray)
-        runOnUiThread(Option(findView(TR.user_badges)).map(_.setAdapter(adapter)))
+        findViewOpt(TR.user_badges).map(v => runOnUiThread(v.setAdapter(adapter)))
       }
       case Failure(err) => {
         runOnUiThread(Toast.makeText(this, R.string.badges_user_failure, Toast.LENGTH_LONG).show)

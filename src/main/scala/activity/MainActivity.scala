@@ -23,7 +23,10 @@ import scala.util.{ Failure, Success }
 import java.util.ArrayList // TODO: Do something about this.
 import java.util.TimeZone
 
-class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefreshListener {
+class MainActivity
+  extends NavDrawerActivity
+  with PullToRefreshAttacher.OnRefreshListener
+  with util.Views {
 
   private lazy val refreshAdapter = new PullToRefreshAttacher(this)
 
@@ -140,7 +143,7 @@ class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefres
   }
 
   private def updateNewsfeed() {
-    Option(findView(TR.progress)).map(_.setVisibility(View.VISIBLE))
+    findViewOpt(TR.progress).map(_.setVisibility(View.VISIBLE))
 
     val newsfeed = findView(TR.newsfeed)
     val messages = getLatestMessages() map { res =>
@@ -153,7 +156,7 @@ class MainActivity extends NavDrawerActivity with PullToRefreshAttacher.OnRefres
         // For web-scale concurrency.
         res onSuccess {
           case hrfResult => {
-            Option(findView(TR.progress)).map(v => runOnUiThread(v.setVisibility(View.GONE)))
+            findViewOpt(TR.progress).map(v => runOnUiThread(v.setVisibility(View.GONE)))
             val arrayList = new ArrayList[HRF.Result]
             hrfResult.foreach { result => arrayList.add(result) }
             val adapter = new FedmsgAdapter(
