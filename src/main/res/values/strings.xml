@@ -2,7 +2,7 @@
   <!-- Navigation Drawer -->
   <string name="infrastructure_status">Infrastructure Status</string>
   <string name="package_search">Package Search</string>
-  <string name="badges">Badges</string>
+  <string name="badges_leaderboard">Badges Leaderboard</string>
   <string name="fedmsg_gcm_demo">Fedmsg GCM Demo (horrible)</string>
   <string name="preferences">Preferences</string>
 
