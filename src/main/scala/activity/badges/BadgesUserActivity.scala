@@ -7,33 +7,37 @@ import Implicits._
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 
 import spray.json._
 
 import com.google.common.hash.Hashing
 
-// import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
 
 import scala.concurrent.{ future, Future }
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 import scala.util.{ Failure, Success }
 
-class BadgesUserActivity extends NavDrawerActivity with util.Views {
+class BadgesUserActivity
+  extends NavDrawerActivity
+  with PullToRefreshAttacher.OnRefreshListener
+  with util.Views {
+
+  private lazy val refreshAdapter = new PullToRefreshAttacher(this)
+
+  // The nickname is passed via the intent. If it's not there, something went
+  // horribly wrong and fataling is probably the correct thing to do.
+  private lazy val nickname = getIntent.getExtras.getString("nickname")
+
   override def onPostCreate(bundle: Bundle) {
     super.onPostCreate(bundle)
     setUpNav(R.layout.badges_user_activity)
 
-    // The nickname is passed via the intent. If it's not there, something went
-    // horribly wrong and fataling is probably the correct thing to do.
-    val nickname = getIntent.getExtras.getString("nickname")
-
     val actionbar = getActionBar
     actionbar.setTitle(nickname)
-
-    // TODO: Include rank one day?
-    //actionbar.setSubtitle(pkg.summary)
 
     val bytes = s"${nickname}@fedoraproject.org".getBytes("utf8")
     Cache.getGravatar(
@@ -46,6 +50,16 @@ class BadgesUserActivity extends NavDrawerActivity with util.Views {
         }
       }
 
+    val badges = findView(TR.user_badges)
+    refreshAdapter.setRefreshableView(badges, this)
+  }
+
+  def onRefreshStarted(view: View): Unit = {
+    updateBadges()
+    runOnUiThread(refreshAdapter.setRefreshComplete)
+  }
+
+  def updateBadges(): Unit = {
     Badges.query(s"/user/${nickname}/json") onComplete {
       case Success(res) => {
         val user = JsonParser(res).convertTo[Badges.User]
