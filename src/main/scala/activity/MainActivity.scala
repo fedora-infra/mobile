@@ -168,9 +168,11 @@ class MainActivity
         }
         res onFailure {
           case failure =>
-            runOnUiThread {
-              Toast.makeText(this, R.string.newsfeed_failure, Toast.LENGTH_LONG).show
-            }
+            runOnUiThread(
+              Toast.makeText(
+                this,
+                R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
+            Log.e("MainActivity", "Error updating newsfeed: " + failure.toString)
         }
     }
   }
