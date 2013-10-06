@@ -1,7 +1,5 @@
 package org.fedoraproject.mobile
 
-import Datagrepper.JSONParsing._
-
 import Implicits._
 
 import android.os.{ Build, Bundle }
@@ -30,54 +28,37 @@ class MainActivity
 
   private lazy val refreshAdapter = new PullToRefreshAttacher(this)
 
-  private def getLatestMessages(before: Option[Long] = None): Future[Datagrepper.Response] = {
-    // TODO: This is dirty like zebra.
+  private def getLatestMessages(before: Option[Long] = None): Future[List[HRF.Result]] = {
     val query = List(
       "delta" -> "7200",
       "order" -> "desc"
     ) ::: (if (before.isDefined) List("start" -> before.get.toString) else Nil)
 
-    Datagrepper.query(query) map { res =>
-      JsonParser(res).convertTo[Datagrepper.Response]
-    }
+    HRF(query, TimeZone.getDefault)
   }
 
-  private def getMessagesSince(since: Long): Future[Datagrepper.Response] = {
-    Datagrepper.query(
+  private def getMessagesSince(since: Long): Future[List[HRF.Result]] =
+    HRF(
       List(
         "start" -> (since + 1).toString,
         "order" -> "desc"
-      )
-    ) map { res =>
-        JsonParser(res).convertTo[Datagrepper.Response]
-      }
-  }
+      ),
+      TimeZone.getDefault)
 
   def onRefreshStarted(view: View): Unit = {
     val newsfeed = findView(TR.newsfeed)
     val newestTimestamp = newsfeed.getAdapter.getItem(0).asInstanceOf[HRF.Result].timestamp("epoch")
-    val messages = getMessagesSince(newestTimestamp.replace(".0", "").toLong) map { res =>
-      HRF(res.messages.toString, TimeZone.getDefault)
-    }
+    val messages = getMessagesSince(newestTimestamp.replace(".0", "").toLong)
     messages onComplete {
-      case Success(res) => {
-        res onComplete {
-          case Success(hrfResult) => {
-            val adapter = newsfeed.getAdapter.asInstanceOf[ArrayAdapter[HRF.Result]]
-            runOnUiThread(hrfResult.reverse.foreach { result => adapter.insert(result, 0) })
-            runOnUiThread(adapter.notifyDataSetChanged)
-            runOnUiThread(refreshAdapter.setRefreshComplete)
-          }
-          case Failure(failure) => {
-            runOnUiThread(Toast.makeText(this, R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
-            Log.e("MainActivity", "Error refreshing [inner]: " + failure.toString)
-            runOnUiThread(refreshAdapter.setRefreshComplete)
-          }
-        }
+      case Success(hrfResult) => {
+        val adapter = newsfeed.getAdapter.asInstanceOf[ArrayAdapter[HRF.Result]]
+        runOnUiThread(hrfResult.reverse.foreach { result => adapter.insert(result, 0) })
+        runOnUiThread(adapter.notifyDataSetChanged)
+        runOnUiThread(refreshAdapter.setRefreshComplete)
       }
       case Failure(failure) => {
         runOnUiThread(Toast.makeText(this, R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
-        Log.e("MainActivity", "Error refreshing [outer]: " + failure.toString)
+        Log.e("MainActivity", "Error refreshing: " + failure.toString)
         runOnUiThread(refreshAdapter.setRefreshComplete)
       }
     }
@@ -85,24 +66,18 @@ class MainActivity
 
   private def getNextPage(lastTimeStamp: Long): Unit = {
     val newsfeed = findView(TR.newsfeed)
-    val messages = getLatestMessages(Option(lastTimeStamp)) map { res =>
-      HRF(res.messages.toString, TimeZone.getDefault)
-    }
+    val messages = getLatestMessages(Option(lastTimeStamp))
     messages onSuccess {
-      case res =>
-        res onSuccess {
-          case hrfResult => {
-            val adapter = newsfeed.getAdapter.asInstanceOf[ArrayAdapter[HRF.Result]]
-            runOnUiThread(hrfResult.foreach { result => adapter.add(result) })
-            runOnUiThread(adapter.notifyDataSetChanged)
-          }
-        }
-        res onFailure {
-          case failure =>
-            runOnUiThread {
-              Toast.makeText(this, R.string.newsfeed_failure, Toast.LENGTH_LONG).show
-            }
-        }
+      case hrfResult => {
+        val adapter = newsfeed.getAdapter.asInstanceOf[ArrayAdapter[HRF.Result]]
+        runOnUiThread(hrfResult.foreach { result => adapter.add(result) })
+        runOnUiThread(adapter.notifyDataSetChanged)
+      }
+    }
+    messages onFailure {
+      case failure =>
+        runOnUiThread(
+          Toast.makeText(this, R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
     }
   }
 
@@ -146,34 +121,27 @@ class MainActivity
     findViewOpt(TR.progress).map(_.setVisibility(View.VISIBLE))
 
     val newsfeed = findView(TR.newsfeed)
-    val messages = getLatestMessages() map { res =>
-      HRF(res.messages.toString, TimeZone.getDefault)
-    }
-
+    val messages = getLatestMessages()
     messages onSuccess {
-      case res =>
-        // Yo dawg. I heard you like futures. So I put futures in your future.
-        // For web-scale concurrency.
-        res onSuccess {
-          case hrfResult => {
-            findViewOpt(TR.progress).map(v => runOnUiThread(v.setVisibility(View.GONE)))
-            val arrayList = new ArrayList[HRF.Result]
-            hrfResult.foreach { result => arrayList.add(result) }
-            val adapter = new FedmsgAdapter(
+      case hrfResult => {
+        findViewOpt(TR.progress).map(v => runOnUiThread(v.setVisibility(View.GONE)))
+        val arrayList = new ArrayList[HRF.Result]
+        hrfResult.foreach { result => arrayList.add(result) }
+        val adapter = new FedmsgAdapter(
+          this,
+          android.R.layout.simple_list_item_1,
+          arrayList)
+        runOnUiThread(newsfeed.setAdapter(adapter))
+      }
+      messages onFailure {
+        case failure => {
+          runOnUiThread(
+            Toast.makeText(
               this,
-              android.R.layout.simple_list_item_1,
-              arrayList)
-            runOnUiThread(newsfeed.setAdapter(adapter))
-          }
+              R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
+          Log.e("MainActivity", "Error updating newsfeed: " + failure.toString)
         }
-        res onFailure {
-          case failure =>
-            runOnUiThread(
-              Toast.makeText(
-                this,
-                R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
-            Log.e("MainActivity", "Error updating newsfeed: " + failure.toString)
-        }
+      }
     }
   }
 }

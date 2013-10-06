@@ -16,53 +16,6 @@ import java.io.{ DataOutputStream, InputStreamReader }
 import java.net.{ HttpURLConnection, URL, URLEncoder }
 import java.util.TimeZone
 
-/** This is a general purpose way to interact with the Datagrepper API.
-  *
-  * Most of the time you will want to use [[HRF]] with this.
-  *
-  * For instance:
-  * {{{
-  * Datagrepper.query(List("delta" -> "1000")).map { r => JsonParser(r).convertTo[HRF.Response] }
-  * }}}
-  *
-  * This class provides a high level abstraction and hides all of the HTTP
-  * details behind a nice Scala API. All HTTP methods within return a Future
-  * which, in normal circumstances, will hold the result of the query.
-  */
-object Datagrepper {
-  val url = "https://apps.fedoraproject.org/datagrepper/raw/"
-
-  case class Response(
-    count: Int,
-    pages: Int,
-    messages: JsValue)
-
-  private def constructURL(arguments: List[(String, String)]): String = {
-    val uri = Uri.parse(url).buildUpon
-    arguments foreach {
-      case (key, value) =>
-        uri.appendQueryParameter(key, value)
-    }
-    uri.build.toString
-  }
-
-  /** Returns a [[Future[String]]] of JSON after completing the query. */
-  def query(arguments: List[(String, String)]) = {
-    Log.v("Datagrepper", "Beginning query")
-    future {
-      val connection = new URL(constructURL(arguments))
-        .openConnection
-        .asInstanceOf[HttpURLConnection]
-      connection setRequestMethod "GET"
-      CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
-    }
-  }
-
-  object JSONParsing extends DefaultJsonProtocol {
-    implicit val datagrepperResponse = jsonFormat(Response, "count", "pages", "raw_messages")
-  }
-}
-
 object HRF {
   val url = "http://hrf.cloud.fedoraproject.org/all"
 
@@ -88,22 +41,20 @@ object HRF {
 
   import JSONParsing._
 
-  def apply(messages: String, timezone: TimeZone): Future[List[Result]] =
-    post(messages, timezone.getID) map { res =>
-      JsonParser(res).convertTo[Response].results
-    }
+  def apply(query: List[(String, String)], timezone: TimeZone): Future[List[Result]] =
+    post(
+      query.map(x =>
+        s"${x._1}=${x._2}").mkString("&"), timezone.getID).map(res =>
+          JsonParser(res).convertTo[Response].results)
 
-  def post(json: String, timezone: String): Future[String] = future {
+  def post(qs: String, timezone: String): Future[String] = future {
     Log.v("HRF", "Beginning POST")
-    val connection = new URL(url + "?timezone=" + URLEncoder.encode(timezone, "utf8"))
+    val connection = new URL(url + "?timezone=" + URLEncoder.encode(timezone, "utf8") + "&" + qs)
       .openConnection
       .asInstanceOf[HttpURLConnection]
     connection setDoOutput true
-    connection setRequestMethod "POST"
+    connection setRequestMethod "GET"
     connection.setRequestProperty("Content-Type", "application/json");
-    val os = new DataOutputStream(connection.getOutputStream)
-    os.writeBytes(json)
-    os.close
     CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
   }
 }
