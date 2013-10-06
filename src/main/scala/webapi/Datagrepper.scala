@@ -52,7 +52,6 @@ object HRF {
     val connection = new URL(url + "?timezone=" + URLEncoder.encode(timezone, "utf8") + "&" + qs)
       .openConnection
       .asInstanceOf[HttpURLConnection]
-    connection setDoOutput true
     connection setRequestMethod "GET"
     connection.setRequestProperty("Content-Type", "application/json");
     CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
