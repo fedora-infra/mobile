@@ -17,14 +17,14 @@
     <ImageView
         android:id="@+id/icon"
         android:layout_width="65dp"
-        android:layout_height="65dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:paddingLeft="10dp"
         android:paddingRight="10dp" />
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
       <TextView
@@ -36,7 +36,6 @@
 
       <TextView
           android:id="@+id/subtitle"
-          android:layout_weight="1"
           android:layout_width="fill_parent"
           android:layout_height="wrap_content" />
 
