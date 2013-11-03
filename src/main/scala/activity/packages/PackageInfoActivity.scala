@@ -1,6 +1,7 @@
 package org.fedoraproject.mobile
 
 import Implicits._
+import util.Hashing
 
 import Pkgwat._
 import Pkgwat.JSONParsing._
@@ -17,8 +18,6 @@ import scala.concurrent.future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 import scala.util.{ Failure, Try, Success }
-
-import com.google.common.hash.Hashing
 
 class PackageInfoActivity extends NavDrawerActivity with util.Views {
   override def onPostCreate(bundle: Bundle) {
@@ -55,7 +54,7 @@ class PackageInfoActivity extends NavDrawerActivity with util.Views {
         ownerView.setText(owner)
         Cache.getGravatar(
           this,
-          Hashing.md5.hashBytes(s"$owner@fedoraproject.org".getBytes("utf8")).toString).onComplete { result =>
+          Hashing.md5(s"$owner@fedoraproject.org").toString).onComplete { result =>
             result match {
               case Success(gravatar) => {
                 runOnUiThread {

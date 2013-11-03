@@ -1,10 +1,14 @@
-import org.fedoraproject.mobile
-import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.FunSpec
+import org.fedoraproject.mobile.util.Hashing
 
-class Specs extends FunSpec with ShouldMatchers {
-  describe("a spec") {
-    it("should do something") {
-    }
+import org.scalacheck.Properties
+import org.scalacheck.Prop.forAll
+
+object StringSpecification extends Properties("String") {
+  property("length") = forAll { (a: String) =>
+    Hashing.md5(a).length == 32
+  }
+
+  property("hexadecimal") = forAll { (a: String) =>
+    Hashing.md5(a).forall((('0' to '9') ++ ('a' to 'f')).contains(_))
   }
 }

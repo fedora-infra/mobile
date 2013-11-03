@@ -25,8 +25,8 @@ object General {
       "com.google.guava" % "guava" % "14.0.1",
       "org.scalaz" %% "scalaz-core" % "7.0.4",
       "org.scalaz.stream" %% "scalaz-stream" % "0.2-SNAPSHOT",
-      "org.scalatest" %% "scalatest" % "1.9.1" % "test",
-      "com.github.chrisbanes.actionbarpulltorefresh" % "library" % "0.5"
+      "com.github.chrisbanes.actionbarpulltorefresh" % "library" % "0.5",
+      "org.scalacheck" %% "scalacheck" % "1.11.0" % "test"
     ),
     scalacOptions         := Seq(
       "-encoding", "utf8",

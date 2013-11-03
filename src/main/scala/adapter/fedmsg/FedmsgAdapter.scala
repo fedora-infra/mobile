@@ -1,6 +1,7 @@
 package org.fedoraproject.mobile
 
 import Implicits._
+import util.Hashing
 
 import android.app.Activity
 import android.content.{ Context, Intent }
@@ -8,8 +9,6 @@ import android.net.Uri
 import android.view.{ LayoutInflater, View, ViewGroup }
 import android.view.View.OnClickListener
 import android.widget.{ ArrayAdapter, ImageView, LinearLayout, ListView, TextView, Toast }
-
-import com.google.common.hash.Hashing
 
 import scala.concurrent.{ future, Future }
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -39,10 +38,10 @@ class FedmsgAdapter(
     // If there's a user associated with it, pull from gravatar.
     // Otherwise, just use the icon if it exists.
     if (item.usernames.length > 0) {
-      val bytes = s"${item.usernames.head}@fedoraproject.org".getBytes("utf8")
+      val email = s"${item.usernames.head}@fedoraproject.org"
       Cache.getGravatar(
         context,
-        Hashing.md5.hashBytes(bytes).toString).onComplete { result =>
+        Hashing.md5(email).toString).onComplete { result =>
           result match {
             case Success(gravatar) => {
               activity.runOnUiThread {

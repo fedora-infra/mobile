@@ -3,6 +3,7 @@ package org.fedoraproject.mobile
 import Badges.JSONParsing._
 
 import Implicits._
+import util.Hashing
 
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
@@ -11,8 +12,6 @@ import android.view.View
 import android.widget.Toast
 
 import spray.json._
-
-import com.google.common.hash.Hashing
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
 
@@ -39,10 +38,10 @@ class BadgesUserActivity
     val actionbar = getActionBar
     actionbar.setTitle(nickname)
 
-    val bytes = s"${nickname}@fedoraproject.org".getBytes("utf8")
+    val email = s"${nickname}@fedoraproject.org"
     Cache.getGravatar(
       this,
-      Hashing.md5.hashBytes(bytes).toString).onComplete { result =>
+      Hashing.md5(email)).onComplete { result =>
         result match {
           case Success(gravatar) =>
             runOnUiThread(actionbar.setIcon(new BitmapDrawable(getResources, gravatar)))
