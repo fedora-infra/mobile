@@ -16,12 +16,15 @@ object General {
     platformName in Android := "android-17",
     resolvers             ++= Seq(
       "spray" at "http://repo.spray.io/",
-      "relrod @ FedoraPeople" at "http://codeblock.fedorapeople.org/maven/"
+      "relrod @ FedoraPeople" at "http://codeblock.fedorapeople.org/maven/",
+      "sonatype-s" at "http://oss.sonatype.org/content/repositories/snapshots"
     ),
     libraryDependencies   ++= Seq(
       "io.spray" %% "spray-json" % "1.2.5",
       //"me.elrod" %% "pkgwat" % "1.0.0",
       "com.google.guava" % "guava" % "14.0.1",
+      "org.scalaz" %% "scalaz-core" % "7.0.4",
+      "org.scalaz.stream" %% "scalaz-stream" % "0.2-SNAPSHOT",
       "org.scalatest" %% "scalatest" % "1.9.1" % "test",
       "com.github.chrisbanes.actionbarpulltorefresh" % "library" % "0.5"
     ),
