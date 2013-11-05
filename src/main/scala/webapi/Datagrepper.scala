@@ -3,14 +3,16 @@ package org.fedoraproject.mobile
 import android.net.Uri
 import android.util.Log
 
-import com.google.common.io.CharStreams
+import argonaut._, Argonaut._
 
-import spray.json._
+import com.google.common.io.CharStreams
 
 import scala.concurrent.{ future, Future }
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 import scala.util.{ Failure, Try, Success }
+
+import scalaz._, Scalaz._
 
 import java.io.{ DataOutputStream, InputStreamReader }
 import java.net.{ HttpURLConnection, URL, URLEncoder }
@@ -32,24 +34,25 @@ object HRF {
     timestamp: Map[String, String],
     title: String,
     usernames: List[String] // TODO: When we have FAS integration, make this a List[FAS.User] or similar.
-    )
+  )
 
-  object JSONParsing extends DefaultJsonProtocol {
-    implicit val messageFormat = jsonFormat(Result, "icon", "secondary_icon", "link", "objects", "packages", "repr", "subtitle", "timestamp", "title", "usernames")
-    implicit val hrfResponse = jsonFormat(Response, "results")
-  }
+  implicit def ResponseCodecJson: CodecJson[Response] =
+    casecodec1(Response.apply, Response.unapply)("results")
 
-  import JSONParsing._
+  implicit def ResultCodecJson: CodecJson[Result] =
+    casecodec10(Result.apply, Result.unapply)("icon", "secondary_icon", "link", "objects", "packages", "repr", "subtitle", "timestamp", "title", "usernames")
 
-  def apply(query: List[(String, String)], timezone: TimeZone): Future[List[Result]] =
+  def apply(query: List[(String, String)], timezone: TimeZone): Future[String \/ List[Result]] =
     post(
       query.map(x =>
-        s"${x._1}=${x._2}").mkString("&"), timezone.getID).map(res =>
-          JsonParser(res).convertTo[Response].results)
+        s"${x._1}=${x._2}").mkString("&"), timezone.getID)
+      .map(Parse.decodeEither[Response](_).map(_.results))
 
   def post(qs: String, timezone: String): Future[String] = future {
-    Log.v("HRF", "Beginning POST")
-    val connection = new URL(url + "?timezone=" + URLEncoder.encode(timezone, "utf8") + "&" + qs)
+    val postUrl: URL = new URL(url + "?timezone=" + URLEncoder.encode(timezone, "utf8") + "&" + qs)
+    Log.v("HRF", "Beginning POST to " + postUrl)
+    val connection: HttpURLConnection =
+      postUrl
       .openConnection
       .asInstanceOf[HttpURLConnection]
     connection setRequestMethod "GET"
