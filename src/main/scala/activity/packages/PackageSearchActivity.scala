@@ -3,16 +3,16 @@ package org.fedoraproject.mobile
 import Implicits._
 
 import Pkgwat._
-import Pkgwat.JSONParsing._
 
 import android.app.SearchManager
 import android.content.{ Context, Intent }
 import android.os.Bundle
+import android.util.Log
 import android.view.{ LayoutInflater, Menu, View, ViewGroup }
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.{ AdapterView, ArrayAdapter, ImageView, LinearLayout, ListView, TextView, Toast, SearchView }
 
-import spray.json._
+import scalaz._, Scalaz._
 
 import scala.concurrent.{ future, Future }
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -51,82 +51,84 @@ class PackageSearchActivity extends NavDrawerActivity with util.Views {
         0,
         Map("search" -> queryText))
 
-      Pkgwat.query(queryObject) onComplete { result =>
-        result match {
-          case Success(content) => {
-            val result = JsonParser(content.replaceAll("""<\/?.*?>""", "")).convertTo[Pkgwat.APIResults[Package]]
-            val packages = result.rows.toArray
+      Log.e("PSA", "here we go!")
 
-            class PackageAdapter(
-              context: Context,
-              resource: Int,
-              items: Array[Package])
-              extends ArrayAdapter[Package](context, resource, items) {
-              override def getView(position: Int, convertView: View, parent: ViewGroup): View = {
-                val pkg = getItem(position)
+      Pkgwat.queryJson(queryObject) map {
+        case \/-(res) => {
+          Log.e("PSA", "Lookin' good!")
+          val packages = res.rows.toArray
 
-                val layout = LayoutInflater.from(context)
-                  .inflate(R.layout.package_list_item, parent, false)
-                  .asInstanceOf[LinearLayout]
+          class PackageAdapter(
+            context: Context,
+            resource: Int,
+            items: Array[Package])
+            extends ArrayAdapter[Package](context, resource, items) {
+            override def getView(position: Int, convertView: View, parent: ViewGroup): View = {
+              Log.e("PSA", "Hey hey hey!")
+              val pkg = getItem(position)
 
-                val iconView = layout
-                  .findViewById(R.id.icon)
-                  .asInstanceOf[ImageView]
+              val layout = LayoutInflater.from(context)
+                .inflate(R.layout.package_list_item, parent, false)
+                .asInstanceOf[LinearLayout]
 
-                Cache.getPackageIcon(PackageSearchActivity.this, pkg.icon) onComplete { result =>
-                  result match {
-                    case Success(icon) => {
-                      runOnUiThread {
-                        iconView.setImageBitmap(icon)
-                      }
+              val iconView = layout
+                .findViewById(R.id.icon)
+                .asInstanceOf[ImageView]
+
+              Cache.getPackageIcon(PackageSearchActivity.this, pkg.icon) onComplete { result =>
+                result match {
+                  case Success(icon) => {
+                    runOnUiThread {
+                      iconView.setImageBitmap(icon)
                     }
-                    case Failure(error) => {
-                      runOnUiThread {
-                        iconView.setImageResource(R.drawable.ic_search)
-                      }
+                  }
+                  case Failure(error) => {
+                    runOnUiThread {
+                      iconView.setImageResource(R.drawable.ic_search)
                     }
                   }
                 }
-
-                layout
-                  .findViewById(R.id.title)
-                  .asInstanceOf[TextView]
-                  .setText(pkg.name)
-
-                layout
               }
-            }
 
-            val adapter = new PackageAdapter(
-              this,
-              android.R.layout.simple_list_item_1,
-              packages)
+              layout
+                .findViewById(R.id.title)
+                .asInstanceOf[TextView]
+                .setText(pkg.name)
 
-            runOnUiThread {
-              findViewOpt(TR.progress).map(_.setVisibility(View.GONE))
-            }
-
-            runOnUiThread {
-              val packagesView = findViewOpt(TR.packages).map(_.asInstanceOf[ListView])
-              packagesView match {
-                case Some(packagesView) => packagesView.tap { obj =>
-                  obj.setAdapter(adapter)
-                  obj.setVisibility(View.VISIBLE)
-                  obj.setOnItemClickListener(new OnItemClickListener {
-                    def onItemClick(parent: AdapterView[_], view: View, position: Int, id: Long) {
-                      val pkg = packages(position)
-                      val intent = new Intent(PackageSearchActivity.this, classOf[PackageInfoActivity])
-                      intent.putExtra("package", pkg)
-                      startActivity(intent)
-                    }
-                  })
-                }
-                case None => // ...
-              }
+              layout
             }
           }
-          case Failure(e) => Toast.makeText(this, R.string.packages_search_failure, Toast.LENGTH_LONG).show
+
+          val adapter = new PackageAdapter(
+            this,
+            android.R.layout.simple_list_item_1,
+            packages)
+
+          runOnUiThread {
+            findViewOpt(TR.progress).map(_.setVisibility(View.GONE))
+          }
+
+          runOnUiThread {
+            val packagesView = findViewOpt(TR.packages).map(_.asInstanceOf[ListView])
+            packagesView match {
+              case Some(packagesView) => packagesView.tap { obj =>
+                obj.setAdapter(adapter)
+                obj.setVisibility(View.VISIBLE)
+                obj.setOnItemClickListener(new OnItemClickListener {
+                  def onItemClick(parent: AdapterView[_], view: View, position: Int, id: Long) {
+                    val pkg = packages(position)
+                    val intent = new Intent(PackageSearchActivity.this, classOf[PackageInfoActivity])
+                    intent.putExtra("package", pkg)
+                    startActivity(intent)
+                  }
+                })
+              }
+              case None => // ...
+            }
+          }
         }
+        case -\/(_) =>
+          Toast.makeText(this, R.string.packages_search_failure, Toast.LENGTH_LONG).show
       }
     }
   }

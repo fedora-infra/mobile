@@ -4,7 +4,6 @@ import Implicits._
 import util.Hashing
 
 import Pkgwat._
-import Pkgwat.JSONParsing._
 
 import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
@@ -12,10 +11,14 @@ import android.os.Bundle
 import android.view.View
 import android.widget.{ TableRow, TextView, Toast }
 
-import spray.json._
+import argonaut._, Argonaut._
 
-import scala.concurrent.future
-import scala.concurrent.ExecutionContext.Implicits.global
+import scalaz._, Scalaz._
+import scalaz.concurrent.Promise
+import scalaz.concurrent.Promise._
+
+import scala.concurrent.future // TODO: Nuke
+import scala.concurrent.ExecutionContext.Implicits.global // TODO: Nuke
 import scala.io.Source
 import scala.util.{ Failure, Try, Success }
 
@@ -43,6 +46,7 @@ class PackageInfoActivity extends NavDrawerActivity with util.Views {
         }
       }
     }
+
     actionbar.setTitle(pkg.name)
     actionbar.setSubtitle(pkg.summary)
 
@@ -75,14 +79,12 @@ class PackageInfoActivity extends NavDrawerActivity with util.Views {
         0,
         Map("package" -> pkg.name)))
 
-    future {
+    promise {
       Source.fromURL(jsonURL).mkString
-    } onComplete { result =>
+    } map {
+      case res: String => {
+        findViewOpt(TR.progress).map(v => runOnUiThread(v.setVisibility(View.GONE)))
 
-      findViewOpt(TR.progress).map(v => runOnUiThread(v.setVisibility(View.GONE)))
-
-      result match {
-        case Success(content) => {
           // This is *really* hacky, but blocked on
           // https://github.com/fedora-infra/fedora-packages/issues/24.
           // The issue is that right now Fedora Packages (the app)'s API
@@ -96,46 +98,45 @@ class PackageInfoActivity extends NavDrawerActivity with util.Views {
           // karma, and karma_icon. But for now, life isn't ideal.
           def stripHTML(s: String) = s.replaceAll("""<\/?.*?>""", "")
 
-          val result = JsonParser(content).convertTo[Pkgwat.APIResults[Release]]
+          val apiResults = stripHTML(res).decodeEither[Pkgwat.APIResults[Release]]
 
-          val releasesTable = findViewOpt(TR.releases)
+          apiResults match {
+            case \/-(r) => {
+              val releasesTable = findViewOpt(TR.releases)
+              val header = new TableRow(this)
+              header.addView(
+                new TextView(this).tap { obj =>
+                  obj.setText(R.string.release)
+                  obj.setTypeface(null, Typeface.BOLD)
+              })
+              header.addView(
+                new TextView(this).tap { obj =>
+                  obj.setText(R.string.stable)
+                  obj.setTypeface(null, Typeface.BOLD)
+              })
 
-          val header = new TableRow(this)
+              header.addView(
+                new TextView(this).tap { obj =>
+                  obj.setText(R.string.testing)
+                  obj.setTypeface(null, Typeface.BOLD)
+              })
 
-          header.addView(
-            new TextView(this).tap { obj =>
-              obj.setText(R.string.release)
-              obj.setTypeface(null, Typeface.BOLD)
-            })
+              runOnUiThread(releasesTable.foreach(_.addView(header)))
 
-          header.addView(
-            new TextView(this).tap { obj =>
-              obj.setText(R.string.stable)
-              obj.setTypeface(null, Typeface.BOLD)
-            })
-
-          header.addView(
-            new TextView(this).tap { obj =>
-              obj.setText(R.string.testing)
-              obj.setTypeface(null, Typeface.BOLD)
-            })
-
-          runOnUiThread {
-            releasesTable.map(_.addView(header))
-          }
-
-          result.rows.foreach { release =>
-            val row = new TableRow(this)
-            row.addView(new TextView(this).tap(_.setText(stripHTML(release.release))))
-            row.addView(new TextView(this).tap(_.setText(stripHTML(release.stableVersion))))
-            row.addView(new TextView(this).tap(_.setText(stripHTML(release.testingVersion.split("<div").head)))) // HACK
-            runOnUiThread {
-              releasesTable.map(_.addView(row))
+              r.rows.foreach { release =>
+                val row = new TableRow(this)
+                row.addView(new TextView(this).tap(_.setText(stripHTML(release.release))))
+                row.addView(new TextView(this).tap(_.setText(stripHTML(release.stableVersion))))
+                row.addView(new TextView(this).tap(_.setText(stripHTML(release.testingVersion.split("<div").head)))) // HACK
+                runOnUiThread(releasesTable.foreach(_.addView(row)))
+              }
             }
+            case -\/(r) =>
+              Toast.makeText(this, R.string.packages_release_failure, Toast.LENGTH_LONG).show
           }
-        }
-        case Failure(error) => Toast.makeText(this, R.string.packages_release_failure, Toast.LENGTH_LONG).show
       }
+      case _ => // TODO: compose this with the above, remove duplicate code
+        Toast.makeText(this, R.string.packages_release_failure, Toast.LENGTH_LONG).show
     }
   }
 }

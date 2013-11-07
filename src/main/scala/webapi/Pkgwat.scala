@@ -2,12 +2,14 @@ package org.fedoraproject.mobile
 
 import android.util.Log
 
+import argonaut._, Argonaut._
+
 import com.google.common.io.CharStreams
 
-import spray.json._
-
-import scala.concurrent.{ future, Future }
-import scala.concurrent.ExecutionContext.Implicits.global
+import scalaz._, Scalaz._
+import scalaz.concurrent.Promise
+import scalaz.concurrent.Promise._
+import scalaz.effect._
 
 import java.io.{ InputStreamReader }
 import java.net.{ HttpURLConnection, URL, URLEncoder }
@@ -20,11 +22,20 @@ object Pkgwat {
     startRow: Int,
     rows: List[T])
 
+  case class SubPackage(
+    icon: String,
+    description: String,
+    link: String,
+    summary: String,
+    name: String,
+    upstreamURL: Option[String] = None,
+    develOwner: Option[String] = None)
+
   case class Package(
     icon: String,
     description: String,
     link: String,
-    subPackages: Option[List[Package]],
+    subPackages: List[SubPackage],
     summary: String,
     name: String,
     upstreamURL: Option[String] = None,
@@ -37,20 +48,27 @@ object Pkgwat {
 
   case class FilteredQuery(rowsPerPage: Int, startRow: Int, filters: Map[String, String])
 
-  object JSONParsing extends DefaultJsonProtocol {
-    implicit val filteredQueryFormat = jsonFormat(FilteredQuery, "rows_per_page", "start_row", "filters")
+  implicit def FilteredQueryCodecJson: CodecJson[FilteredQuery] =
+    casecodec3(FilteredQuery.apply, FilteredQuery.unapply)("rows_per_page", "start_row", "filters")
 
-    implicit val packageFormat: JsonFormat[Package] = lazyFormat(jsonFormat(Package, "icon", "description", "link", "sub_pkgs", "summary", "name", "upstream_url", "devel_owner"))
-    implicit val packageResultFormat = jsonFormat(APIResults[Package], "visible_rows", "total_rows", "rows_per_page", "start_row", "rows")
+  implicit def ReleaseCodecJson: CodecJson[Release] =
+    casecodec3(Release.apply, Release.unapply)("release", "stable_version", "testing_version")
 
-    implicit val releaseFormat = jsonFormat(Release, "release", "stable_version", "testing_version")
-    implicit val releaseResultFormat = jsonFormat(APIResults[Release], "visible_rows", "total_rows", "rows_per_page", "start_row", "rows")
-  }
+  implicit def PackageCodecJson: CodecJson[Package] =
+    casecodec8(Package.apply, Package.unapply)("icon", "description", "link", "sub_pkgs", "summary", "name", "upstream_url", "devel_owner")
 
-  import JSONParsing._
+  implicit def SubPackageCodecJson: CodecJson[SubPackage] =
+    casecodec7(SubPackage.apply, SubPackage.unapply)("icon", "description", "link", "summary", "name", "upstream_url", "devel_owner")
 
+  implicit def PackageResultCodecJson: CodecJson[APIResults[Package]] =
+    casecodec5(APIResults.apply[Package], APIResults.unapply[Package])("visible_rows", "total_rows", "rows_per_page", "start_row", "rows")
+
+  implicit def ReleaseResultCodecJson: CodecJson[APIResults[Release]] =
+    casecodec5(APIResults.apply[Release], APIResults.unapply[Release])("visible_rows", "total_rows", "rows_per_page", "start_row", "rows")
+
+  // TODO: Move this... It's public because it's used by PackageInfoActivity
   def constructURL(path: String, query: FilteredQuery): String = {
-    val json = query.toJson.compactPrint
+    val json: String = query.asJson.nospaces
     Seq(
       "https://apps.fedoraproject.org/packages/",
       "fcomm_connector",
@@ -58,14 +76,19 @@ object Pkgwat {
       URLEncoder.encode(json, "utf8")).mkString("/")
   }
 
-  def query(query: FilteredQuery) = {
+  private def query(query: FilteredQuery): IO[String] = IO {
     Log.v("Pkgwat", "Beginning query")
-    future {
-      val connection = new URL(constructURL("xapian/query/search_packages", query))
-        .openConnection
-        .asInstanceOf[HttpURLConnection]
-      connection setRequestMethod "GET"
-      CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
-    }
+    val connection = new URL(constructURL("xapian/query/search_packages", query))
+      .openConnection
+      .asInstanceOf[HttpURLConnection]
+    connection setRequestMethod "GET"
+    CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
+  }
+
+  def queryJson(q: FilteredQuery): Promise[String \/ APIResults[Package]] = promise {
+    query(q)
+    .unsafePerformIO
+    .replaceAll("""<\/?.*?>""", "")
+    .decodeEither[APIResults[Package]]
   }
 }

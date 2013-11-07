@@ -7,12 +7,12 @@ import argonaut._, Argonaut._
 
 import com.google.common.io.CharStreams
 
+import scalaz._, Scalaz._
+
 import scala.concurrent.{ future, Future }
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 import scala.util.{ Failure, Try, Success }
-
-import scalaz._, Scalaz._
 
 import java.io.{ DataOutputStream, InputStreamReader }
 import java.net.{ HttpURLConnection, URL, URLEncoder }
