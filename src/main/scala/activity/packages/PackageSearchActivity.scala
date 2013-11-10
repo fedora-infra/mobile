@@ -7,19 +7,15 @@ import Pkgwat._
 import android.app.SearchManager
 import android.content.{ Context, Intent }
 import android.os.Bundle
-import android.util.Log
 import android.view.{ LayoutInflater, Menu, View, ViewGroup }
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.{ AdapterView, ArrayAdapter, ImageView, LinearLayout, ListView, TextView, Toast, SearchView }
 
 import scalaz._, Scalaz._
 
-import scala.concurrent.{ future, Future }
+// Needed until Cache moves to scalaz.concurrent.Promise
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.io.Source
 import scala.util.{ Failure, Try, Success }
-
-import java.net.URLEncoder
 
 class PackageSearchActivity extends NavDrawerActivity with util.Views {
   override def onCreate(bundle: Bundle) {
@@ -51,11 +47,8 @@ class PackageSearchActivity extends NavDrawerActivity with util.Views {
         0,
         Map("search" -> queryText))
 
-      Log.e("PSA", "here we go!")
-
       Pkgwat.queryJson(queryObject) map {
         case \/-(res) => {
-          Log.e("PSA", "Lookin' good!")
           val packages = res.rows.toArray
 
           class PackageAdapter(
@@ -64,7 +57,6 @@ class PackageSearchActivity extends NavDrawerActivity with util.Views {
             items: Array[Package])
             extends ArrayAdapter[Package](context, resource, items) {
             override def getView(position: Int, convertView: View, parent: ViewGroup): View = {
-              Log.e("PSA", "Hey hey hey!")
               val pkg = getItem(position)
 
               val layout = LayoutInflater.from(context)

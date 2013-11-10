@@ -17,7 +17,6 @@ import scalaz._, Scalaz._
 import scalaz.concurrent.Promise
 import scalaz.concurrent.Promise._
 
-import scala.concurrent.future // TODO: Nuke
 import scala.concurrent.ExecutionContext.Implicits.global // TODO: Nuke
 import scala.io.Source
 import scala.util.{ Failure, Try, Success }
