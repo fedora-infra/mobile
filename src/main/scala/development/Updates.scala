@@ -7,14 +7,16 @@ import android.content.{ Context, DialogInterface, Intent }
 import android.net.Uri
 import android.util.Log
 
+import argonaut._, Argonaut._
+
 import com.google.common.io.CharStreams
 
-import spray.json._
+import scalaz._, Scalaz._
+import scalaz.concurrent.Promise
+import scalaz.concurrent.Promise._
+import scalaz.effect._
 
-import scala.concurrent.{ future, Future }
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
-import scala.util.{ Failure, Try, Success }
 
 import java.io.{ DataOutputStream, InputStreamReader }
 import java.net.{ HttpURLConnection, URL, URLEncoder }
@@ -26,12 +28,12 @@ object Updates {
   /** Parse the response from GitHub, only pulling out fields we care about. */
   case class Commit(sha: String, stats: CommitStats)
 
-  object JSONParsing extends DefaultJsonProtocol {
-    implicit val statsResponse = jsonFormat(CommitStats, "total", "additions", "deletions")
-    implicit val commitResponse = jsonFormat(Commit, "sha", "stats")
-  }
+  implicit def CommitStatsCodecJson: CodecJson[CommitStats] =
+    casecodec3(CommitStats.apply, CommitStats.unapply)("total", "additions", "deletions")
 
-  import JSONParsing._
+
+  implicit def CommitCodecJson: CodecJson[Commit] =
+    casecodec2(Commit.apply, Commit.unapply)("sha", "stats")
 
   /** Handle checking for updates when running in development mode.
     *
@@ -41,22 +43,22 @@ object Updates {
     * instance). If they match, we do nothing. If they don't match, we pop up a
     * dialog, asking if the user wants to update.
     */
-  private def getLatestCommit(): Future[Commit] = {
+  private def getLatestCommit(): IO[String] = IO {
     Log.v("Updates", "Pinging GitHub API for latest commit info")
     val uri = Uri.parse("https://api.github.com/repos/fedora-infra/mobile/commits/HEAD")
-    future {
-      val connection = new URL(uri.toString)
-        .openConnection
-        .asInstanceOf[HttpURLConnection]
-      connection setRequestMethod "GET"
-      CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
-    } map { res => JsonParser(res).convertTo[Commit] }
+    val connection = new URL(uri.toString)
+      .openConnection
+      .asInstanceOf[HttpURLConnection]
+    connection setRequestMethod "GET"
+    CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
   }
 
-  def compareVersion(context: Context): Future[Boolean] = {
-    val version = context.getString(R.string.git_sha)
-    val c: Future[Commit] = getLatestCommit()
-    c map { commit => commit.sha == version }
+  def compareVersion(context: Context): Promise[String \/ Boolean] = {
+    val version: String = context.getString(R.string.git_sha)
+    val current: IO[String] = getLatestCommit()
+    promise {
+      current.unsafePerformIO.decodeEither[Commit].map(_.sha == version)
+    }
   }
 
   def presentDialog(context: Context): Unit = {

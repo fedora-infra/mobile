@@ -10,6 +10,7 @@ import android.widget.AbsListView.OnScrollListener
 import android.widget.{ AbsListView, ArrayAdapter, Toast }
 
 import scalaz._, Scalaz._
+import scalaz.concurrent.Promise
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
 
@@ -95,13 +96,14 @@ class MainActivity
 
     // If we're not in the emulator and the user hasn't disabled updates...
     if (checkUpdates) {
-      val versionCompare: Future[Boolean] = Updates.compareVersion(this)
-      versionCompare onComplete {
-        case Success(currentHead) =>
-          if (!currentHead) {
-            runOnUiThread(Updates.presentDialog(MainActivity.this))
-          }
-        case Failure(err) => Log.e("MainActivity", err.toString)
+      val versionCompare: Promise[String \/ Boolean] = Updates.compareVersion(this)
+      versionCompare map {
+        case \/-(b) if b == true =>
+          Log.e("MainActivity", "We're up to date!")
+        case \/-(b) if b == false =>
+          runOnUiThread(Updates.presentDialog(MainActivity.this))
+        case -\/(err) =>
+          Log.e("MainActivity", err.toString)
       }
     }
 
