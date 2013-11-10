@@ -94,7 +94,7 @@ class MainActivity
     val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
     val checkUpdates = sharedPref.getBoolean("check_updates", true)
 
-    // If we're not in the emulator and the user hasn't disabled updates...
+    // If the user hasn't disabled updates...
     if (checkUpdates) {
       val versionCompare: Promise[String \/ Boolean] = Updates.compareVersion(this)
       versionCompare map {
