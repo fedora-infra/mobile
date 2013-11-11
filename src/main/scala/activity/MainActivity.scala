@@ -14,10 +14,7 @@ import scalaz.concurrent.Promise
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
 
-import scala.concurrent.{ future, Future }
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
-import scala.util.{ Failure, Success }
 
 import java.util.ArrayList // TODO: Do something about this.
 import java.util.TimeZone
@@ -29,7 +26,7 @@ class MainActivity
 
   private lazy val refreshAdapter = new PullToRefreshAttacher(this)
 
-  private def getLatestMessages(before: Option[Long] = None): Future[String \/ List[HRF.Result]] = {
+  private def getLatestMessages(before: Option[Long] = None): Promise[String \/ List[HRF.Result]] = {
     val query = List(
       "delta" -> "7200",
       "order" -> "desc"
@@ -38,7 +35,7 @@ class MainActivity
     HRF(query, TimeZone.getDefault)
   }
 
-  private def getMessagesSince(since: Long): Future[String \/ List[HRF.Result]] =
+  private def getMessagesSince(since: Long): Promise[String \/ List[HRF.Result]] =
     HRF(
       List(
         "start" -> (since + 1).toString,
@@ -49,22 +46,17 @@ class MainActivity
   def onRefreshStarted(view: View): Unit = {
     val newsfeed = findView(TR.newsfeed)
     val newestTimestamp = newsfeed.getAdapter.getItem(0).asInstanceOf[HRF.Result].timestamp("epoch")
-    val messages = getMessagesSince(newestTimestamp.replace(".0", "").toLong)
-    messages onComplete {
-      case Success(hrfResult) => {
-        hrfResult match {
-          case -\/(err) => Log.e("MainActivity", "Error refreshing: " + err)
-          case \/-(res) => {
-            val adapter = newsfeed.getAdapter.asInstanceOf[ArrayAdapter[HRF.Result]]
-            runOnUiThread(res.reverse.foreach(adapter.insert(_, 0)))
-            runOnUiThread(adapter.notifyDataSetChanged)
-            runOnUiThread(refreshAdapter.setRefreshComplete)
-          }
-        }
+    val messages: Promise[String \/ List[HRF.Result]] = getMessagesSince(newestTimestamp.replace(".0", "").toLong)
+    messages map {
+      case \/-(res) => {
+        val adapter = newsfeed.getAdapter.asInstanceOf[ArrayAdapter[HRF.Result]]
+        runOnUiThread(res.reverse.foreach(adapter.insert(_, 0)))
+        runOnUiThread(adapter.notifyDataSetChanged)
+        runOnUiThread(refreshAdapter.setRefreshComplete)
       }
-      case Failure(failure) => {
+      case -\/(err) => {
         runOnUiThread(Toast.makeText(this, R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
-        Log.e("MainActivity", "Error refreshing: " + failure.toString)
+        Log.e("MainActivity", "Error refreshing: " + err)
         runOnUiThread(refreshAdapter.setRefreshComplete)
       }
     }
@@ -126,30 +118,23 @@ class MainActivity
 
   private def updateNewsfeed() {
     val newsfeed = findView(TR.newsfeed)
-    val messages = getLatestMessages()
-    messages onComplete {
-      case Success(hrfResult) => {
-        findViewOpt(TR.progress).map(v => runOnUiThread(v.setVisibility(View.GONE)))
-        hrfResult match {
-          case -\/(err) => Log.e("MainActivity", "Error updating newsfeed: " + err.toString)
-          case \/-(res) => {
-            val arrayList = new ArrayList[HRF.Result]
-            res.foreach(arrayList.add(_))
-            val adapter = new FedmsgAdapter(
-              this,
-              android.R.layout.simple_list_item_1,
-              arrayList)
-            runOnUiThread(newsfeed.setAdapter(adapter))
-          }
-        }
-      }
-      case Failure(err) => {
-      findViewOpt(TR.progress).map(v => runOnUiThread(v.setVisibility(View.GONE)))
+    val messages: Promise[String \/ List[HRF.Result]] = getLatestMessages()
+    messages map {
+      case -\/(err) => {
+        Log.e("MainActivity", "Error updating newsfeed: " + err)
         runOnUiThread(
           Toast.makeText(
             this,
             R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
-        Log.e("MainActivity", "Error updating newsfeed: " + err.toString)
+      }
+      case \/-(res) => {
+        val arrayList = new ArrayList[HRF.Result]
+        res.foreach(arrayList.add(_))
+        val adapter = new FedmsgAdapter(
+          this,
+          android.R.layout.simple_list_item_1,
+          arrayList)
+        runOnUiThread(newsfeed.setAdapter(adapter))
       }
     }
   }
