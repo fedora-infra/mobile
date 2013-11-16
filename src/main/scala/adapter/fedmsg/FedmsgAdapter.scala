@@ -38,10 +38,11 @@ class FedmsgAdapter(
     // If there's a user associated with it, pull from gravatar.
     // Otherwise, just use the icon if it exists.
     if (item.usernames.length > 0) {
-      val email = s"${item.usernames.head}@fedoraproject.org"
       Cache.getGravatar(
         context,
-        Hashing.md5(email).toString).onComplete { result =>
+        Hashing.md5(s"${item.usernames.head}@fedoraproject.org").toString,
+        default = item.icon.getOrElse("https://fedoraproject.org/static/images/fedora_infinity_64x64.png")
+      ).onComplete { result =>
           result match {
             case Success(gravatar) => {
               activity.runOnUiThread {
