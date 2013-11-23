@@ -120,4 +120,18 @@
           android:text="@string/pkgs_owned" />
     </LinearLayout>
   </LinearLayout>
+
+  <!-- Newsfeed -->
+  <LinearLayout
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"
+      android:orientation="vertical">
+
+    <ListView
+        android:id="@+id/user_newsfeed"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:divider="#cccccc"
+        android:dividerHeight="0.5dp" />
+  </LinearLayout>
 </LinearLayout>

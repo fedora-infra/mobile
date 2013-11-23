@@ -9,15 +9,20 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Toast
+import android.widget.{ AbsListView, ArrayAdapter, Toast }
+
+import scalaz._, Scalaz._
+import scalaz.concurrent.Promise
+import scalaz.effect.IO
+
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
 
 import scala.concurrent.{ future, Future }
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{ Failure, Try, Success }
 
-import scalaz.effect.IO
-
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
+import java.util.ArrayList // TODO: Do something about this.
+import java.util.TimeZone
 
 class UserActivity
   extends NavDrawerActivity
@@ -32,6 +37,7 @@ class UserActivity
     Option(getIntent.getExtras.getString("username"))
 
 
+  /** Show a warning dialog that we this is only for demoing/testing. */
   private def showDemoWarning(): IO[Unit] = IO {
     val builder = new AlertDialog.Builder(this)
     builder.setNegativeButton("Right-o!", new DialogInterface.OnClickListener() {
@@ -42,6 +48,23 @@ class UserActivity
     builder.setMessage("This is just a UI demo. The data is fake and is for UI testing only.")
     val dialog = builder.create
     dialog.show
+  }
+
+  /** Obtain a user's latest fedmsg stories.
+    *
+    * @todo Paginate/endless scrolling/etc.
+  */
+  private def getUserNewsfeed(/*since: Long*/): Promise[String \/ List[HRF.Result]] =
+    HRF(
+      List(
+        //"start"    -> (since + 1).toString,
+        "start"    -> "0",
+        "user"     -> "codeblock",
+        "order"    -> "desc"
+      ),
+      TimeZone.getDefault)
+
+  private def updateNewsfeed() {
   }
 
   override def onPostCreate(bundle: Bundle) {
@@ -74,5 +97,26 @@ class UserActivity
     findView(TR.badge_count).setText("43")
     findView(TR.fas_groups_count).setText("24")
     findView(TR.packages_count).setText("28")
+
+    val newsfeed = findView(TR.user_newsfeed)
+    val messages: Promise[String \/ List[HRF.Result]] = getUserNewsfeed()
+    messages map {
+      case -\/(err) => {
+        Log.e("UserActivity", "Error updating newsfeed: " + err)
+        runOnUiThread(
+          Toast.makeText(
+            this,
+            R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
+      }
+      case \/-(res) => {
+        val arrayList = new ArrayList[HRF.Result]
+        res.foreach(arrayList.add(_))
+        val adapter = new FedmsgAdapter(
+          this,
+          android.R.layout.simple_list_item_1,
+          arrayList)
+        runOnUiThread(newsfeed.setAdapter(adapter))
+      }
+    }
   }
 }
