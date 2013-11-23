@@ -16,6 +16,10 @@
   <string name="update">Update</string>
   <string name="not_now">Not now</string>
   <string name="username">Username</string>
+  <string name="user_profile">User Profile</string>
+  <string name="pkgs_owned">Pkgs Owned</string>
+  <string name="fas_groups">FAS Groups</string>
+  <string name="badges">Badges</string>
 
   <string name="update_available">Update available</string>
   <string name="update_available_desc">A new commit has been made to Fedora Mobile. Would you like to update to it? (You can disable auto-checking via Preferences)</string>

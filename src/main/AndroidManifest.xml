@@ -33,6 +33,8 @@
 
     <activity android:name=".DownloadHeadActivity" />
 
+    <activity android:name=".UserActivity" />
+
     <activity android:name=".FedocalActivity" />
 
     <activity android:name=".GCMDemoActivity" />

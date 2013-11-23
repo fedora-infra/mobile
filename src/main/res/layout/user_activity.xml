@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+
+  <!-- Dark header with name/photo/username/etc. -->
+  <LinearLayout
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:background="#222222"
+      android:orientation="vertical"
+      android:paddingTop="10dp"
+      android:paddingBottom="10dp">
+
+    <ImageView
+        android:id="@+id/profile_pic"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:layout_gravity="center"
+        android:paddingLeft="1dp"
+        android:paddingRight="1dp"
+        android:background="@drawable/image_white_border" />
+
+    <TextView
+        android:id="@+id/full_name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textColor="#f8f8f8"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/username"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="10sp"
+        android:textColor="#f8f8f8"
+        android:gravity="center" />
+  </LinearLayout>
+
+  <!-- 3-box with stats about the user. -->
+  <!-- Number of badges, FAS groups, owned packages? -->
+  <LinearLayout
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal">
+
+    <!-- Left -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+      <TextView
+          android:id="@+id/badge_count"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:textStyle="bold"
+          android:textSize="16sp"
+          android:gravity="center" />
+
+      <TextView
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:textSize="10sp"
+          android:gravity="center"
+          android:textColor="#555555"
+          android:text="@string/badges" />
+    </LinearLayout>
+
+    <!-- Middle -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+      <TextView
+          android:id="@+id/fas_groups_count"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:textStyle="bold"
+          android:textSize="16sp"
+          android:gravity="center" />
+
+      <TextView
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:textSize="10sp"
+          android:gravity="center"
+          android:textColor="#555555"
+          android:text="@string/fas_groups" />
+    </LinearLayout>
+
+    <!-- Right -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+      <TextView
+          android:id="@+id/packages_count"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:textStyle="bold"
+          android:textSize="16sp"
+          android:gravity="center" />
+
+      <TextView
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:textSize="10sp"
+          android:gravity="center"
+          android:textColor="#555555"
+          android:text="@string/pkgs_owned" />
+    </LinearLayout>
+  </LinearLayout>
+</LinearLayout>
