@@ -3,14 +3,14 @@ package org.fedoraproject.mobile
 import android.net.Uri
 import android.util.Log
 
+import argonaut._, Argonaut._
+
 import com.google.common.io.CharStreams
 
-import spray.json._
-
-import scala.concurrent.{ future, Future }
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.io.Source
-import scala.util.{ Failure, Try, Success }
+import scalaz._, Scalaz._
+import scalaz.concurrent.Promise
+import scalaz.concurrent.Promise._
+import scalaz.effect._
 
 import java.io.{ DataOutputStream, InputStreamReader }
 import java.net.{ HttpURLConnection, URL, URLEncoder }
@@ -29,8 +29,7 @@ object Badges {
     percentEarned: Float,
     timesAwarded: Int,
     description: String,
-    issued: Option[Float] = None // Only in the 'user' JSON.
-    )
+    issued: Option[Float] = None) // Only in the 'user' JSON.
 
   case class User(
     percentEarned: Float,
@@ -44,26 +43,41 @@ object Badges {
 
   case class Leaderboard(leaderboard: List[LeaderboardUser])
 
-  object JSONParsing extends DefaultJsonProtocol {
-    implicit val badgeResponse = jsonFormat(Badge, "id", "name", "image", "first_awarded", "first_awarded_person", "last_awarded", "last_awarded_person", "percent_earned", "times_awarded", "description", "issued")
-    implicit val userResponse = jsonFormat(User, "percent_earned", "user", "assertions")
-    implicit val leaderboardUserResponse = jsonFormat(LeaderboardUser, "nickname", "badges", "rank")
-    implicit val leaderboardResponse = jsonFormat(Leaderboard, "leaderboard")
-  }
+  implicit def BadgeCodecJson: CodecJson[Badge] =
+    casecodec11(Badge.apply, Badge.unapply)("id", "name", "image", "first_awarded", "first_awarded_person", "last_awarded", "last_awarded_person", "percent_earned", "times_awarded", "description", "issued")
 
-  /** Returns a [[Future[String]]] of JSON after completing the query. */
-  def query(path: String) = {
+  implicit def UserCodecJson: CodecJson[User] =
+    casecodec3(User.apply, User.unapply)("percent_earned", "user", "assertions")
+
+  implicit def LeaderboardUserCodecJson: CodecJson[LeaderboardUser] =
+    casecodec3(LeaderboardUser.apply, LeaderboardUser.unapply)("nickname", "badges", "rank")
+
+  implicit def LeaderboardCodecJson: CodecJson[Leaderboard] =
+    casecodec1(Leaderboard.apply, Leaderboard.unapply)("leaderboard")
+
+  /** Returns JSON after completing the query. */
+  def query(path: String): IO[String] = IO {
     Log.v("Badges", "Beginning query")
     val uri = Uri.parse(url + path.dropWhile(_ == '/'))
-    future {
-      val connection = new URL(uri.toString)
-        .openConnection
-        .asInstanceOf[HttpURLConnection]
-      connection setRequestMethod "GET"
-      CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
-    }
+    val connection = new URL(uri.toString)
+      .openConnection
+      .asInstanceOf[HttpURLConnection]
+    connection setRequestMethod "GET"
+    CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
   }
 
-  def forUser(user: String): Future[String] = query(s"/user/${user}/json")
-  def info(id: String): Future[String] = query(s"/badge/${id}/json")
+  def info(id: String): Promise[String] = promise {
+    query(s"/badge/${id}/json").unsafePerformIO
+  }
+
+  def user(user: String): Promise[String \/ User] = promise {
+    query(s"/badge/${user}/json").unsafePerformIO.decodeEither[User]
+  }
+
+  def leaderboard(): Promise[String \/ List[LeaderboardUser]] = promise {
+    query("/leaderboard/json")
+      .unsafePerformIO
+      .decodeEither[Leaderboard]
+      .map(_.leaderboard)
+  }
 }

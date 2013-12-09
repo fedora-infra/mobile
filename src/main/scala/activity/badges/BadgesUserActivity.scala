@@ -1,17 +1,15 @@
 package org.fedoraproject.mobile
 
-import Badges.JSONParsing._
-
 import Implicits._
 import util.Hashing
+
+import scalaz._, Scalaz._
 
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-
-import spray.json._
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
 
@@ -59,16 +57,15 @@ class BadgesUserActivity
   }
 
   def updateBadges(): Unit = {
-    Badges.query(s"/user/${nickname}/json") onComplete {
-      case Success(res) => {
-        val user = JsonParser(res).convertTo[Badges.User]
+    Badges.user(nickname) map {
+      case \/-(res) => {
         val adapter = new BadgesUserAdapter(
           this,
           android.R.layout.simple_list_item_1,
-          user.assertions.toArray)
+          res.assertions.toArray)
         findViewOpt(TR.user_badges).map(v => runOnUiThread(v.setAdapter(adapter)))
       }
-      case Failure(err) => {
+      case -\/(err) => {
         runOnUiThread(Toast.makeText(this, R.string.badges_user_failure, Toast.LENGTH_LONG).show)
         Log.e("BadgesUserActivity", err.toString)
       }

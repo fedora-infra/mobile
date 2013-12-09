@@ -1,17 +1,15 @@
 package org.fedoraproject.mobile
 
 import Badges.Badge
-import Badges.JSONParsing._
 
 import Implicits._
+import scalaz._, Scalaz._
 
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.util.Log
 import android.widget.Toast
-
-import spray.json._
 
 import scala.concurrent.{ future, Future }
 import scala.concurrent.ExecutionContext.Implicits.global
