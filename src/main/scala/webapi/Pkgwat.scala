@@ -15,12 +15,14 @@ import java.io.{ InputStreamReader }
 import java.net.{ HttpURLConnection, URL, URLEncoder }
 
 object Pkgwat {
-  case class APIResults[T](
+  sealed trait ResultType
+
+  case class APIResults[ResultType](
     visibleRows: Int,
     totalRows: Int,
     rowsPerPage: Int,
     startRow: Int,
-    rows: List[T])
+    rows: List[ResultType])
 
   case class SubPackage(
     icon: String,
@@ -39,12 +41,12 @@ object Pkgwat {
     summary: String,
     name: String,
     upstreamURL: Option[String] = None,
-    develOwner: Option[String] = None)
+    develOwner: Option[String] = None) extends ResultType
 
   case class Release(
     release: String,
     stableVersion: String,
-    testingVersion: String)
+    testingVersion: String) extends ResultType
 
   case class FilteredQuery(rowsPerPage: Int, startRow: Int, filters: Map[String, String])
 
