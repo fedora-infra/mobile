@@ -12,23 +12,23 @@
       android:layout_height="wrap_content"
       android:background="#222222"
       android:orientation="vertical"
-      android:paddingTop="10dp"
-      android:paddingBottom="10dp">
+      android:paddingTop="15dp"
+      android:paddingBottom="15dp">
 
     <ImageView
         android:id="@+id/profile_pic"
         android:layout_width="65dp"
         android:layout_height="65dp"
         android:layout_gravity="center"
-        android:paddingLeft="1dp"
-        android:paddingRight="1dp"
+        android:paddingLeft="2dp"
+        android:paddingRight="2dp"
         android:background="@drawable/image_white_border" />
 
     <TextView
         android:id="@+id/full_name"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
+        android:textSize="24sp"
         android:textColor="#f8f8f8"
         android:gravity="center" />
 
@@ -36,7 +36,7 @@
         android:id="@+id/username"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="10sp"
+        android:textSize="14sp"
         android:textColor="#f8f8f8"
         android:gravity="center" />
   </LinearLayout>
@@ -60,13 +60,13 @@
           android:layout_width="fill_parent"
           android:layout_height="wrap_content"
           android:textStyle="bold"
-          android:textSize="16sp"
+          android:textSize="20sp"
           android:gravity="center" />
 
       <TextView
           android:layout_width="fill_parent"
           android:layout_height="wrap_content"
-          android:textSize="10sp"
+          android:textSize="14sp"
           android:gravity="center"
           android:textColor="#555555"
           android:text="@string/badges" />
@@ -84,13 +84,13 @@
           android:layout_width="fill_parent"
           android:layout_height="wrap_content"
           android:textStyle="bold"
-          android:textSize="16sp"
+          android:textSize="20sp"
           android:gravity="center" />
 
       <TextView
           android:layout_width="fill_parent"
           android:layout_height="wrap_content"
-          android:textSize="10sp"
+          android:textSize="14sp"
           android:gravity="center"
           android:textColor="#555555"
           android:text="@string/fas_groups" />
@@ -108,13 +108,13 @@
           android:layout_width="fill_parent"
           android:layout_height="wrap_content"
           android:textStyle="bold"
-          android:textSize="16sp"
+          android:textSize="20sp"
           android:gravity="center" />
 
       <TextView
           android:layout_width="fill_parent"
           android:layout_height="wrap_content"
-          android:textSize="10sp"
+          android:textSize="14sp"
           android:gravity="center"
           android:textColor="#555555"
           android:text="@string/pkgs_owned" />
