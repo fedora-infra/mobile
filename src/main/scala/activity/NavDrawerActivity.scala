@@ -18,7 +18,7 @@ trait NavDrawerActivity extends FragmentActivity with TypedActivity {
     getString(R.string.infrastructure_status) -> (classOf[StatusActivity], R.drawable.ic_status),
     getString(R.string.package_search) -> (classOf[PackageSearchActivity], R.drawable.ic_search),
     getString(R.string.badges_leaderboard) -> (classOf[BadgesLeaderboardActivity], R.drawable.ic_badges),
-//    getString(R.string.fedmsg_gcm_demo) -> (classOf[GCMDemoActivity], R.drawable.ic_fedmsg),
+    getString(R.string.fedmsg_gcm_demo) -> (classOf[GCMDemoActivity], R.drawable.ic_fedmsg),
     getString(R.string.preferences) -> (classOf[PreferencesActivity], R.drawable.ic_preferences),
     "Profile UI Demo" -> (classOf[UserActivity], R.drawable.ic_preferences)
   )
