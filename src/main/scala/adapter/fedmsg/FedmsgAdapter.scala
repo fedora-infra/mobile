@@ -9,7 +9,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import android.net.Uri
 import android.view.{ LayoutInflater, View, ViewGroup }
-import android.view.View.OnClickListener
+import android.view.View.{ OnClickListener, OnLongClickListener }
 import android.widget.{ ArrayAdapter, ImageView, LinearLayout, ListView, TextView, Toast }
 
 import scala.concurrent.{ future, Future }
@@ -82,6 +82,16 @@ class FedmsgAdapter(
           val intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link))
           activity.startActivity(intent)
         }
+      }
+    })
+
+    layout.setOnLongClickListener(new OnLongClickListener() {
+      override def onLongClick(view: View): Boolean = {
+        val intent = new Intent(Intent.ACTION_SEND)
+        intent.putExtra(Intent.EXTRA_TEXT, item.subtitle)
+        intent.setType("text/plain")
+        activity.startActivity(intent)
+        true
       }
     })
 
