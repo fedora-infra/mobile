@@ -21,6 +21,15 @@
       </intent-filter>
     </receiver>
 
+    <receiver android:name="FedmsgCountWidgetProvider">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+      </intent-filter>
+      <meta-data
+          android:name="android.appwidget.provider"
+          android:resource="@xml/widget_fedmsg_count" />
+    </receiver>
+
     <activity
         android:name=".BadgeInfoActivity"
         android:label="@string/badge" />

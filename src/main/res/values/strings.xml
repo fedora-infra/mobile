@@ -62,4 +62,7 @@
     <item quantity="other">%d badges</item>
   </plurals>
   <string name="badges_earned_on">Awarded %s.</string>
+
+  <!-- Fedmsg Count Widget -->
+  <string name="fedmsg_count_label">fedmsg messages as of</string>
 </resources>

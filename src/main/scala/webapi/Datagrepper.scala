@@ -44,11 +44,10 @@ object HRF {
 
   def apply(query: List[(String, String)], timezone: TimeZone): Promise[String \/ List[Result]] =
     promise {
-      post(
-        query.map(x =>
-          s"${x._1}=${x._2}").mkString("&"), timezone.getID)
+      post(query.map(x => s"${x._1}=${x._2}").mkString("&"), timezone.getID)
       .unsafePerformIO
-      .decodeEither[Response].map(_.results)
+      .decodeEither[Response]
+      .map(_.results)
     }
 
   def post(qs: String, timezone: String): IO[String] = IO {
@@ -61,5 +60,30 @@ object HRF {
     connection setRequestMethod "GET"
     connection.setRequestProperty("Content-Type", "application/json");
     CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
+  }
+}
+
+object Datagrepper {
+  val url: URL = new URL("https://apps.fedoraproject.org/datagrepper/messagecount")
+
+  case class Messagecount(messagecount: Long)
+
+  implicit def MessagecountCodecJson: CodecJson[Messagecount] =
+    casecodec1(Messagecount.apply, Messagecount.unapply)("messagecount")
+
+  def messagecount(): Promise[String \/ Messagecount] = {
+    def getMessageCount(): IO[String] = IO {
+      val connection: HttpURLConnection =
+        url
+        .openConnection
+        .asInstanceOf[HttpURLConnection]
+      connection setRequestMethod "GET"
+      connection.setRequestProperty("Content-Type", "application/json");
+      CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
+    }
+
+    promise {
+      getMessageCount().unsafePerformIO.decodeEither[Messagecount]
+    }
   }
 }
