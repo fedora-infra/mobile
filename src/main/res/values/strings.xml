@@ -64,5 +64,5 @@
   <string name="badges_earned_on">Awarded %s.</string>
 
   <!-- Fedmsg Count Widget -->
-  <string name="fedmsg_count_label">fedmsg messages as of</string>
+  <string name="fedmsg_count_time">fedmsg messages as of %s.</string>
 </resources>

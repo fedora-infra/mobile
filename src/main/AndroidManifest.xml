@@ -21,7 +21,9 @@
       </intent-filter>
     </receiver>
 
-    <receiver android:name="FedmsgCountWidgetProvider">
+    <receiver
+        android:name="FedmsgCountWidgetProvider"
+        android:label="Fedora Fedmsg Message Count">
       <intent-filter>
         <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
       </intent-filter>

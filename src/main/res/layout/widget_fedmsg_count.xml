@@ -5,6 +5,8 @@
   <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="match_parent"
+      android:layout_gravity="center"
+      android:gravity="center"
       android:orientation="vertical"
       android:background="#222222">
 
@@ -13,19 +15,12 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
+        android:text="@string/loading"
         android:textStyle="bold"
-        android:textSize="25sp" />
+        android:textSize="30sp" />
 
     <TextView
         android:id="@+id/fedmsg_count_label"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:text="@string/fedmsg_count_label"
-        android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/count_time"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
