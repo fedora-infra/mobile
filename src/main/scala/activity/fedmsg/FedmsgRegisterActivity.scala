@@ -32,41 +32,45 @@ class FedmsgRegisterActivity extends NavDrawerActivity {
     setUpNav(R.layout.fmn_register_activity)
 
     val intent = getIntent
-    val uri    = intent.getData
-    val apiKey = Option(uri.getQueryParameter("api_key"))
-    val openid = Option(uri.getQueryParameter("openid"))
+    val uri    = Option(intent.getData)
+    val apiKey = uri.flatMap(x => Option(x.getQueryParameter("api_key")))
+    val openid = uri.flatMap(x => Option(x.getQueryParameter("openid")))
 
     val storeAPIInfo: IO[Unit] =
-      if (apiKey.isEmpty || openid.isEmpty)
-        IO {
-          Toast.makeText(
-            this,
-            R.string.fmn_error,
-            Toast.LENGTH_LONG)
-          .show
+      if (uri.isDefined) {
+        if (apiKey.isEmpty || openid.isEmpty) {
+          IO {
+            Toast.makeText(
+              this,
+              R.string.fmn_error,
+              Toast.LENGTH_LONG)
+            .show
+          }
+        } else {
+          IO {
+            val sharedPrefEdit =
+              PreferenceManager.getDefaultSharedPreferences(this).edit
+            sharedPrefEdit.putString("pref_fmn_openid", openid.get)
+            sharedPrefEdit.putString("pref_fmn_apikey", apiKey.get)
+            sharedPrefEdit.commit()
+            Toast.makeText(
+              this,
+              R.string.fmn_save_success,
+              Toast.LENGTH_LONG)
+            .show
+          }
         }
-      else
-        IO {
-          val sharedPrefEdit =
-            PreferenceManager.getDefaultSharedPreferences(this).edit
-          sharedPrefEdit.putString("pref_fmn_openid", openid.get)
-          sharedPrefEdit.putString("pref_fmn_apikey", apiKey.get)
-          Toast.makeText(
-            this,
-            R.string.fmn_save_success,
-            Toast.LENGTH_LONG)
-          .show
-        }
+      } else IO {}
     storeAPIInfo.unsafePerformIO
   }
 
   def register(view: View): Unit = {
     val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
-    val username   = Option(sharedPref.getString("pref_fas_username", null))
+    val openid     = Option(sharedPref.getString("pref_fmn_openid", null))
     val apiKey     = Option(sharedPref.getString("pref_fmn_apikey", null))
 
     val sendFMN =
-      if (username.isEmpty || apiKey.isEmpty)
+      if (openid.isEmpty || apiKey.isEmpty)
         IO {
           Toast.makeText(
             this,
@@ -78,7 +82,7 @@ class FedmsgRegisterActivity extends NavDrawerActivity {
         IO {
           val registrationID: Promise[String] = getRegistrationID
           val fmnResponse = registrationID map {
-            case id => sendIDToFMN(username.get, apiKey.get, id)
+            case id => sendIDToFMN(openid.get, apiKey.get, id)
           }
           fmnResponse map {
             case r => // TODO: Parse JSON response and do something with it.
@@ -88,11 +92,10 @@ class FedmsgRegisterActivity extends NavDrawerActivity {
   }
 
   private def sendIDToFMN(
-    username: String,
+    openid: String,
     apiKey: String,
     id: String): Promise[String] = promise {
-    val openid = username + ".id.fedoraproject.org"
-    val connection =
+     val connection =
       new URL(
         "https://apps.fedoraproject.org/notifications/link-fedora-mobile/" ++
           openid ++ "/" ++ apiKey ++ "/" ++ id)

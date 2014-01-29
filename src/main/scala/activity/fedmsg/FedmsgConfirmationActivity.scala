@@ -45,15 +45,14 @@ class FedmsgConfirmationActivity extends NavDrawerActivity {
 
   private def finalizeDecision(
     accepted: Boolean,
-    username: String,
+    openid: String,
     apiKey: String,
     secret: String): IO[String] = IO {
-    val openid = username + ".id.fedoraproject.org"
     val connection =
       new URL(
         "https://apps.fedoraproject.org/notifications/confirm/" ++
-          (if (accepted) "accept" else "reject") ++ "/" ++ secret ++ "/" ++
-          apiKey)
+          (if (accepted) "accept" else "reject") ++ "/" ++ "/" ++ openid ++
+          "/" ++ secret ++ "/" ++ apiKey)
         .openConnection
         .asInstanceOf[HttpURLConnection]
     connection setDoOutput true
@@ -63,12 +62,12 @@ class FedmsgConfirmationActivity extends NavDrawerActivity {
 
   def decide(accepted: Boolean): IO[Option[String]] = {
     val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
-    val username   = Option(sharedPref.getString("pref_fas_username", null))
+    val openid     = Option(sharedPref.getString("pref_fmn_openid", null))
     val apiKey     = Option(sharedPref.getString("pref_fmn_apikey", null))
     val intent     = getIntent
     val secret     = intent.getStringExtra("secret")
 
-    if (username.isEmpty || apiKey.isEmpty) {
+    if (openid.isEmpty || apiKey.isEmpty) {
       IO {
         Toast.makeText(
           this,
@@ -81,7 +80,7 @@ class FedmsgConfirmationActivity extends NavDrawerActivity {
       Option(
         finalizeDecision(
           accepted,
-          username.get,
+          openid.get,
           apiKey.get,
           secret)
         .unsafePerformIO) // TODO: Yuck.

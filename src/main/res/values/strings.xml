@@ -78,7 +78,7 @@
   <string name="fedmsg_confirmation_text">Please confirm that you would like to subscribe to Fedora Fedmsg notifications</string>
   <string name="reject">Reject</string>
   <string name="accept">Accept</string>
-  <string name="fmn_no_username_or_api_key">Please ensure that you have a valid FAS username and FMN API key in your Fedora Mobile preferences.</string>
+  <string name="fmn_no_username_or_api_key">Please ensure that you have a valid oauth URL and FMN API key in your Fedora Mobile preferences.</string>
   <string name="fmn_error">An interesting error occurred. Please try again and if the problem persists, file a bug.</string>
   <string name="fmn_save_success">Successfully saved your Fedmsg Notifications authentication information!</string>
 </resources>
