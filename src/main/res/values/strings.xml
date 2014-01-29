@@ -3,7 +3,7 @@
   <string name="infrastructure_status">Infrastructure Status</string>
   <string name="package_search">Package Search</string>
   <string name="badges_leaderboard">Badges Leaderboard</string>
-  <string name="fedmsg_gcm_demo">Fedmsg GCM Demo (horrible)</string>
+  <string name="register_fmn">Fedmsg Notifications (beta)</string>
   <string name="preferences">Preferences</string>
 
   <string name="app_name">Fedora Mobile</string>
@@ -46,11 +46,15 @@
 
   <string name="newsfeed_failure">An issue occurred while updating newsfeed data.</string>
 
+  <!-- Preferences -->
   <string name="pref_fas">Fedora Account System (FAS)</string>
   <string name="pref_fas_username_summary">Currently only used for Badges integration.</string>
   <string name="check_updates">Check for updates</string>
   <string name="pref_check_updates_summary">Call out to GitHub on application start, to see if we are running the latest commit.</string>
+  <string name="fmn_apikey">Fedmsg Notifications API Key</string>
+  <string name="pref_fmn_apikey_summary">The API used to authenticate with the Fedmsg Notifications system.</string>
 
+  <!-- Badges -->
   <string name="fedora_badges">Fedora Badges</string>
   <string name="leaderboard">Leaderboard</string>
   <string name="badge">Badge</string>
@@ -65,4 +69,12 @@
 
   <!-- Fedmsg Count Widget -->
   <string name="fedmsg_count_time">fedmsg messages as of %s</string>
+
+  <!-- Fedmsg Notifications -->
+  <string name="register">Register</string>
+  <string name="fedmsg_confirmation_title">Fedmsg Notifications Confirmation</string>
+  <string name="fedmsg_confirmation_text">Please confirm that you would like to subscribe to Fedora Fedmsg notifications</string>
+  <string name="reject">Reject</string>
+  <string name="accept">Accept</string>
+  <string name="fmn_no_username_or_api_key">Please ensure that you have a valid FAS username and FMN API key in your Fedora Mobile preferences.</string>
 </resources>

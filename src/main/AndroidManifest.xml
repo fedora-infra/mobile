@@ -44,7 +44,9 @@
 
     <activity android:name=".DownloadHeadActivity" />
 
-    <activity android:name=".UserActivity" />
+    <activity android:name=".FedmsgConfirmationActivity" />
+
+    <activity android:name=".FedmsgRegisterActivity" />
 
     <activity android:name=".FedocalActivity" />
 
@@ -76,6 +78,7 @@
         android:name=".StatusActivity"
         android:label="@string/fedora_status" />
 
+    <activity android:name=".UserActivity" />
   </application>
 
   <permission

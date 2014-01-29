@@ -8,6 +8,11 @@
         android:title="@string/username"
         android:summary="@string/pref_fas_username_summary" />
 
+    <EditTextPreference
+        android:key="pref_fmn_apikey"
+        android:title="@string/fmn_apikey"
+        android:summary="@string/pref_fmn_apikey_summary" />
+
     <CheckBoxPreference
         android:key="check_updates"
         android:title="@string/check_updates"
