@@ -48,11 +48,13 @@
 
     <activity android:name=".FedmsgRegisterActivity">
       <intent-filter>
-        <action android:name="android.intent.action.VIEW" />
         <data
             android:scheme="fedoramobile"
             android:host="org.fedoraproject.mobile"
             android:path="register_fmn" />
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <category android:name="android.intent.category.DEFAULT" />
       </intent-filter>
     </activity>
 
