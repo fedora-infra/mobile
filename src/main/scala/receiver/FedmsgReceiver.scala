@@ -72,7 +72,7 @@ class FedmsgReceiver extends BroadcastReceiver {
           .setSmallIcon(R.drawable.fedoraicon)
           .setContentIntent(createIntent(None))
         }
-      case FedmsgNotification => // TODO
+      case FedmsgNotification => new NotificationCompat.Builder(context) // TODO
     }
     notificationManager.notify(1, builder.build)
   }
