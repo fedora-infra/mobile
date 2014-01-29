@@ -2,6 +2,7 @@ package org.fedoraproject.mobile
 
 import Implicits._
 
+import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.View
@@ -26,15 +27,43 @@ import java.net.{ HttpURLConnection, URL, URLEncoder }
   * we tell FMN whether or not they accepted.
   */
 class FedmsgRegisterActivity extends NavDrawerActivity {
-  override def onPostCreate(bundle: Bundle) {
+  override def onPostCreate(bundle: Bundle): Unit = {
     super.onPostCreate(bundle)
     setUpNav(R.layout.fmn_register_activity)
+
+    val intent = getIntent
+    val uri    = intent.getData
+    val apiKey = Option(uri.getQueryParameter("api_key"))
+    val openid = Option(uri.getQueryParameter("openid"))
+
+    val storeAPIInfo: IO[Unit] =
+      if (apiKey.isEmpty || openid.isEmpty)
+        IO {
+          Toast.makeText(
+            this,
+            R.string.fmn_error,
+            Toast.LENGTH_LONG)
+          .show
+        }
+      else
+        IO {
+          val sharedPrefEdit =
+            PreferenceManager.getDefaultSharedPreferences(this).edit
+          sharedPrefEdit.putString("pref_fmn_openid", openid.get)
+          sharedPrefEdit.putString("pref_fmn_apikey", apiKey.get)
+          Toast.makeText(
+            this,
+            R.string.fmn_save_success,
+            Toast.LENGTH_LONG)
+          .show
+        }
+    storeAPIInfo.unsafePerformIO
   }
 
   def register(view: View): Unit = {
     val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
-    val username = Option(sharedPref.getString("pref_fas_username", null))
-    val apiKey = Option(sharedPref.getString("pref_fmn_apikey", null))
+    val username   = Option(sharedPref.getString("pref_fas_username", null))
+    val apiKey     = Option(sharedPref.getString("pref_fmn_apikey", null))
 
     val sendFMN =
       if (username.isEmpty || apiKey.isEmpty)

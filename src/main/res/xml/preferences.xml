@@ -9,6 +9,11 @@
         android:summary="@string/pref_fas_username_summary" />
 
     <EditTextPreference
+        android:key="pref_fmn_openid"
+        android:title="@string/fmn_openid"
+        android:summary="@string/pref_fmn_openid_summary" />
+
+    <EditTextPreference
         android:key="pref_fmn_apikey"
         android:title="@string/fmn_apikey"
         android:summary="@string/pref_fmn_apikey_summary" />

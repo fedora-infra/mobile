@@ -46,7 +46,15 @@
 
     <activity android:name=".FedmsgConfirmationActivity" />
 
-    <activity android:name=".FedmsgRegisterActivity" />
+    <activity android:name=".FedmsgRegisterActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <data
+            android:scheme="fedoramobile"
+            android:host="org.fedoraproject.mobile"
+            android:path="register_fmn" />
+      </intent-filter>
+    </activity>
 
     <activity android:name=".FedocalActivity" />
 

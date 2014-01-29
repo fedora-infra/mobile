@@ -53,6 +53,8 @@
   <string name="pref_check_updates_summary">Call out to GitHub on application start, to see if we are running the latest commit.</string>
   <string name="fmn_apikey">Fedmsg Notifications API Key</string>
   <string name="pref_fmn_apikey_summary">The API used to authenticate with the Fedmsg Notifications system.</string>
+  <string name="fmn_openid">Fedmsg Notifications OpenID</string>
+  <string name="pref_fmn_openid_summary">The OpenID account used to authenticate with the Fedmsg Notifications system.</string>
 
   <!-- Badges -->
   <string name="fedora_badges">Fedora Badges</string>
@@ -77,4 +79,6 @@
   <string name="reject">Reject</string>
   <string name="accept">Accept</string>
   <string name="fmn_no_username_or_api_key">Please ensure that you have a valid FAS username and FMN API key in your Fedora Mobile preferences.</string>
+  <string name="fmn_error">An interesting error occurred. Please try again and if the problem persists, file a bug.</string>
+  <string name="fmn_save_success">Successfully saved your Fedmsg Notifications authentication information!</string>
 </resources>
