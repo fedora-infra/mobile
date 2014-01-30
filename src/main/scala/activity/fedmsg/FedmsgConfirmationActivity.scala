@@ -26,10 +26,10 @@ class FedmsgConfirmationActivity extends NavDrawerActivity {
     val intent = getIntent
 
     val accepted: Option[Boolean] =
-      if (intent.hasExtra("action"))
+      if (intent.hasExtra("accepted"))
         // The second argument to getBooleanExtra can be anything, since we
         // already check that it exists and won't hit this case if it doesn't.
-        Some(intent.getBooleanExtra("action", false))
+        Some(intent.getBooleanExtra("accepted", false))
       else
         None
 
