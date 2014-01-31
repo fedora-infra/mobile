@@ -44,7 +44,9 @@
 
     <activity android:name=".DownloadHeadActivity" />
 
-    <activity android:name=".FedmsgConfirmationActivity" />
+    <activity
+        android:name=".FedmsgConfirmationActivity"
+        android:exported="true" />
 
     <activity
         android:name=".FedmsgRegisterActivity"

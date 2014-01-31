@@ -40,12 +40,23 @@ class FedmsgReceiver extends BroadcastReceiver {
         .getSystemService(Context.NOTIFICATION_SERVICE)
         .asInstanceOf[NotificationManager]
 
-    def createIntent(accepted: Option[Boolean]): PendingIntent = {
+    def createIntent(
+      accepted: Option[Boolean],
+      secret: String): PendingIntent = {
       val intent = accepted match {
         case Some(a: Boolean) =>
           new Intent(context, classOf[FedmsgConfirmationActivity])
-            .putExtra("accepted", a)
-        case None => new Intent(context, classOf[FedmsgConfirmationActivity])
+            .putExtra("org.fedoraproject.mobile.accepted", a)
+            .putExtra("org.fedoraproject.mobile.secret", secret)
+            // http://stackoverflow.com/q/3127957/1106202
+            // http://stackoverflow.com/a/3140371/1106202
+            .setAction("FedmsgConfirmationActivity_" + System.currentTimeMillis)
+        case None =>
+          new Intent(context, classOf[FedmsgConfirmationActivity])
+            .putExtra("org.fedoraproject.mobile.secret", secret)
+            // http://stackoverflow.com/q/3127957/1106202
+            // http://stackoverflow.com/a/3140371/1106202
+            .setAction("FedmsgConfirmationActivity_" + System.currentTimeMillis)
       }
 
       PendingIntent.getActivity(context, 0, intent, 0)
@@ -63,14 +74,16 @@ class FedmsgReceiver extends BroadcastReceiver {
           .addAction(
             android.R.drawable.presence_offline,
             context.getString(R.string.reject),
-            createIntent(Some(false)))
+            createIntent(Some(false), bundle.getString("secret", "")))
           .addAction(
             android.R.drawable.presence_online,
             context.getString(R.string.accept),
-            createIntent(Some(true)))
+            createIntent(Some(true), bundle.getString("secret", "")))
           .setContentText(context.getString(R.string.fedmsg_confirmation_text))
           .setSmallIcon(R.drawable.fedoraicon)
-          .setContentIntent(createIntent(None))
+          .setContentIntent(
+            createIntent(None, bundle.getString("secret", "")))
+          .setAutoCancel(true)
         }
       case FedmsgNotification => new NotificationCompat.Builder(context) // TODO
     }

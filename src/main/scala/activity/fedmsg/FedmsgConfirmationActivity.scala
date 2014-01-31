@@ -23,15 +23,10 @@ class FedmsgConfirmationActivity extends NavDrawerActivity {
     super.onPostCreate(bundle)
     setUpNav(R.layout.fmn_confirmation_activity)
 
-    val intent = getIntent
-
-    val accepted: Option[Boolean] =
-      if (intent.hasExtra("accepted"))
-        // The second argument to getBooleanExtra can be anything, since we
-        // already check that it exists and won't hit this case if it doesn't.
-        Some(intent.getBooleanExtra("accepted", false))
-      else
-        None
+    val accepted: Option[Boolean] = Option(
+      getIntent
+        .getExtras
+        .getBoolean("org.fedoraproject.mobile.accepted"))
 
     val fromDecisionNotification  = accepted match {
       case Some(decision) => decide(decision)
@@ -47,11 +42,11 @@ class FedmsgConfirmationActivity extends NavDrawerActivity {
     accepted: Boolean,
     openid: String,
     apiKey: String,
-    secret: String): IO[String] = IO {
+    secret: String): Promise[String] = promise {
     val connection =
       new URL(
         "https://apps.fedoraproject.org/notifications/confirm/" ++
-          (if (accepted) "accept" else "reject") ++ "/" ++ "/" ++ openid ++
+          (if (accepted) "accept" else "reject") ++ "/" ++ openid ++
           "/" ++ secret ++ "/" ++ apiKey)
         .openConnection
         .asInstanceOf[HttpURLConnection]
@@ -60,12 +55,12 @@ class FedmsgConfirmationActivity extends NavDrawerActivity {
     CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
   }
 
-  def decide(accepted: Boolean): IO[Option[String]] = {
+  def decide(accepted: Boolean): IO[Unit] = {
     val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
     val openid     = Option(sharedPref.getString("pref_fmn_openid", null))
     val apiKey     = Option(sharedPref.getString("pref_fmn_apikey", null))
-    val intent     = getIntent
-    val secret     = intent.getStringExtra("secret")
+    val extras     = getIntent.getExtras
+    val secret     = extras.getString("org.fedoraproject.mobile.secret")
 
     if (openid.isEmpty || apiKey.isEmpty) {
       IO {
@@ -74,16 +69,29 @@ class FedmsgConfirmationActivity extends NavDrawerActivity {
           R.string.fmn_no_username_or_api_key,
           Toast.LENGTH_LONG)
         .show
-        None
       }
-    } else IO {
-      Option(
-        finalizeDecision(
-          accepted,
-          openid.get,
-          apiKey.get,
-          secret)
-        .unsafePerformIO) // TODO: Yuck.
+    } else if (secret == "") {
+      IO {
+        Toast.makeText(
+          this,
+          R.string.fmn_no_secret,
+          Toast.LENGTH_LONG)
+        .show
+      }
+    } else {
+      IO {
+        val d: Promise[String] =
+          finalizeDecision(accepted, openid.get, apiKey.get, secret)
+        d map {
+          case _ => {
+            Toast.makeText(
+              this,
+              R.string.fmn_stored,
+              Toast.LENGTH_LONG)
+            .show
+          }
+        }
+      }
     }
   }
 
