@@ -48,16 +48,14 @@ Because the readme is too short and I need to fill some space. ;)
 # Setting up a development environment
 
 Fedora Mobile is primarily written in Scala - but don't let this scare you.
-Scala is a language that was created in 2003 and is still being developed. It
-runs on the JVM and provides a mix of object oriented and functional paradigms.
-
-It has features that make it a real pleasure to work with, and enables us to
-write more concise code than the Java equivalent.
 
 If you're familiar with the Android SDK, you'll find the Fedora Mobile code
 really familiar. Because Scala runs on the JVM, we can use the same Java
 libraries that native Java programs use, within our code. Yep, a `ListView`
 is still a `ListView`.
+
+(Ideally we would make very heavy use of scalaz's `Free` and wrap the Android
+SDK like crazy, but I digress).
 
 For the rest of this section, we'll assume that you're on a fairly modern
 Fedora version -- if not, some things might differ slightly. The general
@@ -65,7 +63,7 @@ idea is to get a working SBT (Simple Build Tool) launcher working, and
 to get the Android SDK somewhere safe that SBT can read.
 
 This guide does NOT assume any particular IDE - in fact, I (@CodeBlock) solely
-use Emacs to develop. However, if you must use an IDE, I suggest the
+use Emacs to develop. However, if you must use an IDE, maybe consider the
 [Scala IDE](http://www.scala-ide.org/) for Eclipse.
 
 ## Installing dependencies
@@ -191,7 +189,9 @@ In most cases, you can make your changes, then just do
 the project of old build artifacts, and you can do that with the `clean`
 command.
 
-To compile without installing to the emulator, use `compile`.
+To compile without installing to the emulator, use `compile`. This is
+sometimes quicker just for making sure syntax is fine and everything
+typechecks.
 
 To just obtain an APK (without installing into the emulator), use
 `android:package-debug` or `android:package-release`. You can install that APK
