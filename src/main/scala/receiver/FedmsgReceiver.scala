@@ -6,6 +6,7 @@ import android.app.{ Activity, NotificationManager, PendingIntent }
 import android.content.{ BroadcastReceiver, Context, Intent }
 import android.os.Bundle
 import android.support.v4.app.NotificationCompat
+import android.util.Log
 
 import com.google.android.gms.gcm.GoogleCloudMessaging
 
@@ -62,31 +63,66 @@ class FedmsgReceiver extends BroadcastReceiver {
       PendingIntent.getActivity(context, 0, intent, 0)
     }
 
-    val builder = nType match {
-      case RegistrationConfirmation => {
-        new NotificationCompat.Builder(context)
-          .setContentTitle(
-            context.getString(R.string.fedmsg_confirmation_title))
-          .setStyle(
-            new NotificationCompat
-              .BigTextStyle()
-              .bigText(context.getString(R.string.fedmsg_confirmation_text)))
-          .addAction(
-            android.R.drawable.presence_offline,
-            context.getString(R.string.reject),
-            createIntent(Some(false), bundle.getString("secret", "")))
-          .addAction(
-            android.R.drawable.presence_online,
-            context.getString(R.string.accept),
-            createIntent(Some(true), bundle.getString("secret", "")))
-          .setContentText(context.getString(R.string.fedmsg_confirmation_text))
-          .setSmallIcon(R.drawable.fedoraicon)
-          .setContentIntent(
-            createIntent(None, bundle.getString("secret", "")))
-          .setAutoCancel(true)
+    val builder: IO[Option[NotificationCompat.Builder]] = nType match {
+      case RegistrationConfirmation =>
+        IO {
+          Some(
+            new NotificationCompat.Builder(context)
+              .setContentTitle(
+                context.getString(R.string.fedmsg_confirmation_title))
+              .setStyle(
+                new NotificationCompat
+                  .BigTextStyle()
+                  .bigText(context.getString(R.string.fedmsg_confirmation_text)))
+              .addAction(
+                android.R.drawable.presence_offline,
+                context.getString(R.string.reject),
+                createIntent(Some(false), bundle.getString("secret", "")))
+              .addAction(
+                android.R.drawable.presence_online,
+                context.getString(R.string.accept),
+                createIntent(Some(true), bundle.getString("secret", "")))
+              .setContentText(context.getString(R.string.fedmsg_confirmation_text))
+              .setSmallIcon(R.drawable.fedoraicon)
+              .setContentIntent(
+                createIntent(None, bundle.getString("secret", "")))
+              .setAutoCancel(true))
         }
-      case FedmsgNotification => new NotificationCompat.Builder(context) // TODO
+      case FedmsgNotification => {
+        val hrf: IO[String \/ Option[HRF.Result]] = for {
+          hrf <- HRF.fromJsonString(bundle.getString("message"))
+        } yield hrf
+
+        hrf map {
+          case -\/(error) =>
+            {
+              Log.e("FedmsgReceiver", "error parsing JSON")
+              None
+            }
+          case \/-(result) =>
+            result match {
+              case None =>
+                {
+                  Log.e("FedmsgReceiver", "Empty resultset from JSON")
+                  None
+                }
+              case Some(r) =>
+                {
+                  Some(
+                    new NotificationCompat.Builder(context)
+                      .setContentTitle(r.subtitle)
+                      .setStyle(
+                        new NotificationCompat
+                          .BigTextStyle()
+                          .bigText(r.repr))
+                      .setContentText(r.repr)
+                      .setSmallIcon(R.drawable.fedoraicon)
+                      .setAutoCancel(true))
+                }
+            }
+        }
+      }
     }
-    notificationManager.notify(1, builder.build)
+    builder.map(_.map(b => notificationManager.notify(1, b.build)))
   }
 }

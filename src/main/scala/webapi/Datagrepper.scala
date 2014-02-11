@@ -44,22 +44,47 @@ object HRF {
 
   def apply(query: List[(String, String)], timezone: TimeZone): Promise[String \/ List[Result]] =
     promise {
-      post(query.map(x => s"${x._1}=${x._2}").mkString("&"), timezone.getID)
+      get(query.map(x => s"${x._1}=${x._2}").mkString("&"), timezone.getID)
       .unsafePerformIO
       .decodeEither[Response]
       .map(_.results)
     }
 
-  def post(qs: String, timezone: String): IO[String] = IO {
-    val postUrl: URL = new URL(url + "?timezone=" + URLEncoder.encode(timezone, "utf8") + "&" + qs)
-    Log.v("HRF", "Beginning POST to " + postUrl)
+  def get(qs: String, timezone: String): IO[String] = IO {
+    val getUrl: URL = new URL(url + "?timezone=" + URLEncoder.encode(timezone, "utf8") + "&" + qs)
+    Log.v("HRF", "Beginning GET to " + getUrl)
     val connection: HttpURLConnection =
-      postUrl
+      getUrl
       .openConnection
       .asInstanceOf[HttpURLConnection]
     connection setRequestMethod "GET"
     connection.setRequestProperty("Content-Type", "application/json");
     CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
+  }
+
+  /** Given a JSON string containing a fedmsg message, make it human readable.
+    *
+    * Send it to HRF, get back something we can display pieces of.
+    */
+  def fromJsonString(s: String): IO[String \/ Option[Result]] = IO {
+    val qUrl: URL =
+      new URL(
+        url + "?timezone=" +
+        URLEncoder.encode(TimeZone.getDefault.getID, "utf8"))
+    val connection: HttpURLConnection =
+      qUrl
+      .openConnection
+      .asInstanceOf[HttpURLConnection]
+    connection.setRequestMethod("POST")
+    connection.setDoOutput(true)
+    connection.setRequestProperty("Content-Type", "application/json")
+    val os = new DataOutputStream(connection.getOutputStream)
+    os.writeBytes(s)
+    os.close
+    CharStreams
+      .toString(new InputStreamReader(connection.getInputStream, "utf8"))
+      .decodeEither[Response]
+      .map(_.results.headOption)
   }
 }
 
