@@ -17,7 +17,7 @@ case object RegistrationConfirmation extends FMNMessage
 case object FedmsgNotification extends FMNMessage
 
 class FedmsgReceiver extends BroadcastReceiver {
-  override def onReceive(context: Context, intent: Intent): Unit = {
+  override def onReceive(context: Context, intent: Intent): Unit = IO {
     val gcm = GoogleCloudMessaging.getInstance(context)
 
     val bundle: Bundle = intent.getExtras
@@ -27,8 +27,8 @@ class FedmsgReceiver extends BroadcastReceiver {
       else FedmsgNotification
 
     setResultCode(Activity.RESULT_OK)
-    sendNotification(nType, context, bundle).unsafePerformIO
-  }
+    sendNotification(nType, context, bundle)
+  }.unsafePerformIO
 
   private def sendNotification(
     nType: FMNMessage,
