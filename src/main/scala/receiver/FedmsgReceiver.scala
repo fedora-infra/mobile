@@ -66,27 +66,27 @@ class FedmsgReceiver extends BroadcastReceiver {
     val builder: IO[Option[NotificationCompat.Builder]] = nType match {
       case RegistrationConfirmation(bundle) =>
         IO {
-          Some(
-            new NotificationCompat.Builder(context)
-              .setContentTitle(
-                context.getString(R.string.fedmsg_confirmation_title))
-              .setStyle(
-                new NotificationCompat
-                  .BigTextStyle()
-                  .bigText(context.getString(R.string.fedmsg_confirmation_text)))
-              .addAction(
-                android.R.drawable.presence_offline,
-                context.getString(R.string.reject),
-                createIntent(Some(false), bundle.getString("secret", "")))
-              .addAction(
-                android.R.drawable.presence_online,
-                context.getString(R.string.accept),
-                createIntent(Some(true), bundle.getString("secret", "")))
-              .setContentText(context.getString(R.string.fedmsg_confirmation_text))
-              .setSmallIcon(R.drawable.fedoraicon)
-              .setContentIntent(
-                createIntent(None, bundle.getString("secret", "")))
-              .setAutoCancel(true))
+          val compatBuilder = new NotificationCompat.Builder(context)
+            .setContentTitle(
+              context.getString(R.string.fedmsg_confirmation_title))
+            .setStyle(
+              new NotificationCompat
+                .BigTextStyle()
+                .bigText(context.getString(R.string.fedmsg_confirmation_text)))
+            .addAction(
+              android.R.drawable.presence_offline,
+              context.getString(R.string.reject),
+              createIntent(Some(false), bundle.getString("secret", "")))
+            .addAction(
+              android.R.drawable.presence_online,
+              context.getString(R.string.accept),
+              createIntent(Some(true), bundle.getString("secret", "")))
+            .setContentText(context.getString(R.string.fedmsg_confirmation_text))
+            .setSmallIcon(R.drawable.fedoraicon)
+            .setContentIntent(
+              createIntent(None, bundle.getString("secret", "")))
+            .setAutoCancel(true)
+          Some(compatBuilder)
         }
       case FedmsgNotification(bundle) => {
         val hrf: IO[String \/ Option[HRF.Result]] = for {
