@@ -43,7 +43,7 @@ class FedmsgReceiver extends BroadcastReceiver {
 
     def createIntent(
       accepted: Option[Boolean],
-      secret: String): PendingIntent = {
+      secret: String): IO[PendingIntent] = IO {
       val intent = accepted match {
         case Some(a: Boolean) =>
           new Intent(context, classOf[FedmsgConfirmationActivity])
@@ -59,35 +59,37 @@ class FedmsgReceiver extends BroadcastReceiver {
             // http://stackoverflow.com/a/3140371/1106202
             .setAction("FedmsgConfirmationActivity_" + System.currentTimeMillis)
       }
-
       PendingIntent.getActivity(context, 0, intent, 0)
     }
 
     val builder: IO[Option[NotificationCompat.Builder]] = nType match {
       case RegistrationConfirmation(bundle) =>
-        IO {
-          val compatBuilder = new NotificationCompat.Builder(context)
-            .setContentTitle(
-              context.getString(R.string.fedmsg_confirmation_title))
-            .setStyle(
-              new NotificationCompat
-                .BigTextStyle()
-                .bigText(context.getString(R.string.fedmsg_confirmation_text)))
-            .addAction(
-              android.R.drawable.presence_offline,
-              context.getString(R.string.reject),
-              createIntent(Some(false), bundle.getString("secret", "")))
-            .addAction(
-              android.R.drawable.presence_online,
-              context.getString(R.string.accept),
-              createIntent(Some(true), bundle.getString("secret", "")))
-            .setContentText(context.getString(R.string.fedmsg_confirmation_text))
-            .setSmallIcon(R.drawable.fedoraicon)
-            .setContentIntent(
-              createIntent(None, bundle.getString("secret", "")))
-            .setAutoCancel(true)
-          Some(compatBuilder)
-        }
+        for {
+          acceptIntent  <- createIntent(Some(true), bundle.getString("secret", ""))
+          rejectIntent  <- createIntent(Some(false), bundle.getString("secret", ""))
+          neitherIntent <- createIntent(None, bundle.getString("secret", ""))
+          compatBuilder <- IO {
+            new NotificationCompat.Builder(context)
+              .setContentTitle(
+                context.getString(R.string.fedmsg_confirmation_title))
+              .setStyle(
+                new NotificationCompat
+                  .BigTextStyle()
+                  .bigText(context.getString(R.string.fedmsg_confirmation_text)))
+              .addAction(
+                android.R.drawable.presence_offline,
+                context.getString(R.string.reject),
+                rejectIntent)
+              .addAction(
+                android.R.drawable.presence_online,
+                context.getString(R.string.accept),
+                acceptIntent)
+              .setContentText(context.getString(R.string.fedmsg_confirmation_text))
+              .setSmallIcon(R.drawable.fedoraicon)
+              .setContentIntent(neitherIntent)
+              .setAutoCancel(true)
+          }
+        } yield Some(compatBuilder)
       case FedmsgNotification(bundle) => {
         val hrf: IO[String \/ Option[HRF.Result]] = for {
           hrf <- HRF.fromJsonString(bundle.getString("message"))
