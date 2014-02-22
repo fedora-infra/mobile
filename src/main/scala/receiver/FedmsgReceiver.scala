@@ -13,9 +13,9 @@ import com.google.android.gms.gcm.GoogleCloudMessaging
 import scalaz._, Scalaz._
 import scalaz.effect._
 
-sealed trait FMNMessage
-case object RegistrationConfirmation extends FMNMessage
-case object FedmsgNotification extends FMNMessage
+sealed abstract class FMNMessage
+case class RegistrationConfirmation(b: Bundle) extends FMNMessage
+case class FedmsgNotification(b: Bundle) extends FMNMessage
 
 class FedmsgReceiver extends BroadcastReceiver {
   override def onReceive(context: Context, intent: Intent): Unit = IO {
@@ -24,17 +24,17 @@ class FedmsgReceiver extends BroadcastReceiver {
     val bundle: Bundle = intent.getExtras
 
     val nType: FMNMessage =
-      if (bundle.containsKey("secret")) RegistrationConfirmation
-      else FedmsgNotification
+      if (bundle.containsKey("secret")) RegistrationConfirmation(bundle)
+      else FedmsgNotification(bundle)
 
     setResultCode(Activity.RESULT_OK)
-    sendNotification(nType, context, bundle)
+    sendNotification(context, nType)
   }.unsafePerformIO
 
   private def sendNotification(
-    nType: FMNMessage,
     context: Context,
-    bundle: Bundle): IO[Unit] = IO {
+    nType: FMNMessage): IO[Unit] = IO {
+
     // Ugh, Object.
     val notificationManager =
       context
@@ -64,7 +64,7 @@ class FedmsgReceiver extends BroadcastReceiver {
     }
 
     val builder: IO[Option[NotificationCompat.Builder]] = nType match {
-      case RegistrationConfirmation =>
+      case RegistrationConfirmation(bundle) =>
         IO {
           Some(
             new NotificationCompat.Builder(context)
@@ -88,17 +88,16 @@ class FedmsgReceiver extends BroadcastReceiver {
                 createIntent(None, bundle.getString("secret", "")))
               .setAutoCancel(true))
         }
-      case FedmsgNotification => {
+      case FedmsgNotification(bundle) => {
         val hrf: IO[String \/ Option[HRF.Result]] = for {
           hrf <- HRF.fromJsonString(bundle.getString("message"))
         } yield hrf
 
         hrf map {
-          case -\/(error) =>
-            {
-              Log.e("FedmsgReceiver", "error parsing JSON")
-              None
-            }
+          case -\/(error) => {
+            Log.e("FedmsgReceiver", "error parsing JSON")
+            None
+          }
           case \/-(result) =>
             result match {
               case None =>
