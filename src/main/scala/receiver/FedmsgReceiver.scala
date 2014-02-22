@@ -17,6 +17,15 @@ sealed abstract class FMNMessage
 case class RegistrationConfirmation(b: Bundle) extends FMNMessage
 case class FedmsgNotification(b: Bundle) extends FMNMessage
 
+case class ObjectCast[A](x: Object \/ A)
+case object ObjectCast {
+  def unsafeCastNotificationManager(y: Object): ObjectCast[NotificationManager] =
+    if (y.isInstanceOf[NotificationManager])
+      ObjectCast(y.asInstanceOf[NotificationManager].right)
+    else
+      ObjectCast(y.left)
+}
+
 class FedmsgReceiver extends BroadcastReceiver {
   override def onReceive(context: Context, intent: Intent): Unit = IO {
     val gcm = GoogleCloudMessaging.getInstance(context)
@@ -35,11 +44,9 @@ class FedmsgReceiver extends BroadcastReceiver {
     context: Context,
     nType: FMNMessage): IO[Unit] = IO {
 
-    // Ugh, Object.
-    val notificationManager =
-      context
-        .getSystemService(Context.NOTIFICATION_SERVICE)
-        .asInstanceOf[NotificationManager]
+     val notificationManager =
+       ObjectCast.unsafeCastNotificationManager(
+         context.getSystemService(Context.NOTIFICATION_SERVICE))
 
     def createIntent(
       accepted: Option[Boolean],
@@ -123,6 +130,6 @@ class FedmsgReceiver extends BroadcastReceiver {
         }
       }
     }
-    builder.map(_.map(b => notificationManager.notify(1, b.build)))
+    builder.map(_.map(b => notificationManager.x.map(_.notify(1, b.build))))
   }
 }
