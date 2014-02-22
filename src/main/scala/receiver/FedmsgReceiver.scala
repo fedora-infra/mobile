@@ -102,25 +102,24 @@ class FedmsgReceiver extends BroadcastReceiver {
           }
           case \/-(result) =>
             result match {
-              case None =>
-                {
-                  Log.e("FedmsgReceiver", "Empty resultset from JSON")
-                  None
-                }
-              case Some(r) =>
-                {
-                  Some(
-                    new NotificationCompat.Builder(context)
-                      .setContentTitle(r.subtitle)
-                      .setStyle(
-                        new NotificationCompat
-                          .BigTextStyle()
-                          .bigText(r.repr))
-                      .setContentText(r.repr)
-                      .setSmallIcon(R.drawable.fedoraicon)
-                      .setAutoCancel(true))
-                }
-            }
+              case None => {
+                Log.e("FedmsgReceiver", "Empty resultset from JSON")
+                None
+              }
+              case Some(r) => {
+                val compatBuilder =
+                  new NotificationCompat.Builder(context)
+                    .setContentTitle(r.subtitle)
+                    .setStyle(
+                      new NotificationCompat
+                        .BigTextStyle()
+                        .bigText(r.repr))
+                    .setContentText(r.repr)
+                    .setSmallIcon(R.drawable.fedoraicon)
+                    .setAutoCancel(true)
+                Some(compatBuilder)
+              }
+          }
         }
       }
     }
