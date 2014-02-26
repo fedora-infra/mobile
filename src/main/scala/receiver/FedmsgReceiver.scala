@@ -13,7 +13,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging
 import scalaz._, Scalaz._
 import scalaz.effect._
 
-sealed abstract class FMNMessage
+sealed trait FMNMessage
 case class RegistrationConfirmation(b: Bundle) extends FMNMessage
 case class FedmsgNotification(b: Bundle) extends FMNMessage
 
