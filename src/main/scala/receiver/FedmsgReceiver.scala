@@ -17,13 +17,13 @@ sealed trait FMNMessage
 case class RegistrationConfirmation(b: Bundle) extends FMNMessage
 case class FedmsgNotification(b: Bundle) extends FMNMessage
 
-case class ObjectCast[A](x: Object \/ A)
-case object ObjectCast {
-  def unsafeCastNotificationManager(y: Object): ObjectCast[NotificationManager] =
+sealed case class NotificationManagerCast[A](x: Object \/ A)
+case object NotificationManagerCast {
+  def unsafeCastNotificationManager(y: Object): NotificationManagerCast[NotificationManager] =
     if (y.isInstanceOf[NotificationManager])
-      ObjectCast(y.asInstanceOf[NotificationManager].right)
+      NotificationManagerCast(y.asInstanceOf[NotificationManager].right)
     else
-      ObjectCast(y.left)
+      NotificationManagerCast(y.left)
 }
 
 class FedmsgReceiver extends BroadcastReceiver {
@@ -45,7 +45,7 @@ class FedmsgReceiver extends BroadcastReceiver {
     nType: FMNMessage): IO[Unit] = IO {
 
      val notificationManager =
-       ObjectCast.unsafeCastNotificationManager(
+       NotificationManagerCast.unsafeCastNotificationManager(
          context.getSystemService(Context.NOTIFICATION_SERVICE))
 
     def createIntent(
