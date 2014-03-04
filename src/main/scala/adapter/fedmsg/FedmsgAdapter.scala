@@ -12,6 +12,8 @@ import android.view.{ LayoutInflater, View, ViewGroup }
 import android.view.View.{ OnClickListener, OnLongClickListener }
 import android.widget.{ ArrayAdapter, ImageView, LinearLayout, ListView, TextView, Toast }
 
+import scalaz._, Scalaz._
+
 import scala.concurrent.{ future, Future }
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{ Failure, Try, Success }
@@ -43,22 +45,19 @@ class FedmsgAdapter(
     // If there is no username, follow the same a/b path as above, but on our
     // side without redirects. i.e., simply load the primary icon or the
     // infinity logo.
-    val defaultIcon = item.icon.getOrElse("https://fedoraproject.org/static/images/fedora_infinity_64x64.png")
+    val serviceIcon =
+      item.icon.getOrElse("https://fedoraproject.org/static/images/fedora_infinity_64x64.png")
     val primaryUser = item.usernames.headOption
-    val image: Future[Bitmap] = primaryUser match {
-      case Some(username) => {
-        Cache.getGravatar(
-          context,
-          Hashing.md5(s"${item.usernames.head}@fedoraproject.org").toString,
-          default = defaultIcon)
-      }
-      case None => Cache.getServiceIcon(context, defaultIcon, item.title)
+    val image = primaryUser match {
+      case Some(username) =>
+        BitmapFetch.fromGravatarEmail(s"${username}@fedoraproject.org")
+      case None => BitmapFetch.fromURL(serviceIcon)
     }
 
     // XXX: Move this to scalaz Promise.
-    image.onComplete {
-      case Success(img) => activity.runOnUiThread(iconView.setImageBitmap(img))
-      case _ => Log.e("FedmsgAdapter", "Unable to fetch icon.")
+    image runAsync {
+      case -\/(err) => Log.e("FedmsgAdapter", err.toString)
+      case \/-(img) => activity.runOnUiThread(iconView.setImageBitmap(img))
     }
 
     layout
