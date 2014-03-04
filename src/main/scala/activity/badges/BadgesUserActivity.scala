@@ -14,11 +14,6 @@ import android.widget.Toast
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
 
-import scala.concurrent.{ future, Future }
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.io.Source
-import scala.util.{ Failure, Success }
-
 class BadgesUserActivity
   extends NavDrawerActivity
   with PullToRefreshAttacher.OnRefreshListener
@@ -34,16 +29,12 @@ class BadgesUserActivity
       case Some(nickname) => {
         val actionbar = getActionBar
         actionbar.setTitle(nickname)
-        val email = s"${nickname}@fedoraproject.org"
-        Cache.getGravatar(
-          this,
-          Hashing.md5(email)).onComplete { result =>
-            result match {
-              case Success(gravatar) =>
-                runOnUiThread(actionbar.setIcon(new BitmapDrawable(getResources, gravatar)))
-              case _ =>
-            }
-          }
+        BitmapFetch.fromGravatarEmail(s"${nickname}@fedoraproject.org") runAsync {
+          case -\/(err) => Log.e("BadgesUserActivity", err.toString)
+          case \/-(image) =>
+            runOnUiThread(
+              actionbar.setIcon(new BitmapDrawable(getResources, image)))
+        }
 
         val badges = findView(TR.user_badges)
         refreshAdapter.setRefreshableView(badges, this)
