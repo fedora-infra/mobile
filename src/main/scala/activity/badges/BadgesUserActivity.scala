@@ -4,6 +4,7 @@ import Implicits._
 import util.Hashing
 
 import scalaz._, Scalaz._
+import scalaz.effect.IO
 
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
@@ -25,49 +26,66 @@ class BadgesUserActivity
 
   private lazy val refreshAdapter = new PullToRefreshAttacher(this)
 
-  // The nickname is passed via the intent. If it's not there, something went
-  // horribly wrong and fataling is probably the correct thing to do.
-  private lazy val nickname = getIntent.getExtras.getString("nickname")
-
-  override def onPostCreate(bundle: Bundle) {
+  override def onPostCreate(bundle: Bundle): Unit = IO {
     super.onPostCreate(bundle)
     setUpNav(R.layout.badges_user_activity)
 
-    val actionbar = getActionBar
-    actionbar.setTitle(nickname)
+    Option(getIntent.getExtras.getString("nickname")) match {
+      case Some(nickname) => {
+        val actionbar = getActionBar
+        actionbar.setTitle(nickname)
+        val email = s"${nickname}@fedoraproject.org"
+        Cache.getGravatar(
+          this,
+          Hashing.md5(email)).onComplete { result =>
+            result match {
+              case Success(gravatar) =>
+                runOnUiThread(actionbar.setIcon(new BitmapDrawable(getResources, gravatar)))
+              case _ =>
+            }
+          }
 
-    val email = s"${nickname}@fedoraproject.org"
-    Cache.getGravatar(
-      this,
-      Hashing.md5(email)).onComplete { result =>
-        result match {
-          case Success(gravatar) =>
-            runOnUiThread(actionbar.setIcon(new BitmapDrawable(getResources, gravatar)))
-          case _ =>
-        }
+        val badges = findView(TR.user_badges)
+        refreshAdapter.setRefreshableView(badges, this)
       }
-
-    val badges = findView(TR.user_badges)
-    refreshAdapter.setRefreshableView(badges, this)
+      case None => {
+        Log.e(
+          "BadgesUserActivity",
+          "No nickname given. Spawned without an Intent somehow?")
+        Toast.makeText(this, R.string.badges_user_failure, Toast.LENGTH_LONG).show
+        finish() // Nuke the activity.
+      }
+    }
   }
 
   def onRefreshStarted(view: View): Unit = {
-    updateBadges()
+    updateBadges().unsafePerformIO
     runOnUiThread(refreshAdapter.setRefreshComplete)
   }
 
-  def updateBadges(): Unit = {
-    Badges.user(nickname) map {
-      case \/-(res) => {
-        val adapter = new BadgesUserAdapter(
-          this,
-          android.R.layout.simple_list_item_1,
-          res.assertions.toArray)
-        findViewOpt(TR.user_badges).map(v => runOnUiThread(v.setAdapter(adapter)))
+  def updateBadges(): IO[Unit] = IO {
+    Option(getIntent.getExtras.getString("nickname")) match {
+      case Some(nickname) => {
+        Badges.user(nickname) map {
+          case \/-(res) => {
+            val adapter = new BadgesUserAdapter(
+              this,
+              android.R.layout.simple_list_item_1,
+              res.assertions.toArray)
+            findViewOpt(TR.user_badges).map(v => runOnUiThread(v.setAdapter(adapter)))
+          }
+          case -\/(err) => {
+            runOnUiThread(Toast.makeText(this, R.string.badges_user_failure, Toast.LENGTH_LONG).show)
+            Log.e("BadgesUserActivity", err.toString)
+          }
+        }
       }
-      case -\/(err) => {
-        runOnUiThread(Toast.makeText(this, R.string.badges_user_failure, Toast.LENGTH_LONG).show)
-        Log.e("BadgesUserActivity", err.toString)
+      case None => {
+        Log.e(
+          "BadgesUserActivity",
+          "No nickname given. Spawned without an Intent somehow?")
+        Toast.makeText(this, R.string.badges_user_failure, Toast.LENGTH_LONG).show
+        finish() // Nuke the activity.
       }
     }
   }
