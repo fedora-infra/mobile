@@ -3,18 +3,15 @@ package org.fedoraproject.mobile
 import Badges.LeaderboardUser
 
 import Implicits._
-import util.Hashing
 
 import android.app.Activity
 import android.content.{ Context, Intent }
-import android.net.Uri
+import android.util.Log
 import android.view.{ LayoutInflater, View, ViewGroup }
 import android.view.View.OnClickListener
 import android.widget.{ ArrayAdapter, ImageView, LinearLayout, TextView }
 
-import scala.concurrent.{ future, Future }
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{ Failure, Try, Success }
+import scalaz._, Scalaz._
 
 class BadgesLeaderboardAdapter(
   context: Context,
@@ -43,18 +40,11 @@ class BadgesLeaderboardAdapter(
     // If there's a user associated with it, pull from gravatar.
     // Otherwise, just use the icon if it exists.
     val email = s"${item.nickname}@fedoraproject.org"
-    Cache.getGravatar(
-      context,
-      Hashing.md5(email)).onComplete { result =>
-        result match {
-          case Success(gravatar) => {
-            activity.runOnUiThread {
-              iconView.setImageBitmap(gravatar)
-            }
-          }
-          case _ =>
-        }
-      }
+    BitmapFetch.fromGravatarEmail(email) runAsync {
+      case -\/(err) => Log.e("BadgesLeaderboardAdapter", err.toString)
+      case \/-(image) =>
+        activity.runOnUiThread(iconView.setImageBitmap(image))
+    }
 
     layout
       .findViewById(R.id.nickname)
