@@ -11,11 +11,6 @@ import android.text.format.DateUtils
 import android.util.Log
 import android.widget.Toast
 
-import scala.concurrent.{ future, Future }
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.io.Source
-import scala.util.{ Failure, Success }
-
 sealed case class BadgeSerializableCast[A](x: java.io.Serializable \/ A)
 case object BadgeSerializableCast {
   def unsafeCastBadge(y: java.io.Serializable): BadgeSerializableCast[Badge] =
@@ -39,19 +34,14 @@ class BadgeInfoActivity extends NavDrawerActivity {
         val actionbar = getActionBar
         actionbar.setTitle(badge.name)
 
-        val badgeImageFuture = Cache.getBadgeImage(
-          this,
-          badge.image,
-          badge.id)
+        val badgeImage = BitmapFetch.fromURL(badge.image)
 
-        badgeImageFuture onComplete { result =>
-          result match {
-            case Success(badge) => {
-              runOnUiThread(findView(TR.icon).setImageBitmap(badge))
-              runOnUiThread(
-                actionbar.setIcon(new BitmapDrawable(getResources, badge)))
-            }
-            case _ =>
+        badgeImage runAsync {
+          case -\/(err) => Log.e("BadgeInfoActivity", "Unable to fetch badge image")
+          case \/-(image) => {
+            runOnUiThread(findView(TR.icon).setImageBitmap(image))
+            runOnUiThread(
+              actionbar.setIcon(new BitmapDrawable(getResources, image)))
           }
         }
 
