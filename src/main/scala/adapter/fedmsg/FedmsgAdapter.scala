@@ -14,10 +14,6 @@ import android.widget.{ ArrayAdapter, ImageView, LinearLayout, ListView, TextVie
 
 import scalaz._, Scalaz._
 
-import scala.concurrent.{ future, Future }
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{ Failure, Try, Success }
-
 import java.util.ArrayList // TODO: Do something about this.
 
 class FedmsgAdapter(
