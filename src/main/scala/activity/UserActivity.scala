@@ -17,10 +17,6 @@ import scalaz.effect.IO
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
 
-import scala.concurrent.{ future, Future }
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{ Failure, Try, Success }
-
 import java.util.ArrayList // TODO: Do something about this.
 import java.util.TimeZone
 
@@ -83,15 +79,9 @@ class UserActivity
 
     val profilePic = findView(TR.profile_pic)
 
-    val image: Future[Bitmap] =
-      Cache.getGravatar(
-        this,
-        Hashing.md5(s"codeblock@fedoraproject.org").toString)
-
-    // XXX: Move this to scalaz Promise.
-    image.onComplete {
-      case Success(img) => runOnUiThread(profilePic.setImageBitmap(img))
-      case _ => Log.e("UserActivity", "Unable to fetch profile image.")
+    BitmapFetch.fromGravatarEmail("codeblock@fedoraproject.org") runAsync {
+      case -\/(err) => Log.e("UserActivity", err.toString)
+      case \/-(img) => runOnUiThread(profilePic.setImageBitmap(img))
     }
 
     findView(TR.badge_count).setText("43")
