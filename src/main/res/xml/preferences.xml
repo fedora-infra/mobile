@@ -21,6 +21,7 @@
         android:key="pref_fmn_apikey"
         android:title="@string/fmn_apikey"
         android:summary="@string/pref_fmn_apikey_summary" />
+  </PreferenceCategory>
 
   <PreferenceCategory
       android:title="@string/pref_development"
