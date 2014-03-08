@@ -19,5 +19,4 @@
         android:divider="#444"
         android:dividerHeight="0.5dp"
         android:background="#222"/>
-
 </android.support.v4.widget.DrawerLayout>

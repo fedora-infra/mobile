@@ -1,93 +1,147 @@
 package org.fedoraproject.mobile
 
+import scala.language.existentials
+
 import Implicits._
 
+import android.app.{ Activity, Fragment }
+import android.content.{ Context, Intent }
 import android.os.{ Build, Bundle }
 import android.preference.PreferenceManager
+import android.support.v4.app.ActionBarDrawerToggle
+import android.support.v4.view.GravityCompat
 import android.util.Log
-import android.view.{ Menu, MenuItem, View }
+import android.view.{ LayoutInflater, MenuItem, View, ViewGroup }
 import android.widget.AbsListView.OnScrollListener
-import android.widget.{ AbsListView, ArrayAdapter, Toast }
+import android.widget.{ AdapterView, AbsListView, ArrayAdapter, TextView, Toast }
 
 import scalaz._, Scalaz._
 import scalaz.concurrent.Promise
 
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
-
-import scala.io.Source
-
 import java.util.ArrayList // TODO: Do something about this.
-import java.util.TimeZone
 
-class MainActivity
-  extends NavDrawerActivity
-  with PullToRefreshAttacher.OnRefreshListener
-  with util.Views {
+sealed trait Delegation {
+  def d: Class[_]
+  def icon: Int
+  def name: String
+}
+sealed case class ActivityDelegation(
+  override val d: Class[_ <: Activity],
+  override val icon: Int,
+  override val name: String) extends Delegation
+sealed case class FragmentDelegation(
+  override val d: Class[_ <: Fragment],
+  override val icon: Int,
+  override val name: String) extends Delegation
 
-  private lazy val refreshAdapter = new PullToRefreshAttacher(this)
+sealed class NavAdapter(
+  context: Context,
+  resource: Int,
+  delegations: List[Delegation])
+  extends ArrayAdapter[String](context, resource, delegations.map(_.name).toArray) {
+    override def getView(position: Int, convertView: View, parent: ViewGroup): View = {
+      val delegation: Delegation = delegations(position)
 
-  private def getLatestMessages(before: Option[Long] = None): Promise[String \/ List[HRF.Result]] = {
-    val query = List(
-      "delta" -> "7200",
-      "order" -> "desc"
-    ) ::: (if (before.isDefined) List("start" -> before.get.toString) else Nil)
+      val layout = LayoutInflater.from(context)
+        .inflate(R.layout.drawer_list_item, parent, false)
+        .asInstanceOf[TextView]
 
-    HRF(query, TimeZone.getDefault)
-  }
-
-  private def getMessagesSince(since: Long): Promise[String \/ List[HRF.Result]] =
-    HRF(
-      List(
-        "start" -> (since + 1).toString,
-        "order" -> "desc"
-      ),
-      TimeZone.getDefault)
-
-  def onRefreshStarted(view: View): Unit = {
-    val newsfeed = findView(TR.newsfeed)
-    val newestItem = \/.fromTryCatch(newsfeed.getAdapter.getItem(0))
-    newestItem match {
-      case -\/(err) => updateNewsfeed()
-      case \/-(item) => {
-        val timestamp = item.asInstanceOf[HRF.Result].timestamp("epoch")
-        val messages: Promise[String \/ List[HRF.Result]] = getMessagesSince(timestamp.replace(".0", "").toLong)
-        messages map {
-          case \/-(res) => {
-            val adapter = newsfeed.getAdapter.asInstanceOf[ArrayAdapter[HRF.Result]]
-            runOnUiThread(res.reverse.foreach(adapter.insert(_, 0)))
-            runOnUiThread(adapter.notifyDataSetChanged)
-            runOnUiThread(refreshAdapter.setRefreshComplete)
-          }
-          case -\/(err) => {
-            runOnUiThread(Toast.makeText(this, R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
-            Log.e("MainActivity", "Error refreshing: " + err)
-            runOnUiThread(refreshAdapter.setRefreshComplete)
-          }
-        }
+      layout.tap { obj =>
+        obj.setCompoundDrawablesWithIntrinsicBounds(delegation.icon, 0, 0, 0)
+        obj.setText(delegation.name)
       }
+
+      layout
     }
   }
 
-  /*private def getNextPage(lastTimeStamp: Long): Unit = {
-    val newsfeed = findView(TR.newsfeed)
-    val messages = getLatestMessages(Option(lastTimeStamp))
-    messages onSuccess {
-      case hrfResult => {
-        val adapter = newsfeed.getAdapter.asInstanceOf[ArrayAdapter[HRF.Result]]
-        runOnUiThread(hrfResult.foreach { result => adapter.add(result) })
-        runOnUiThread(adapter.notifyDataSetChanged)
-      }
-    }
-    messages onFailure {
-      case failure =>
-        runOnUiThread(
-          Toast.makeText(this, R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
-    }
-  }*/
-
+class MainActivity extends util.Views {
   override def onPostCreate(bundle: Bundle) {
     super.onPostCreate(bundle)
-    setUpNav(R.layout.main_activity)
+    setContentView(R.layout.navdrawer)
+
+    val navMap: List[Delegation] =
+      List(
+        ActivityDelegation(
+          classOf[StatusActivity],
+          R.drawable.ic_status,
+          getString(R.string.infrastructure_status)),
+        ActivityDelegation(
+          classOf[PackageSearchActivity],
+          R.drawable.ic_search,
+          getString(R.string.package_search)),
+        ActivityDelegation(
+          classOf[BadgesLeaderboardActivity],
+          R.drawable.ic_badges,
+          getString(R.string.badges_leaderboard)),
+        ActivityDelegation(
+          classOf[FedmsgRegisterActivity],
+          R.drawable.ic_fedmsg,
+          getString(R.string.register_fmn)),
+        ActivityDelegation(
+          classOf[PreferencesActivity],
+          R.drawable.ic_preferences,
+          getString(R.string.preferences)),
+        ActivityDelegation(
+          classOf[UserActivity],
+          R.drawable.ic_preferences,
+          "Profile UI Demo")
+      )
+
+    val title = getTitle
+
+    val drawerLayout = findView(TR.drawer_layout)
+    val drawerToggle = new ActionBarDrawerToggle(
+      this,
+      drawerLayout,
+      R.drawable.ic_drawer,
+      R.string.open,
+      R.string.close) {
+      override def onDrawerClosed(view: View): Unit = {
+        super.onDrawerClosed(view)
+        getActionBar.setTitle(title)
+        invalidateOptionsMenu
+      }
+      override def onDrawerOpened(view: View): Unit = {
+        super.onDrawerOpened(view)
+        getActionBar.setTitle(title)
+        invalidateOptionsMenu
+      }
+    }
+
+    drawerLayout.setDrawerListener(drawerToggle)
+    drawerToggle.syncState
+
+    val drawerList = findView(TR.left_drawer)
+    drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START)
+    drawerList.setAdapter(
+      new NavAdapter(
+        this,
+        android.R.layout.simple_list_item_1,
+        navMap))
+
+    drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener {
+      def onItemClick(parent: AdapterView[_], view: View, position: Int, id: Long) {
+        navMap(position) match {
+          case ActivityDelegation(c, i, s) => {
+            val intent = new Intent(MainActivity.this, c)
+            drawerLayout.closeDrawer(drawerList)
+            startActivity(intent)
+          }
+          case FragmentDelegation(c, i, s) => {
+            val fragment = c.newInstance
+            val fragmentManager = getFragmentManager
+            fragmentManager.beginTransaction
+              .replace(R.id.content_frame, fragment)
+              .commit()
+          }
+
+          drawerList.setItemChecked(position, true)
+          getActionBar.setTitle(s)
+          drawerLayout.closeDrawer(drawerList)
+        }
+      }
+    })
 
     val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
     val checkUpdates = sharedPref.getBoolean("check_updates", true)
@@ -104,47 +158,13 @@ class MainActivity
           Log.e("MainActivity", err.toString)
       }
     }
-
-    updateNewsfeed()
-    val newsfeed = findView(TR.newsfeed)
-
-    refreshAdapter.setRefreshableView(newsfeed, this)
-
-    /*newsfeed.setOnScrollListener(new OnScrollListener {
-      def onScrollStateChanged(view: AbsListView, scrollState: Int) { /* ... */ }
-
-      override def onScroll(view: AbsListView, firstVisible: Int, visibleCount: Int, totalCount: Int) {
-        if (firstVisible + visibleCount == totalCount && totalCount != 0 && totalCount > visibleCount) {
-          val last = view.getItemAtPosition(totalCount - 1).asInstanceOf[HRF.Result]
-          getNextPage(last.timestamp("epoch").replace(".0", "").toLong)
-        }
-       }
-    })*/
   }
 
-
-  private def updateNewsfeed() {
-    val newsfeed = findView(TR.newsfeed)
-    val messages: Promise[String \/ List[HRF.Result]] = getLatestMessages()
-    val arrayList = new ArrayList[HRF.Result]
-    val adapter = new FedmsgAdapter(
-      this,
-      android.R.layout.simple_list_item_1,
-      arrayList)
-    newsfeed.setAdapter(adapter)
-
-    messages map {
-      case -\/(err) => {
-        Log.e("MainActivity", "Error updating newsfeed: " + err)
-        runOnUiThread(
-          Toast.makeText(
-            this,
-            R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
-      }
-      case \/-(res) => {
-        res.foreach(arrayList.add(_))
-        runOnUiThread(newsfeed.setAdapter(adapter))
-      }
-    }
+  /*
+  override def onPrepareOptionsMenu(menu: Menu): Boolean {
+    val drawerOpen: Boolean = mDrawerLayout.isDrawerOpen(mDrawerList)
+    menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
+    return super.onPrepareOptionsMenu(menu);
   }
+  */
 }
