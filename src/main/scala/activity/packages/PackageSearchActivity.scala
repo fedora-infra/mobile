@@ -7,15 +7,12 @@ import Pkgwat._
 import android.app.SearchManager
 import android.content.{ Context, Intent }
 import android.os.Bundle
+import android.util.Log
 import android.view.{ LayoutInflater, Menu, View, ViewGroup }
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.{ AdapterView, ArrayAdapter, ImageView, LinearLayout, ListView, TextView, Toast, SearchView }
 
 import scalaz._, Scalaz._
-
-// Needed until Cache moves to scalaz.concurrent.Promise
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{ Failure, Try, Success }
 
 class PackageSearchActivity extends NavDrawerActivity with util.Views {
   override def onCreate(bundle: Bundle) {
@@ -67,19 +64,12 @@ class PackageSearchActivity extends NavDrawerActivity with util.Views {
                 .findViewById(R.id.icon)
                 .asInstanceOf[ImageView]
 
-              Cache.getPackageIcon(PackageSearchActivity.this, pkg.icon) onComplete { result =>
-                result match {
-                  case Success(icon) => {
-                    runOnUiThread {
-                      iconView.setImageBitmap(icon)
-                    }
-                  }
-                  case Failure(error) => {
-                    runOnUiThread {
-                      iconView.setImageResource(R.drawable.ic_search)
-                    }
-                  }
+              BitmapFetch.fromPackage(pkg) runAsync {
+                case -\/(err) => {
+                  Log.e("PackageSearchActivity", err.toString)
+                  runOnUiThread(iconView.setImageResource(R.drawable.ic_search))
                 }
+                case \/-(icon) => runOnUiThread(iconView.setImageBitmap(icon))
               }
 
               layout
