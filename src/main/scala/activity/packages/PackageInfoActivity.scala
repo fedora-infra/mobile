@@ -8,6 +8,7 @@ import Pkgwat._
 import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.{ TableRow, TextView, Toast }
 
@@ -17,33 +18,19 @@ import scalaz._, Scalaz._
 import scalaz.concurrent.Promise
 import scalaz.concurrent.Promise._
 
-import scala.concurrent.ExecutionContext.Implicits.global // TODO: Nuke
 import scala.io.Source
-import scala.util.{ Failure, Try, Success }
 
 class PackageInfoActivity extends NavDrawerActivity with util.Views {
   override def onPostCreate(bundle: Bundle) {
     super.onPostCreate(bundle)
     setUpNav(R.layout.package_info_activity)
     val pkg = getIntent.getSerializableExtra("package").asInstanceOf[Package]
-
     val actionbar = getActionBar
+    val iconView = findView(TR.icon)
 
-    lazy val iconView = findView(TR.icon)
-
-    Cache.getPackageIcon(this, pkg.icon) onComplete { result =>
-      result match {
-        case Success(icon) => {
-          runOnUiThread {
-            actionbar.setIcon(new BitmapDrawable(getResources, icon))
-          }
-        }
-        case Failure(error) => {
-          runOnUiThread {
-            iconView.setImageResource(R.drawable.ic_search)
-          }
-        }
-      }
+    BitmapFetch.fromPackage(pkg) runAsync {
+      case -\/(err) => Log.e("PackageInfoActivity", err.toString)
+      case \/-(icon) => runOnUiThread(actionbar.setIcon(new BitmapDrawable(getResources, icon)))
     }
 
     actionbar.setTitle(pkg.name)
@@ -55,20 +42,15 @@ class PackageInfoActivity extends NavDrawerActivity with util.Views {
       case Some(owner) => {
         val ownerView = findView(TR.owner)
         ownerView.setText(owner)
-        Cache.getGravatar(
-          this,
-          Hashing.md5(s"$owner@fedoraproject.org").toString).onComplete { result =>
-            result match {
-              case Success(gravatar) => {
-                runOnUiThread {
-                  ownerView.setCompoundDrawablesWithIntrinsicBounds(new BitmapDrawable(getResources, gravatar), null, null, null)
-                }
-              }
-              case _ =>
-            }
-          }
+        BitmapFetch.fromGravatarEmail(s"${owner}@fedoraproject.org") runAsync {
+          case -\/(err) => Log.e("PackageInfoActivity", err.toString)
+          case \/-(gravatar) =>
+            runOnUiThread(
+              ownerView.setCompoundDrawablesWithIntrinsicBounds(
+                new BitmapDrawable(getResources, gravatar), null, null, null))
+        }
       }
-      case None =>
+      case None => // TODO: Show "no owner" in the UI or something.
     }
 
     val jsonURL = constructURL(

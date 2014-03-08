@@ -36,4 +36,16 @@ object BitmapFetch {
         val is = connection.getInputStream
         BitmapFactory.decodeStream(is)
       }
+
+  def fromPackage(p: Pkgwat.Package) = Task {
+    val icon = URLEncoder.encode(p.icon, "utf8")
+    val connection =
+       new URL(s"https://apps.fedoraproject.org/packages/images/icons/${icon}.png")
+       .openConnection
+       .asInstanceOf[HttpURLConnection]
+     connection setUseCaches true
+     connection setInstanceFollowRedirects true
+     val is = connection.getInputStream
+     BitmapFactory.decodeStream(is)
+  }
 }
