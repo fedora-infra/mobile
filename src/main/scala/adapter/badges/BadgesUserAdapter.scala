@@ -4,18 +4,15 @@ import Badges.Badge
 
 import Implicits._
 
+import scalaz._, Scalaz._
+
 import android.app.Activity
 import android.content.{ Context, Intent }
 import android.net.Uri
+import android.util.Log
 import android.view.{ LayoutInflater, View, ViewGroup }
 import android.view.View.OnClickListener
 import android.widget.{ ArrayAdapter, ImageView, LinearLayout, TextView }
-
-import com.google.common.hash.Hashing
-
-import scala.concurrent.{ future, Future }
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{ Failure, Try, Success }
 
 class BadgesUserAdapter(
   context: Context,
@@ -36,20 +33,9 @@ class BadgesUserAdapter(
       .findViewById(R.id.icon)
       .asInstanceOf[ImageView]
 
-    val badgeImageFuture = Cache.getBadgeImage(
-      context,
-      item.image,
-      item.id)
-
-    badgeImageFuture onComplete { result =>
-      result match {
-        case Success(badge) => {
-          activity.runOnUiThread {
-            iconView.setImageBitmap(badge)
-          }
-        }
-        case _ =>
-      }
+    BitmapFetch.fromURL(item.image) runAsync {
+      case -\/(err) => Log.e("BadgesUserAdapter", err.toString)
+      case \/-(badge) => activity.runOnUiThread(iconView.setImageBitmap(badge))
     }
 
     layout
