@@ -12,12 +12,19 @@
         android:key="pref_fmn_openid"
         android:title="@string/fmn_openid"
         android:summary="@string/pref_fmn_openid_summary" />
+  </PreferenceCategory>
 
+  <PreferenceCategory
+      android:title="@string/pref_fmn"
+      android:key="pref_fmn">
     <EditTextPreference
         android:key="pref_fmn_apikey"
         android:title="@string/fmn_apikey"
         android:summary="@string/pref_fmn_apikey_summary" />
 
+  <PreferenceCategory
+      android:title="@string/pref_development"
+      android:key="pref_development">
     <CheckBoxPreference
         android:key="check_updates"
         android:title="@string/check_updates"
