@@ -17,6 +17,7 @@ import android.widget.{ AdapterView, AbsListView, ArrayAdapter, TextView, Toast 
 
 import scalaz._, Scalaz._
 import scalaz.concurrent.Promise
+import scalaz.effect.IO
 
 import java.util.ArrayList // TODO: Do something about this.
 
@@ -126,26 +127,14 @@ class MainActivity extends util.Views {
 
     drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener {
       def onItemClick(parent: AdapterView[_], view: View, position: Int, id: Long) {
-        navMap(position) match {
-          case ActivityDelegation(c, i, s) => {
-            val intent = new Intent(MainActivity.this, c)
-            drawerLayout.closeDrawer(drawerList)
-            startActivity(intent)
-          }
-          case FragmentDelegation(c, i, s) => {
-            val fragment = c.newInstance
-            val fragmentManager = getFragmentManager
-            fragmentManager.beginTransaction
-              .replace(R.id.content_frame, fragment)
-              .commit()
-          }
-
-          drawerList.setItemChecked(position, true)
-          getActionBar.setTitle(s)
-          drawerLayout.closeDrawer(drawerList)
-        }
+        spawn(navMap(position)).unsafePerformIO // TODO
+        drawerList.setItemChecked(position, true)
+        drawerLayout.closeDrawer(drawerList)
       }
     })
+
+    // Default fragment
+    spawn(navMap.head).unsafePerformIO // TODO
 
     val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
     val checkUpdates = sharedPref.getBoolean("check_updates", true)
@@ -162,6 +151,24 @@ class MainActivity extends util.Views {
           Log.e("MainActivity", err.toString)
       }
     }
+  }
+
+  private def spawn(x: Delegation): IO[Unit] = IO {
+     x match {
+       case ActivityDelegation(c, i, s) => {
+         val intent = new Intent(MainActivity.this, c)
+         getActionBar.setTitle(s)
+         startActivity(intent)
+       }
+       case FragmentDelegation(c, i, s) => {
+         getActionBar.setTitle(s)
+         val fragment = c.newInstance
+         val fragmentManager = getFragmentManager
+         fragmentManager.beginTransaction
+           .replace(R.id.content_frame, fragment)
+           .commit()
+       }
+     }
   }
 
   /*
