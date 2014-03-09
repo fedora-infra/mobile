@@ -15,7 +15,6 @@ trait NavDrawerActivity extends FragmentActivity with TypedActivity {
   // This must be lazy because we won't have an activity initialized yet, and
   // our resources will be null.
   lazy val navMap = Map(
-    getString(R.string.infrastructure_status) -> (classOf[StatusActivity], R.drawable.ic_status),
     getString(R.string.package_search) -> (classOf[PackageSearchActivity], R.drawable.ic_search),
     getString(R.string.badges_leaderboard) -> (classOf[BadgesLeaderboardActivity], R.drawable.ic_badges),
     getString(R.string.register_fmn) -> (classOf[FedmsgRegisterActivity], R.drawable.ic_fedmsg),

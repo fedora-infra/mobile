@@ -2,7 +2,6 @@ package org.fedoraproject.mobile
 
 import Implicits._
 
-import android.app.Activity
 import android.content.Context
 import android.view.{ LayoutInflater, View, ViewGroup }
 import android.view.View.OnClickListener
@@ -14,7 +13,6 @@ class StatusAdapter(
   items: Array[(String, Map[String, String])])
   extends ArrayAdapter[(String, Map[String, String])](context, resource, items) {
   override def getView(position: Int, convertView: View, parent: ViewGroup): View = {
-    val activity = context.asInstanceOf[StatusActivity]
     val entry = getItem(position)
     val service: Map[String, String] = entry._2
 
@@ -48,7 +46,7 @@ class StatusAdapter(
       .asInstanceOf[TextView]
       .tap { obj =>
         obj.setText(status)
-        activity.getColorFor(service("status")).map { c => obj.setTextColor(c) }
+        StatusColor.colorFor(service("status")).map { c => obj.setTextColor(c) }
       }
 
     layout.setOnClickListener(new OnClickListener() {

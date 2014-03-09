@@ -67,8 +67,8 @@ class MainActivity extends util.Views {
           classOf[FedmsgNewsfeedFragment],
           R.drawable.ic_status,
           "Newsfeed"),
-        ActivityDelegation(
-          classOf[StatusActivity],
+        FragmentDelegation(
+          classOf[StatusFragment],
           R.drawable.ic_status,
           getString(R.string.infrastructure_status)),
         ActivityDelegation(
@@ -154,21 +154,21 @@ class MainActivity extends util.Views {
   }
 
   private def spawn(x: Delegation): IO[Unit] = IO {
-     x match {
-       case ActivityDelegation(c, i, s) => {
-         val intent = new Intent(MainActivity.this, c)
-         getActionBar.setTitle(s)
-         startActivity(intent)
-       }
-       case FragmentDelegation(c, i, s) => {
-         getActionBar.setTitle(s)
-         val fragment = c.newInstance
-         val fragmentManager = getFragmentManager
-         fragmentManager.beginTransaction
-           .replace(R.id.content_frame, fragment)
-           .commit()
-       }
-     }
+    x match {
+      case ActivityDelegation(c, i, s) => {
+        val intent = new Intent(MainActivity.this, c)
+        getActionBar.setTitle(s)
+        startActivity(intent)
+      }
+      case FragmentDelegation(c, i, s) => {
+        getActionBar.setTitle(s)
+        val fragment = c.newInstance
+        val fragmentManager = getFragmentManager
+        fragmentManager.beginTransaction
+         .replace(R.id.content_frame, fragment)
+         .commit()
+      }
+    }
   }
 
   /*

@@ -7,4 +7,5 @@ trait TypedFragment extends Fragment with TypedActivityHolder {
   def findViewById(x: Int): View = getView.findViewById(x)
   def activity = getActivity
   def runOnUiThread(x: Runnable): Unit = activity.runOnUiThread(x)
+  def findViewOpt[T](tr: TypedResource[T]) = Option(findView(tr))
 }

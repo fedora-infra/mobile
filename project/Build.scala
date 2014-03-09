@@ -24,6 +24,7 @@ object General {
       //"me.elrod" %% "pkgwat" % "1.0.0",
       "com.google.guava" % "guava" % "14.0.1",
       "org.scalaz" %% "scalaz-core" % "7.0.4",
+      //"com.github.xuwei-k" %% "iarray" % "0.2.6",
       "org.scalaz.stream" %% "scalaz-stream" % "0.2-SNAPSHOT",
       "io.argonaut" %% "argonaut" % "6.0.1",
       "com.github.chrisbanes.actionbarpulltorefresh" % "library" % "0.5",

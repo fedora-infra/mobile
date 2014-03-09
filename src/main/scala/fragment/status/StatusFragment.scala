@@ -17,18 +17,27 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 import scala.util.{ Failure, Try, Success }
 
+object StatusColor {
+  // TODO: This should most definitely be a sum type.
+  def colorFor(status: String) = status match {
+    case "good" => Some(Color.parseColor("#009900"))
+    case "minor" | "scheduled" => Some(Color.parseColor("#ff6103"))
+    case "major" => Some(Color.parseColor("#990000"))
+    case _ => None
+  }
+}
+
 case class StatusesResponse(
   global_info: String,
   global_status: String,
   global_verbose_status: String,
   services: Map[String, Map[String, String]])
 
-class StatusActivity
-  extends NavDrawerActivity
-  with PullToRefreshAttacher.OnRefreshListener
-  with util.Views {
+class StatusFragment
+  extends TypedFragment
+  with PullToRefreshAttacher.OnRefreshListener {
 
-  private lazy val refreshAdapter = new PullToRefreshAttacher(this)
+  private lazy val refreshAdapter = new PullToRefreshAttacher(activity)
 
   def onRefreshStarted(view: View): Unit = updateStatuses()
 
@@ -37,15 +46,6 @@ class StatusActivity
   }
 
   import StatusJsonProtocol._
-
-  // TODO: Move this somewhere.
-  def getColorFor(status: String) =
-    status match {
-      case "good" => Some(Color.parseColor("#009900"))
-      case "minor" | "scheduled" => Some(Color.parseColor("#ff6103"))
-      case "major" => Some(Color.parseColor("#990000"))
-      case _ => None
-    }
 
   private def updateStatuses() {
     findViewOpt(TR.progress).map(_.setVisibility(View.VISIBLE))
@@ -59,7 +59,7 @@ class StatusActivity
           val parsed = JsonParser(e).convertTo[StatusesResponse]
 
           val adapter = new StatusAdapter(
-            this,
+            activity,
             android.R.layout.simple_list_item_1,
             parsed.services.toArray.sortBy(_._2("name")))
 
@@ -70,7 +70,9 @@ class StatusActivity
             globalInfoView match {
               case Some(globalInfoView) => globalInfoView.tap { obj =>
                 obj.setText(parsed.global_verbose_status)
-                getColorFor(parsed.global_status).map { c => obj.setBackgroundColor(c) }
+                StatusColor.colorFor(parsed.global_status) map { c =>
+                  obj.setBackgroundColor(c)
+                }
               }
               case None =>
             }
@@ -79,14 +81,18 @@ class StatusActivity
           runOnUiThread(refreshAdapter.setRefreshComplete)
         }
         case Failure(e) =>
-          runOnUiThread(Toast.makeText(this, R.string.status_failure, Toast.LENGTH_LONG).show)
+          runOnUiThread(Toast.makeText(activity, R.string.status_failure, Toast.LENGTH_LONG).show)
       }
     }
   }
 
-  override def onPostCreate(bundle: Bundle) {
-    super.onPostCreate(bundle)
-    setUpNav(R.layout.status_activity)
+  override def onCreateView(i: LayoutInflater, c: ViewGroup, b: Bundle): View = {
+    super.onCreateView(i, c, b)
+    i.inflate(R.layout.status_activity, c, false)
+  }
+
+  override def onStart() {
+    super.onStart()
     val view = findView(TR.statuses)
     refreshAdapter.setRefreshableView(view, this)
     updateStatuses()
