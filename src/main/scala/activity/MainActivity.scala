@@ -62,6 +62,10 @@ class MainActivity extends util.Views {
 
     val navMap: List[Delegation] =
       List(
+        FragmentDelegation(
+          classOf[FedmsgNewsfeedFragment],
+          R.drawable.ic_status,
+          "Newsfeed"),
         ActivityDelegation(
           classOf[StatusActivity],
           R.drawable.ic_status,
