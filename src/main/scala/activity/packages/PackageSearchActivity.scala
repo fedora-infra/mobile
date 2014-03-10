@@ -17,6 +17,7 @@ import scalaz._, Scalaz._
 class PackageSearchActivity extends TypedActivity with util.Views {
   override def onCreate(bundle: Bundle) {
     super.onCreate(bundle)
+    setContentView(R.layout.package_search_activity)
     handleIntent(getIntent())
   }
 

@@ -20,10 +20,10 @@ import scalaz.concurrent.Promise._
 
 import scala.io.Source
 
-class PackageInfoActivity extends NavDrawerActivity with util.Views {
+class PackageInfoActivity extends TypedActivity with util.Views {
   override def onPostCreate(bundle: Bundle) {
     super.onPostCreate(bundle)
-    setUpNav(R.layout.package_info_activity)
+    setContentView(R.layout.package_info_activity)
     val pkg = getIntent.getSerializableExtra("package").asInstanceOf[Package]
     val actionbar = getActionBar
     val iconView = findView(TR.icon)
