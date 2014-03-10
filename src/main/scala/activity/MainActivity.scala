@@ -6,20 +6,17 @@ import Implicits._
 
 import android.app.{ Activity, Fragment }
 import android.content.{ Context, Intent }
-import android.os.{ Build, Bundle }
+import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v4.app.ActionBarDrawerToggle
 import android.support.v4.view.GravityCompat
 import android.util.Log
 import android.view.{ LayoutInflater, MenuItem, View, ViewGroup }
-import android.widget.AbsListView.OnScrollListener
-import android.widget.{ AdapterView, AbsListView, ArrayAdapter, TextView, Toast }
+import android.widget.{ AdapterView, ArrayAdapter, TextView }
 
 import scalaz._, Scalaz._
 import scalaz.concurrent.Promise
 import scalaz.effect.IO
-
-import java.util.ArrayList // TODO: Do something about this.
 
 sealed trait Delegation {
   def d: Class[_]
@@ -57,7 +54,10 @@ sealed class NavAdapter(
   }
 
 class MainActivity extends util.Views {
-  override def onPostCreate(bundle: Bundle) {
+  // Blech - can we do something about this?
+  private var drawerToggle: Option[ActionBarDrawerToggle] = None
+
+  override def onPostCreate(bundle: Bundle): Unit = {
     super.onPostCreate(bundle)
     setContentView(R.layout.navdrawer)
 
@@ -96,29 +96,33 @@ class MainActivity extends util.Views {
     val title = getTitle
 
     val drawerLayout = findView(TR.drawer_layout)
-    val drawerToggle = new ActionBarDrawerToggle(
-      this,
-      drawerLayout,
-      R.drawable.ic_drawer,
-      R.string.open,
-      R.string.close) {
-      override def onDrawerClosed(view: View): Unit = {
-        super.onDrawerClosed(view)
-        getActionBar.setTitle(title)
-        invalidateOptionsMenu
+    drawerToggle = Some(
+      new ActionBarDrawerToggle(
+        this,
+        drawerLayout,
+        R.drawable.ic_drawer,
+        R.string.open,
+        R.string.close) {
+        override def onDrawerClosed(view: View): Unit = {
+          super.onDrawerClosed(view)
+          getActionBar.setTitle(title)
+          invalidateOptionsMenu
+        }
+        override def onDrawerOpened(view: View): Unit = {
+          super.onDrawerOpened(view)
+          getActionBar.setTitle(title)
+          invalidateOptionsMenu
+        }
       }
-      override def onDrawerOpened(view: View): Unit = {
-        super.onDrawerOpened(view)
-        getActionBar.setTitle(title)
-        invalidateOptionsMenu
-      }
-    }
-
-    drawerLayout.setDrawerListener(drawerToggle)
-    drawerToggle.syncState
+    )
 
     val drawerList = findView(TR.left_drawer)
+    getActionBar.setDisplayHomeAsUpEnabled(true)
+    getActionBar.setHomeButtonEnabled(true)
     drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START)
+    drawerToggle.map(drawerLayout.setDrawerListener)
+    drawerToggle.map(_.syncState)
+
     drawerList.setAdapter(
       new NavAdapter(
         this,
@@ -171,11 +175,13 @@ class MainActivity extends util.Views {
     }
   }
 
-  /*
-  override def onPrepareOptionsMenu(menu: Menu): Boolean {
-    val drawerOpen: Boolean = mDrawerLayout.isDrawerOpen(mDrawerList)
-    menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
-    return super.onPrepareOptionsMenu(menu);
-  }
-  */
+  override def onOptionsItemSelected(item: MenuItem): Boolean =
+    drawerToggle match {
+      case Some(t) =>
+        if (t.onOptionsItemSelected(item))
+          true
+        else
+          super.onOptionsItemSelected(item)
+      case None => super.onOptionsItemSelected(item)
+    }
 }
