@@ -14,21 +14,19 @@ import android.widget.{ AdapterView, ArrayAdapter, ImageView, LinearLayout, List
 
 import scalaz._, Scalaz._
 
-class PackageSearchActivity extends NavDrawerActivity with util.Views {
+class PackageSearchActivity extends TypedActivity with util.Views {
   override def onCreate(bundle: Bundle) {
     super.onCreate(bundle)
-    setUpNav(R.layout.package_search_activity)
     handleIntent(getIntent())
   }
 
-  override def onNewIntent(intent: Intent) {
+  override def onNewIntent(intent: Intent): Unit = {
     setIntent(intent)
     handleIntent(intent)
   }
 
-  def handleIntent(intent: Intent) {
+  def handleIntent(intent: Intent): Unit = {
     if (intent.getAction == Intent.ACTION_SEARCH) {
-
       findViewOpt(TR.packages).map {
         _.tap { obj =>
           obj.setAdapter(null)
@@ -115,15 +113,15 @@ class PackageSearchActivity extends NavDrawerActivity with util.Views {
     }
   }
 
-  override def onCreateOptionsMenu(menu: Menu) = {
+  override def onCreateOptionsMenu(menu: Menu): Boolean = {
     val inflater = getMenuInflater
     inflater.inflate(R.menu.search, menu);
-
     val searchManager = getSystemService(Context.SEARCH_SERVICE).asInstanceOf[SearchManager]
-    val searchView = menu.findItem(R.id.menu_search).getActionView.asInstanceOf[SearchView]
+    val searchViewMenuItem = menu.findItem(R.id.menu_search)
+    val searchView = searchViewMenuItem.getActionView.asInstanceOf[SearchView]
     searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName))
     searchView.setIconifiedByDefault(false)
-
+    searchViewMenuItem.expandActionView
     true
   }
 }
