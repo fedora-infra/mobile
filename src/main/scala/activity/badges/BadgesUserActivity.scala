@@ -47,7 +47,7 @@ class BadgesUserActivity
         finish() // Nuke the activity.
       }
     }
-  }
+  }.unsafePerformIO
 
   def onRefreshStarted(view: View): Unit = {
     updateBadges().unsafePerformIO
