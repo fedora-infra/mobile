@@ -3,7 +3,9 @@ package org.fedoraproject.mobile
 import Badges.Badge
 
 import Implicits._
+
 import scalaz._, Scalaz._
+import scalaz.effect.IO
 
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
@@ -21,9 +23,9 @@ case object BadgeSerializableCast {
 }
 
 class BadgeInfoActivity extends NavDrawerActivity {
-  override def onPostCreate(bundle: Bundle) {
+  override def onPostCreate(bundle: Bundle): Unit = IO {
     super.onPostCreate(bundle)
-    setUpNav(R.layout.badge_info_activity)
+    setContentView(R.layout.badge_info_activity)
 
     val badgeCast = BadgeSerializableCast.unsafeCastBadge(
       getIntent.getSerializableExtra("badge"))
@@ -62,5 +64,5 @@ class BadgeInfoActivity extends NavDrawerActivity {
         }
       }
     }
-  }
+  }.unsafePerformIO
 }

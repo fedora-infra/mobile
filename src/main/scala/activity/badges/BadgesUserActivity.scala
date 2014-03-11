@@ -15,7 +15,7 @@ import android.widget.Toast
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
 
 class BadgesUserActivity
-  extends NavDrawerActivity
+  extends TypedActivity
   with PullToRefreshAttacher.OnRefreshListener
   with util.Views {
 
@@ -23,7 +23,7 @@ class BadgesUserActivity
 
   override def onPostCreate(bundle: Bundle): Unit = IO {
     super.onPostCreate(bundle)
-    setUpNav(R.layout.badges_user_activity)
+    setContentView(R.layout.badges_user_activity)
 
     Option(getIntent.getExtras.getString("nickname")) match {
       case Some(nickname) => {
