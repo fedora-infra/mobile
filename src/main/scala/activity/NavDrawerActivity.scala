@@ -16,7 +16,6 @@ trait NavDrawerActivity extends FragmentActivity with TypedActivity {
   // our resources will be null.
   lazy val navMap = Map(
     getString(R.string.package_search) -> (classOf[PackageSearchActivity], R.drawable.ic_search),
-    getString(R.string.badges_leaderboard) -> (classOf[BadgesLeaderboardActivity], R.drawable.ic_badges),
     getString(R.string.register_fmn) -> (classOf[FedmsgRegisterActivity], R.drawable.ic_fedmsg),
     getString(R.string.preferences) -> (classOf[PreferencesActivity], R.drawable.ic_preferences),
     "Profile UI Demo" -> (classOf[UserActivity], R.drawable.ic_preferences)

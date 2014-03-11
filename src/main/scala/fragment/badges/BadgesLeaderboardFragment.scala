@@ -4,25 +4,27 @@ import Implicits._
 
 import android.os.Bundle
 import android.util.Log
-import android.view.View
+import android.view.{ LayoutInflater, View, ViewGroup }
 import android.widget.Toast
 
 import scalaz._, Scalaz._
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
 
-class BadgesLeaderboardActivity
-  extends NavDrawerActivity
-  with PullToRefreshAttacher.OnRefreshListener
-  with util.Views {
+class BadgesLeaderboardFragment
+  extends TypedFragment
+  with PullToRefreshAttacher.OnRefreshListener {
 
-  private lazy val refreshAdapter = new PullToRefreshAttacher(this)
+  private lazy val refreshAdapter = new PullToRefreshAttacher(activity)
 
-  override def onPostCreate(bundle: Bundle) {
-    super.onPostCreate(bundle)
-    setUpNav(R.layout.badges_leaderboard_activity)
+  override def onCreateView(i: LayoutInflater, c: ViewGroup, b: Bundle): View = {
+    super.onCreateView(i, c, b)
+    i.inflate(R.layout.badges_leaderboard_activity, c, false)
+  }
+
+  override def onStart(): Unit = {
+    super.onStart()
     updateLeaderboard(true)
-
     val lb = findView(TR.leaderboard)
     refreshAdapter.setRefreshableView(lb, this)
   }
@@ -37,10 +39,10 @@ class BadgesLeaderboardActivity
       findViewOpt(TR.progress).map(_.setVisibility(View.VISIBLE))
     }
 
-    Badges.leaderboard() map {
+    Badges.leaderboard map { // TODO: Uncontrolled side effect.
       case \/-(res) => {
         val adapter = new BadgesLeaderboardAdapter(
-          this,
+          activity,
           android.R.layout.simple_list_item_1,
           res.toArray)
 
@@ -50,7 +52,7 @@ class BadgesLeaderboardActivity
         findViewOpt(TR.leaderboard).map(v => runOnUiThread(v.setAdapter(adapter)))
       }
       case -\/(err) => {
-        runOnUiThread(Toast.makeText(this, R.string.badges_lb_failure, Toast.LENGTH_LONG).show)
+        runOnUiThread(Toast.makeText(activity, R.string.badges_lb_failure, Toast.LENGTH_LONG).show)
         Log.e("BadgesLeaderboardActivity", err)
       }
     }

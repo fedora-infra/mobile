@@ -75,8 +75,8 @@ class MainActivity extends util.Views {
           classOf[PackageSearchActivity],
           R.drawable.ic_search,
           getString(R.string.package_search)),
-        ActivityDelegation(
-          classOf[BadgesLeaderboardActivity],
+        FragmentDelegation(
+          classOf[BadgesLeaderboardFragment],
           R.drawable.ic_badges,
           getString(R.string.badges_leaderboard)),
         ActivityDelegation(
