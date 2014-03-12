@@ -62,7 +62,7 @@ object General {
     proguardOptions in Android += "-keep class scala.PartialFunction",
     proguardOptions in Android += "-keep class scala.util.parsing.combinator.Parsers",
 
-    //proguardCache in Android += ProguardCache("guava") % "com.google.guava",
+    proguardCache in Android += ProguardCache("guava") % "com.google.common",
     proguardCache in Android += ProguardCache("scalaz") % "org.scalaz",
     proguardCache in Android += ProguardCache("argonaut") % "io.argonaut"
   )
