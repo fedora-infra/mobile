@@ -36,10 +36,6 @@
         android:name=".BadgeInfoActivity"
         android:label="@string/badge" />
 
-    <activity
-        android:name=".BadgesLeaderboardActivity"
-        android:label="@string/leaderboard" />
-
     <activity android:name=".BadgesUserActivity" />
 
     <activity android:name=".DownloadHeadActivity" />
@@ -64,8 +60,6 @@
 
     <activity android:name=".FedocalActivity" />
 
-    <activity android:name=".GCMDemoActivity" />
-
     <activity android:name=".MainActivity">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -88,10 +82,6 @@
 
     <activity android:name=".PreferencesActivity" />
 
-    <activity
-        android:name=".StatusActivity"
-        android:label="@string/fedora_status" />
-
     <activity android:name=".UserActivity" />
   </application>
 
@@ -112,5 +102,5 @@
 
   <uses-permission android:name="org.fedoraproject.mobile.permission.C2D_MESSAGE" />
 
-  <uses-sdk android:minSdkVersion="11" />
+  <uses-sdk android:minSdkVersion="14" />
 </manifest>

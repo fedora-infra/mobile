@@ -1,8 +1,7 @@
 import sbt._
 import Keys._
 
-import sbtandroid._
-import sbtandroid.AndroidKeys._
+import android.Keys._
 
 import scalariform.formatter.preferences._
 import com.typesafe.sbt.SbtScalariform._
@@ -11,9 +10,8 @@ object General {
   val settings = Defaults.defaultSettings ++ Seq (
     name := "Fedora Mobile",
     version := "0.1",
-    versionCode := 0,
+    versionCode := Some(0),
     scalaVersion := "2.10.3",
-    platformName in Android := "android-17",
     resolvers             ++= Seq(
       "spray" at "http://repo.spray.io/",
       "relrod @ FedoraPeople" at "http://codeblock.fedorapeople.org/maven/",
@@ -54,38 +52,43 @@ object General {
 
   val proguardSettings = Seq (
     useProguard in Android := true,
-    proguardOption in Android := """
-      -keep class scala.Function1
-      -keep class scala.collection.SeqLike { public protected *; }
-      -keep class spray.json.*
-    """
+    proguardOptions in Android += "-dontwarn com.google.android.gms.**",
+    proguardOptions in Android += "-dontwarn com.google.appengine.api.ThreadManager",
+    proguardOptions in Android += "-dontwarn com.google.apphosting.api.ApiProxy",
+    proguardOptions in Android += "-dontwarn javax.annotation.**",
+    proguardOptions in Android += "-dontwarn javax.inject.**",
+    proguardOptions in Android += "-dontwarn scalaz.concurrent.*",
+    proguardOptions in Android += "-dontwarn sun.misc.Unsafe",
+    proguardOptions in Android += "-keep class com.google.android.gms.** { *; }",
+    proguardOptions in Android += "-keep class org.parboiled.matchervisitors.MatcherVisitor",
+    proguardOptions in Android += "-keep class scala.Function1",
+    proguardOptions in Android += "-keep class scala.PartialFunction",
+    proguardOptions in Android += "-keep class scala.util.parsing.combinator.Parsers",
+    proguardOptions in Android += "-keep class spray.json.** { *; }",
+
+    proguardCache in Android += ProguardCache("guava") % "com.google.guava",
+    proguardCache in Android += ProguardCache("scalaz") % "org.scalaz",
+    proguardCache in Android += ProguardCache("spray-json") % "io.spray"
   )
 
   lazy val fullAndroidSettings =
     General.settings ++
-    AndroidProject.androidSettings ++
-    TypedResources.settings ++
-    proguardSettings ++
-    AndroidManifestGenerator.settings ++
-    AndroidMarketPublish.settings ++ Seq (
-      keyalias in Android := "change-me"
-    )
+    android.Plugin.androidBuild ++
+    proguardSettings
 }
 
 object AndroidBuild extends Build {
   lazy val main = Project (
     "FedoraMobile",
     file("."),
-    settings = General.fullAndroidSettings
+    settings = General.fullAndroidSettings ++ Seq(
+      platformTarget in Android := "android-17"
+    )
   )
 
   lazy val tests = Project (
     "tests",
     file("tests"),
-    settings = General.settings ++
-               AndroidTest.androidSettings ++
-               General.proguardSettings ++ Seq (
-      name := "Fedora MobileTests"
-    )
+    settings = General.settings
   ) dependsOn main
 }
