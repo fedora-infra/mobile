@@ -1,7 +1,7 @@
 package org.fedoraproject.mobile
 
 import Implicits._
-import util.Hashing
+import util.{ BitmapTransformations, Hashing }
 
 import android.app.Activity
 import android.content.{ Context, Intent }
@@ -57,7 +57,8 @@ class FedmsgAdapter(
         ()
       }
       case \/-(img) => {
-        activity.runOnUiThread(iconView.setImageBitmap(img))
+        val rounded = BitmapTransformations.roundCorners(img, 5)
+        activity.runOnUiThread(iconView.setImageBitmap(rounded))
         ()
       }
     }
