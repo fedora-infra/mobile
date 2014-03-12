@@ -89,6 +89,7 @@ class FedmsgRegisterActivity extends NavDrawerActivity {
           }
         }
     sendFMN.unsafePerformIO
+    ()
   }
 
   private def sendIDToFMN(

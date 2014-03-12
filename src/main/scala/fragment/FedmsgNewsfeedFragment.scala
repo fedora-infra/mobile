@@ -66,6 +66,7 @@ class FedmsgNewsfeedFragment
         }
       }
     }
+    ()
   }
 
   /*private def getNextPage(lastTimeStamp: Long): Unit = {
@@ -109,7 +110,7 @@ class FedmsgNewsfeedFragment
   }
 
 
-  private def updateNewsfeed() {
+  private def updateNewsfeed(): Unit = {
     val newsfeed = findView(TR.newsfeed)
     val messages: Promise[String \/ List[HRF.Result]] = getLatestMessages()
     val arrayList = new ArrayList[HRF.Result]
@@ -132,5 +133,6 @@ class FedmsgNewsfeedFragment
         runOnUiThread(newsfeed.setAdapter(adapter))
       }
     }
+    ()
   }
 }

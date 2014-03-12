@@ -1,7 +1,14 @@
 package org.fedoraproject.mobile
 
+import scala.language.implicitConversions
+
 package object Implicits {
-  implicit def toRunnable[F](f: => F): Runnable = new Runnable() { def run() = { f } }
+  implicit def toRunnable[F](f: => F): Runnable = new Runnable() {
+    def run(): Unit = {
+      f
+      ()
+    }
+  }
 
   /** A rough implementation of Ruby's "tap" method.
     *

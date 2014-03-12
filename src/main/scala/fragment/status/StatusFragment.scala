@@ -47,7 +47,7 @@ class StatusFragment
 
   import StatusJsonProtocol._
 
-  private def updateStatuses() {
+  private def updateStatuses(): Unit = {
     findViewOpt(TR.progress).map(_.setVisibility(View.VISIBLE))
 
     future {
@@ -68,10 +68,10 @@ class StatusFragment
           runOnUiThread {
             val globalInfoView = findViewOpt(TR.globalinfo)
             globalInfoView match {
-              case Some(globalInfoView) => globalInfoView.tap { obj =>
-                obj.setText(parsed.global_verbose_status)
+              case Some(globalInfoView) => {
+                globalInfoView.setText(parsed.global_verbose_status)
                 StatusColor.colorFor(parsed.global_status) map { c =>
-                  obj.setBackgroundColor(c)
+                  globalInfoView.setBackgroundColor(c)
                 }
               }
               case None =>
@@ -84,6 +84,7 @@ class StatusFragment
           runOnUiThread(Toast.makeText(activity, R.string.status_failure, Toast.LENGTH_LONG).show)
       }
     }
+    ()
   }
 
   override def onCreateView(i: LayoutInflater, c: ViewGroup, b: Bundle): View = {
@@ -91,7 +92,7 @@ class StatusFragment
     i.inflate(R.layout.status_activity, c, false)
   }
 
-  override def onStart() {
+  override def onStart(): Unit = {
     super.onStart()
     val view = findView(TR.statuses)
     refreshAdapter.setRefreshableView(view, this)

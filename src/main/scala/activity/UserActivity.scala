@@ -80,8 +80,14 @@ class UserActivity
     val profilePic = findView(TR.profile_pic)
 
     BitmapFetch.fromGravatarEmail("codeblock@fedoraproject.org") runAsync {
-      case -\/(err) => Log.e("UserActivity", err.toString)
-      case \/-(img) => runOnUiThread(profilePic.setImageBitmap(img))
+      case -\/(err) => {
+        Log.e("UserActivity", err.toString)
+        ()
+      }
+      case \/-(img) => {
+        runOnUiThread(profilePic.setImageBitmap(img))
+        ()
+      }
     }
 
     findView(TR.badge_count).setText("43")
@@ -108,5 +114,6 @@ class UserActivity
         runOnUiThread(newsfeed.setAdapter(adapter))
       }
     }
+    ()
   }
 }

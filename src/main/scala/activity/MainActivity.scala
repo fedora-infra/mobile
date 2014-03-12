@@ -44,11 +44,8 @@ sealed class NavAdapter(
         .inflate(R.layout.drawer_list_item, parent, false)
         .asInstanceOf[TextView]
 
-      layout.tap { obj =>
-        obj.setCompoundDrawablesWithIntrinsicBounds(delegation.icon, 0, 0, 0)
-        obj.setText(delegation.name)
-      }
-
+      layout.setCompoundDrawablesWithIntrinsicBounds(delegation.icon, 0, 0, 0)
+      layout.setText(delegation.name)
       layout
     }
   }
@@ -154,6 +151,7 @@ class MainActivity extends util.Views {
         case -\/(err) =>
           Log.e("MainActivity", err.toString)
       }
+      ()
     }
   }
 
@@ -173,6 +171,7 @@ class MainActivity extends util.Views {
          .commit()
       }
     }
+    ()
   }
 
   override def onOptionsItemSelected(item: MenuItem): Boolean =

@@ -34,8 +34,14 @@ class BadgesUserAdapter(
       .asInstanceOf[ImageView]
 
     BitmapFetch.fromURL(item.image) runAsync {
-      case -\/(err) => Log.e("BadgesUserAdapter", err.toString)
-      case \/-(badge) => activity.runOnUiThread(iconView.setImageBitmap(badge))
+      case -\/(err) => {
+        Log.e("BadgesUserAdapter", err.toString)
+        ()
+      }
+      case \/-(badge) => {
+        activity.runOnUiThread(iconView.setImageBitmap(badge))
+        ()
+      }
     }
 
     layout

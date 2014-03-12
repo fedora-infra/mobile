@@ -32,7 +32,12 @@ object General {
     ),
     scalacOptions         := Seq(
       "-encoding", "utf8",
-      "-target:jvm-1.6"
+      "-target:jvm-1.6",
+      "-feature",
+      "-unchecked",
+      "-deprecation",
+      "-optimise",
+      "-Ywarn-value-discard"
     ),
     javacOptions          ++= Seq(
       "-encoding", "utf8",

@@ -19,6 +19,7 @@ import scalaz.concurrent.Promise
 import scalaz.concurrent.Promise._
 
 import scala.io.Source
+import scala.language.reflectiveCalls
 
 class PackageInfoActivity extends TypedActivity with util.Views {
   override def onPostCreate(bundle: Bundle) {
@@ -29,8 +30,14 @@ class PackageInfoActivity extends TypedActivity with util.Views {
     val iconView = findView(TR.icon)
 
     BitmapFetch.fromPackage(pkg) runAsync {
-      case -\/(err) => Log.e("PackageInfoActivity", err.toString)
-      case \/-(icon) => runOnUiThread(actionbar.setIcon(new BitmapDrawable(getResources, icon)))
+      case -\/(err) => {
+        Log.e("PackageInfoActivity", err.toString)
+        ()
+      }
+      case \/-(icon) => {
+        runOnUiThread(actionbar.setIcon(new BitmapDrawable(getResources, icon)))
+        ()
+      }
     }
 
     actionbar.setTitle(pkg.name)
@@ -43,11 +50,16 @@ class PackageInfoActivity extends TypedActivity with util.Views {
         val ownerView = findView(TR.owner)
         ownerView.setText(owner)
         BitmapFetch.fromGravatarEmail(s"${owner}@fedoraproject.org") runAsync {
-          case -\/(err) => Log.e("PackageInfoActivity", err.toString)
-          case \/-(gravatar) =>
+          case -\/(err) => {
+            Log.e("PackageInfoActivity", err.toString)
+            ()
+          }
+          case \/-(gravatar) => {
             runOnUiThread(
               ownerView.setCompoundDrawablesWithIntrinsicBounds(
                 new BitmapDrawable(getResources, gravatar), null, null, null))
+            ()
+          }
         }
       }
       case None => // TODO: Show "no owner" in the UI or something.
@@ -66,58 +78,61 @@ class PackageInfoActivity extends TypedActivity with util.Views {
       case res: String => {
         findViewOpt(TR.progress).map(v => runOnUiThread(v.setVisibility(View.GONE)))
 
-          // This is *really* hacky, but blocked on
-          // https://github.com/fedora-infra/fedora-packages/issues/24.
-          // The issue is that right now Fedora Packages (the app)'s API
-          // returns strings of HTML in some of its responses. We have to
-          // strip out the HTML in most cases, but in one case here, we
-          // want to use the HTML to split on, so that we can nuke the karma
-          // that we also get back in testing_version, since we only care
-          // about the version number. Ideally we'd actually get an object
-          // back in JSON, and we could split that into a Version object
-          // locally, here in Scala-land. This object would have: version,
-          // karma, and karma_icon. But for now, life isn't ideal.
-          def stripHTML(s: String) = s.replaceAll("""<\/?.*?>""", "")
+        // This is *really* hacky, but blocked on
+        // https://github.com/fedora-infra/fedora-packages/issues/24.
+        // The issue is that right now Fedora Packages (the app)'s API
+        // returns strings of HTML in some of its responses. We have to
+        // strip out the HTML in most cases, but in one case here, we
+        // want to use the HTML to split on, so that we can nuke the karma
+        // that we also get back in testing_version, since we only care
+        // about the version number. Ideally we'd actually get an object
+        // back in JSON, and we could split that into a Version object
+        // locally, here in Scala-land. This object would have: version,
+        // karma, and karma_icon. But for now, life isn't ideal.
+        def stripHTML(s: String) = s.replaceAll("""<\/?.*?>""", "")
 
-          val apiResults = stripHTML(res).decodeEither[Pkgwat.APIResults[Release]]
+        val apiResults = stripHTML(res).decodeEither[Pkgwat.APIResults[Release]]
 
-          apiResults match {
-            case \/-(r) => {
-              val releasesTable = findViewOpt(TR.releases)
-              val header = new TableRow(this)
-              header.addView(
-                new TextView(this).tap { obj =>
-                  obj.setText(R.string.release)
-                  obj.setTypeface(null, Typeface.BOLD)
-              })
-              header.addView(
-                new TextView(this).tap { obj =>
-                  obj.setText(R.string.stable)
-                  obj.setTypeface(null, Typeface.BOLD)
-              })
+        apiResults match {
+          case \/-(r) => {
+            val releasesTable = findViewOpt(TR.releases)
+            val header = new TableRow(this)
+            header.addView(
+              new TextView(this).tap { obj =>
+                obj.setText(R.string.release)
+                obj.setTypeface(null, Typeface.BOLD)
+            })
+            header.addView(
+              new TextView(this).tap { obj =>
+                obj.setText(R.string.stable)
+                obj.setTypeface(null, Typeface.BOLD)
+            })
 
-              header.addView(
-                new TextView(this).tap { obj =>
-                  obj.setText(R.string.testing)
-                  obj.setTypeface(null, Typeface.BOLD)
-              })
+            header.addView(
+              new TextView(this).tap { obj =>
+                obj.setText(R.string.testing)
+                obj.setTypeface(null, Typeface.BOLD)
+            })
 
-              runOnUiThread(releasesTable.foreach(_.addView(header)))
+            runOnUiThread(releasesTable.foreach(_.addView(header)))
 
-              r.rows.foreach { release =>
-                val row = new TableRow(this)
-                row.addView(new TextView(this).tap(_.setText(stripHTML(release.release))))
-                row.addView(new TextView(this).tap(_.setText(stripHTML(release.stableVersion))))
-                row.addView(new TextView(this).tap(_.setText(stripHTML(release.testingVersion.split("<div").head)))) // HACK
-                runOnUiThread(releasesTable.foreach(_.addView(row)))
-              }
+            r.rows.foreach { release =>
+              val row = new TableRow(this)
+              row.addView(new TextView(this).tap(_.setText(stripHTML(release.release))))
+              row.addView(new TextView(this).tap(_.setText(stripHTML(release.stableVersion))))
+              row.addView(new TextView(this).tap(_.setText(stripHTML(release.testingVersion.split("<div").head)))) // HACK
+              runOnUiThread(releasesTable.foreach(_.addView(row)))
             }
-            case -\/(r) =>
-              Toast.makeText(this, R.string.packages_release_failure, Toast.LENGTH_LONG).show
           }
+          case -\/(r) =>
+            Toast.makeText(this, R.string.packages_release_failure, Toast.LENGTH_LONG).show
+        }
       }
-      case _ => // TODO: compose this with the above, remove duplicate code
+      case _ => {
+        // TODO: compose this with the above, remove duplicate code
         Toast.makeText(this, R.string.packages_release_failure, Toast.LENGTH_LONG).show
+      }
     }
+    ()
   }
 }

@@ -28,11 +28,9 @@ class PackageSearchActivity extends TypedActivity with util.Views {
 
   def handleIntent(intent: Intent): Unit = {
     if (intent.getAction == Intent.ACTION_SEARCH) {
-      findViewOpt(TR.packages).map {
-        _.tap { obj =>
-          obj.setAdapter(null)
-          obj.setVisibility(View.GONE)
-        }
+      findViewOpt(TR.packages).map { v =>
+        v.setAdapter(null)
+        v.setVisibility(View.GONE)
       }
 
       findViewOpt(TR.progress).map(_.setVisibility(View.VISIBLE))
@@ -92,10 +90,10 @@ class PackageSearchActivity extends TypedActivity with util.Views {
           runOnUiThread {
             val packagesView = findViewOpt(TR.packages).map(_.asInstanceOf[ListView])
             packagesView match {
-              case Some(packagesView) => packagesView.tap { obj =>
-                obj.setAdapter(adapter)
-                obj.setVisibility(View.VISIBLE)
-                obj.setOnItemClickListener(new OnItemClickListener {
+              case Some(v) => {
+                v.setAdapter(adapter)
+                v.setVisibility(View.VISIBLE)
+                v.setOnItemClickListener(new OnItemClickListener {
                   def onItemClick(parent: AdapterView[_], view: View, position: Int, id: Long) {
                     val pkg = packages(position)
                     val intent = new Intent(PackageSearchActivity.this, classOf[PackageInfoActivity])
@@ -108,10 +106,12 @@ class PackageSearchActivity extends TypedActivity with util.Views {
             }
           }
         }
-        case -\/(_) =>
+        case -\/(_) => {
           Toast.makeText(this, R.string.packages_search_failure, Toast.LENGTH_LONG).show
+        }
       }
     }
+    ()
   }
 
   override def onCreateOptionsMenu(menu: Menu): Boolean = {

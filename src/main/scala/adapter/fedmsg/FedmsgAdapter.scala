@@ -52,8 +52,14 @@ class FedmsgAdapter(
 
     // XXX: Move this to scalaz Promise.
     image runAsync {
-      case -\/(err) => Log.e("FedmsgAdapter", err.toString)
-      case \/-(img) => activity.runOnUiThread(iconView.setImageBitmap(img))
+      case -\/(err) => {
+        Log.e("FedmsgAdapter", err.toString)
+        ()
+      }
+      case \/-(img) => {
+        activity.runOnUiThread(iconView.setImageBitmap(img))
+        ()
+      }
     }
 
     layout
@@ -77,6 +83,7 @@ class FedmsgAdapter(
           val intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link))
           activity.startActivity(intent)
         }
+        ()
       }
     })
 

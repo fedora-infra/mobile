@@ -41,25 +41,25 @@ class StatusAdapter(
       case _ => R.string.status_unknown
     }
 
-    layout
-      .findViewById(R.id.servicestatus)
-      .asInstanceOf[TextView]
-      .tap { obj =>
-        obj.setText(status)
-        StatusColor.colorFor(service("status")).map { c => obj.setTextColor(c) }
-      }
+    val statusView =
+      layout
+        .findViewById(R.id.servicestatus)
+        .asInstanceOf[TextView]
+      statusView.setText(status)
+      StatusColor.colorFor(service("status")).map(statusView.setTextColor(_))
 
     layout.setOnClickListener(new OnClickListener() {
       override def onClick(view: View): Unit = {
-        view
-          .findViewById(R.id.servicemessage)
-          .asInstanceOf[TextView].tap { obj =>
-            obj.setText(service("message"))
-            obj.setVisibility(obj.getVisibility match {
+        val message =
+          view
+            .findViewById(R.id.servicemessage)
+            .asInstanceOf[TextView]
+          message.setText(service("message"))
+          message.setVisibility(
+            message.getVisibility match {
               case View.GONE => View.VISIBLE
               case View.VISIBLE => View.GONE
             })
-          }
       }
     })
 

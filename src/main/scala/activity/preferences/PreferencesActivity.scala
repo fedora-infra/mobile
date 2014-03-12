@@ -9,5 +9,6 @@ class PreferencesActivity extends PreferenceActivity {
   override def onCreate(savedInstanceState: Bundle): Unit = {
     super.onCreate(savedInstanceState)
     addPreferencesFromResource(R.xml.preferences)
+    ()
   }
 }

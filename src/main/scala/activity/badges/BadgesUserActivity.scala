@@ -30,10 +30,15 @@ class BadgesUserActivity
         val actionbar = getActionBar
         actionbar.setTitle(nickname)
         BitmapFetch.fromGravatarEmail(s"${nickname}@fedoraproject.org") runAsync {
-          case -\/(err) => Log.e("BadgesUserActivity", err.toString)
-          case \/-(image) =>
+          case -\/(err) => {
+            Log.e("BadgesUserActivity", err.toString)
+            ()
+          }
+          case \/-(image) => {
             runOnUiThread(
               actionbar.setIcon(new BitmapDrawable(getResources, image)))
+            ()
+          }
         }
 
         val badges = findView(TR.user_badges)
@@ -52,6 +57,7 @@ class BadgesUserActivity
   def onRefreshStarted(view: View): Unit = {
     updateBadges().unsafePerformIO
     runOnUiThread(refreshAdapter.setRefreshComplete)
+    ()
   }
 
   def updateBadges(): IO[Unit] = IO {
@@ -79,5 +85,6 @@ class BadgesUserActivity
         finish() // Nuke the activity.
       }
     }
+    ()
   }
 }

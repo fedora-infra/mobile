@@ -38,6 +38,7 @@ class FedmsgReceiver extends BroadcastReceiver {
 
     setResultCode(Activity.RESULT_OK)
     sendNotification(context, nType)
+    ()
   }.unsafePerformIO
 
   private def sendNotification(
@@ -131,5 +132,6 @@ class FedmsgReceiver extends BroadcastReceiver {
       }
     }
     builder.map(_.map(b => notificationManager.x.map(_.notify(1, b.build))))
+    ()
   }
 }

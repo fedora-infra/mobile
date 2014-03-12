@@ -66,11 +66,8 @@ trait NavDrawerActivity extends FragmentActivity with TypedActivity {
           .inflate(R.layout.drawer_list_item, parent, false)
           .asInstanceOf[TextView]
 
-        layout.tap { obj =>
-          obj.setCompoundDrawablesWithIntrinsicBounds(value._2, 0, 0, 0)
-          obj.setText(key)
-        }
-
+        layout.setCompoundDrawablesWithIntrinsicBounds(value._2, 0, 0, 0)
+        layout.setText(key)
         layout
       }
     }

@@ -56,5 +56,6 @@ class BadgesLeaderboardFragment
         Log.e("BadgesLeaderboardActivity", err)
       }
     }
+    ()
   }
 }

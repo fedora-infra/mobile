@@ -87,10 +87,10 @@ class FedmsgConfirmationActivity extends NavDrawerActivity {
             Toast.makeText(
               this,
               R.string.fmn_stored,
-              Toast.LENGTH_LONG)
-            .show
+              Toast.LENGTH_LONG).show
           }
         }
+        ()
       }
     }
   }

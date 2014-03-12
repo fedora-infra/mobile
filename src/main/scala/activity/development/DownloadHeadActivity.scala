@@ -43,7 +43,7 @@ class DownloadHeadActivity extends NavDrawerActivity {
       val outputStream = new BufferedOutputStream(new FileOutputStream(file))
       Iterator
         .continually(urlStream.read)
-        .takeWhile(-1 !=)
+        .takeWhile(_ != -1)
         .foreach(outputStream.write)
       outputStream.flush
     } onComplete {
