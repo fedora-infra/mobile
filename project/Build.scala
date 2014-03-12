@@ -10,15 +10,12 @@ object General {
   val settings = Defaults.defaultSettings ++ Seq (
     name := "Fedora Mobile",
     version := "0.1",
-    versionCode := Some(0),
     scalaVersion := "2.10.3",
     resolvers             ++= Seq(
-      "spray" at "http://repo.spray.io/",
       "relrod @ FedoraPeople" at "http://codeblock.fedorapeople.org/maven/",
       "sonatype-s" at "http://oss.sonatype.org/content/repositories/snapshots"
     ),
     libraryDependencies   ++= Seq(
-      "io.spray" %% "spray-json" % "1.2.5",
       //"me.elrod" %% "pkgwat" % "1.0.0",
       "com.google.guava" % "guava" % "14.0.1",
       "org.scalaz" %% "scalaz-core" % "7.0.4",
@@ -64,11 +61,10 @@ object General {
     proguardOptions in Android += "-keep class scala.Function1",
     proguardOptions in Android += "-keep class scala.PartialFunction",
     proguardOptions in Android += "-keep class scala.util.parsing.combinator.Parsers",
-    proguardOptions in Android += "-keep class spray.json.** { *; }",
 
-    proguardCache in Android += ProguardCache("guava") % "com.google.guava",
+    //proguardCache in Android += ProguardCache("guava") % "com.google.guava",
     proguardCache in Android += ProguardCache("scalaz") % "org.scalaz",
-    proguardCache in Android += ProguardCache("spray-json") % "io.spray"
+    proguardCache in Android += ProguardCache("argonaut") % "io.argonaut"
   )
 
   lazy val fullAndroidSettings =

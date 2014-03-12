@@ -5,10 +5,12 @@ import Implicits._
 import android.content.Context
 import android.graphics.{ Color, PorterDuff }
 import android.os.Bundle
+import android.util.Log
 import android.view.{ LayoutInflater, Menu, MenuItem, View, ViewGroup }
 import android.widget.{ AdapterView, ArrayAdapter, LinearLayout, TextView, Toast }
 
-import spray.json._
+import argonaut._, Argonaut._
+import scalaz._, Scalaz._
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
 
@@ -41,49 +43,44 @@ class StatusFragment
 
   def onRefreshStarted(view: View): Unit = updateStatuses()
 
-  object StatusJsonProtocol extends DefaultJsonProtocol {
-    implicit val f = jsonFormat4(StatusesResponse.apply)
-  }
-
-  import StatusJsonProtocol._
+  implicit def StatusCodecJson: CodecJson[StatusesResponse] =
+    casecodec4(StatusesResponse.apply, StatusesResponse.unapply)("global_info", "global_status", "global_verbose_status", "services")
 
   private def updateStatuses(): Unit = {
-    findViewOpt(TR.progress).map(_.setVisibility(View.VISIBLE))
+    val progress = findView(TR.progress)
+    progress.setVisibility(View.VISIBLE)
 
     future {
       Source.fromURL("http://status.fedoraproject.org/statuses.json").mkString
     }.onComplete { result =>
-      findViewOpt(TR.progress).map(v => runOnUiThread(v.setVisibility(View.GONE)))
+      runOnUiThread(progress.setVisibility(View.GONE))
       result match {
         case Success(e) => {
-          val parsed = JsonParser(e).convertTo[StatusesResponse]
+          e.decodeEither[StatusesResponse] match {
+            case -\/(err) => Log.e("StatusFragment", err.toString)
+            case \/-(parsed) => {
+              val adapter = new StatusAdapter(
+                activity,
+                android.R.layout.simple_list_item_1,
+                parsed.services.toArray.sortBy(_._2("name")))
 
-          val adapter = new StatusAdapter(
-            activity,
-            android.R.layout.simple_list_item_1,
-            parsed.services.toArray.sortBy(_._2("name")))
+              runOnUiThread(findView(TR.statuses).setAdapter(adapter))
 
-          findViewOpt(TR.statuses).map(v => runOnUiThread(v.setAdapter(adapter)))
-
-          runOnUiThread {
-            val globalInfoView = findViewOpt(TR.globalinfo)
-            globalInfoView match {
-              case Some(globalInfoView) => {
+              runOnUiThread {
+                val globalInfoView = findView(TR.globalinfo)
                 globalInfoView.setText(parsed.global_verbose_status)
                 StatusColor.colorFor(parsed.global_status) map { c =>
                   globalInfoView.setBackgroundColor(c)
                 }
               }
-              case None =>
             }
           }
-
-          runOnUiThread(refreshAdapter.setRefreshComplete)
         }
         case Failure(e) =>
           runOnUiThread(Toast.makeText(activity, R.string.status_failure, Toast.LENGTH_LONG).show)
       }
     }
+    runOnUiThread(refreshAdapter.setRefreshComplete)
     ()
   }
 
