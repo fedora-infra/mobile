@@ -17,7 +17,6 @@ object General {
     ),
     libraryDependencies   ++= Seq(
       //"me.elrod" %% "pkgwat" % "1.0.0",
-      "com.google.guava" % "guava" % "14.0.1",
       "org.scalaz" %% "scalaz-core" % "7.0.4",
       //"com.github.xuwei-k" %% "iarray" % "0.2.6",
       "org.scalaz.stream" %% "scalaz-stream" % "0.2-SNAPSHOT",
@@ -55,14 +54,12 @@ object General {
     proguardOptions in Android += "-dontwarn javax.annotation.**",
     proguardOptions in Android += "-dontwarn javax.inject.**",
     proguardOptions in Android += "-dontwarn scalaz.concurrent.*",
-    proguardOptions in Android += "-dontwarn sun.misc.Unsafe",
     proguardOptions in Android += "-keep class com.google.android.gms.** { *; }",
     proguardOptions in Android += "-keep class org.parboiled.matchervisitors.MatcherVisitor",
     proguardOptions in Android += "-keep class scala.Function1",
     proguardOptions in Android += "-keep class scala.PartialFunction",
     proguardOptions in Android += "-keep class scala.util.parsing.combinator.Parsers",
 
-    proguardCache in Android += ProguardCache("guava") % "com.google.common",
     proguardCache in Android += ProguardCache("scalaz") % "org.scalaz",
     proguardCache in Android += ProguardCache("argonaut") % "io.argonaut"
   )

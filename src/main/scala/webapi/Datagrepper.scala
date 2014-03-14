@@ -5,14 +5,12 @@ import android.util.Log
 
 import argonaut._, Argonaut._
 
-import com.google.common.io.CharStreams
-
 import scalaz._, Scalaz._
 import scalaz.concurrent.Promise
 import scalaz.concurrent.Promise._
 import scalaz.effect._
 
-import scala.io.Source
+import scala.io.{ Codec, Source }
 
 import java.io.{ DataOutputStream, InputStreamReader }
 import java.net.{ HttpURLConnection, URL, URLEncoder }
@@ -59,7 +57,7 @@ object HRF {
       .asInstanceOf[HttpURLConnection]
     connection setRequestMethod "GET"
     connection.setRequestProperty("Content-Type", "application/json");
-    CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
+    Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
   }
 
   /** Given a JSON string containing a fedmsg message, make it human readable.
@@ -81,8 +79,7 @@ object HRF {
     val os = new DataOutputStream(connection.getOutputStream)
     os.writeBytes(s)
     os.close
-    CharStreams
-      .toString(new InputStreamReader(connection.getInputStream, "utf8"))
+    Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
       .decodeEither[Response]
       .map(_.results.headOption)
   }
@@ -103,8 +100,8 @@ object Datagrepper {
         .openConnection
         .asInstanceOf[HttpURLConnection]
       connection setRequestMethod "GET"
-      connection.setRequestProperty("Content-Type", "application/json");
-      CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
+      connection.setRequestProperty("Content-Type", "application/json")
+      Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
     }
 
     promise {

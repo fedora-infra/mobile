@@ -9,7 +9,6 @@ import android.view.View
 import android.widget.Toast
 
 import com.google.android.gms.gcm.GoogleCloudMessaging
-import com.google.common.io.CharStreams
 
 import scalaz._, Scalaz._
 import scalaz.concurrent.Promise
@@ -18,6 +17,8 @@ import scalaz.effect._
 
 import java.io.{ DataOutputStream, InputStreamReader }
 import java.net.{ HttpURLConnection, URL, URLEncoder }
+
+import scala.io.{ Codec, Source }
 
 /** This is where the user actually registers for FMN notifications.
   *
@@ -104,7 +105,7 @@ class FedmsgRegisterActivity extends NavDrawerActivity {
         .asInstanceOf[HttpURLConnection]
     connection setDoOutput true
     connection setRequestMethod "GET"
-    CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
+    Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
   }
 
   def getRegistrationID: Promise[String] = promise {

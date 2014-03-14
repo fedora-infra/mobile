@@ -9,14 +9,12 @@ import android.util.Log
 
 import argonaut._, Argonaut._
 
-import com.google.common.io.CharStreams
-
 import scalaz._, Scalaz._
 import scalaz.concurrent.Promise
 import scalaz.concurrent.Promise._
 import scalaz.effect._
 
-import scala.io.Source
+import scala.io.{ Codec, Source }
 
 import java.io.{ DataOutputStream, InputStreamReader }
 import java.net.{ HttpURLConnection, URL, URLEncoder }
@@ -50,7 +48,7 @@ object Updates {
       .openConnection
       .asInstanceOf[HttpURLConnection]
     connection setRequestMethod "GET"
-    CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
+    Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
   }
 
   def compareVersion(context: Context): Promise[String \/ Boolean] = {

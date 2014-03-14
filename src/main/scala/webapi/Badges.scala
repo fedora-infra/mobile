@@ -5,8 +5,6 @@ import android.util.Log
 
 import argonaut._, Argonaut._
 
-import com.google.common.io.CharStreams
-
 import scalaz._, Scalaz._
 import scalaz.concurrent.Promise
 import scalaz.concurrent.Promise._
@@ -14,6 +12,8 @@ import scalaz.effect._
 
 import java.io.{ DataOutputStream, InputStreamReader }
 import java.net.{ HttpURLConnection, URL, URLEncoder }
+
+import scala.io.{ Codec, Source }
 
 object Badges {
   val url = "https://badges.fedoraproject.org/"
@@ -63,7 +63,7 @@ object Badges {
       .openConnection
       .asInstanceOf[HttpURLConnection]
     connection setRequestMethod "GET"
-    CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
+    Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
   }
 
   def info(id: String): Promise[String] = promise {

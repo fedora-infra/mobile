@@ -14,6 +14,8 @@ import scalaz.effect._
 import java.io.{ InputStreamReader }
 import java.net.{ HttpURLConnection, URL, URLEncoder }
 
+import scala.io.{ Codec, Source }
+
 object Pkgwat {
   sealed trait ResultType
 
@@ -84,7 +86,7 @@ object Pkgwat {
       .openConnection
       .asInstanceOf[HttpURLConnection]
     connection setRequestMethod "GET"
-    CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
+    Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
   }
 
   def queryJson(q: FilteredQuery): Promise[String \/ APIResults[Package]] = promise {

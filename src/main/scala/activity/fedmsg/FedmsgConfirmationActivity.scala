@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.Toast
 
 import com.google.android.gms.gcm.GoogleCloudMessaging
-import com.google.common.io.CharStreams
 
 import scalaz._, Scalaz._
 import scalaz.concurrent.Promise
@@ -17,6 +16,8 @@ import scalaz.effect._
 
 import java.io.{ DataOutputStream, InputStreamReader }
 import java.net.{ HttpURLConnection, URL, URLEncoder }
+
+import scala.io.{ Codec, Source }
 
 class FedmsgConfirmationActivity extends NavDrawerActivity {
   override def onPostCreate(bundle: Bundle) {
@@ -52,7 +53,7 @@ class FedmsgConfirmationActivity extends NavDrawerActivity {
         .asInstanceOf[HttpURLConnection]
     connection setDoOutput true
     connection setRequestMethod "GET"
-    CharStreams.toString(new InputStreamReader(connection.getInputStream, "utf8"))
+    Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
   }
 
   def decide(accepted: Boolean): IO[Unit] = {
