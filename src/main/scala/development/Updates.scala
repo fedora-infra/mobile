@@ -67,12 +67,12 @@ object Updates {
         val intent = new Intent(context, classOf[DownloadHeadActivity])
         context.startActivity(intent)
       }
-    });
+    })
 
     builder.setNegativeButton(R.string.not_now, new DialogInterface.OnClickListener() {
       def onClick(dialog: DialogInterface, id: Int): Unit = {
       }
-    });
+    })
 
     builder.setTitle(R.string.update_available)
     builder.setMessage(R.string.update_available_desc)

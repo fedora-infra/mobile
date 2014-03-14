@@ -50,8 +50,8 @@ trait NavDrawerActivity extends FragmentActivity with TypedActivity {
 
     drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START)
 
-    getActionBar.setDisplayHomeAsUpEnabled(true);
-    getActionBar.setHomeButtonEnabled(true);
+    getActionBar.setDisplayHomeAsUpEnabled(true)
+    getActionBar.setHomeButtonEnabled(true)
 
     class NavAdapter(
       context: Context,

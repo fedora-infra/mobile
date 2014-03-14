@@ -56,7 +56,7 @@ object HRF {
       .openConnection
       .asInstanceOf[HttpURLConnection]
     connection setRequestMethod "GET"
-    connection.setRequestProperty("Content-Type", "application/json");
+    connection.setRequestProperty("Content-Type", "application/json")
     Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
   }
 

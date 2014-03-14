@@ -116,7 +116,7 @@ class PackageSearchActivity extends TypedActivity with util.Views {
 
   override def onCreateOptionsMenu(menu: Menu): Boolean = {
     val inflater = getMenuInflater
-    inflater.inflate(R.menu.search, menu);
+    inflater.inflate(R.menu.search, menu)
     val searchManager = getSystemService(Context.SEARCH_SERVICE).asInstanceOf[SearchManager]
     val searchViewMenuItem = menu.findItem(R.id.menu_search)
     val searchView = searchViewMenuItem.getActionView.asInstanceOf[SearchView]
