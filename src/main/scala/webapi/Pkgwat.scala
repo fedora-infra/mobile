@@ -4,8 +4,6 @@ import android.util.Log
 
 import argonaut._, Argonaut._
 
-import com.google.common.io.CharStreams
-
 import scalaz._, Scalaz._
 import scalaz.concurrent.Promise
 import scalaz.concurrent.Promise._
