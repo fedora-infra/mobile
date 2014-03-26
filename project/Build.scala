@@ -36,7 +36,9 @@ object General {
     javacOptions          ++= Seq(
       "-encoding", "utf8",
       "-source", "1.6",
-      "-target", "1.6"
+      "-target", "1.6",
+      "-Xlint:deprecation",
+      "-Xlint:unchecked"
     )
   ) ++
   defaultScalariformSettings ++ Seq(
