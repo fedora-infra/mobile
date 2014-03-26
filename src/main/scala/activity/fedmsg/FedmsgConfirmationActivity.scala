@@ -19,10 +19,10 @@ import java.net.{ HttpURLConnection, URL, URLEncoder }
 
 import scala.io.{ Codec, Source }
 
-class FedmsgConfirmationActivity extends NavDrawerActivity {
+class FedmsgConfirmationActivity extends TypedActivity {
   override def onPostCreate(bundle: Bundle) {
     super.onPostCreate(bundle)
-    setUpNav(R.layout.fmn_confirmation_activity)
+    setContentView(R.layout.fmn_confirmation_activity)
 
     val accepted: Option[Boolean] = Option(
       getIntent

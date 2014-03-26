@@ -15,11 +15,11 @@ import scala.util.{ Failure, Success }
 import java.io.{ File, BufferedOutputStream, FileOutputStream }
 import java.net.{ HttpURLConnection, URL }
 
-class DownloadHeadActivity extends NavDrawerActivity {
+class DownloadHeadActivity extends TypedActivity {
 
   override def onPostCreate(bundle: Bundle) {
     super.onPostCreate(bundle)
-    setUpNav(R.layout.download_head_activity)
+    setContentView(R.layout.download_head_activity)
 
     Log.v("DownloadHeadActivity", s"Starting download")
 

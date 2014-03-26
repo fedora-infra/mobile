@@ -2,9 +2,9 @@ package org.fedoraproject.mobile
 
 import android.os.Bundle
 
-class FedocalActivity extends NavDrawerActivity {
+class FedocalActivity extends TypedActivity {
   override def onPostCreate(bundle: Bundle) {
     super.onPostCreate(bundle)
-    setUpNav(R.layout.main_activity)
+    setContentView(R.layout.main_activity)
   }
 }

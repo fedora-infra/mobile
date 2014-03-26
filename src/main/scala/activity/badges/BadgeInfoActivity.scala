@@ -22,7 +22,7 @@ case object BadgeSerializableCast {
       BadgeSerializableCast(y.left)
 }
 
-class BadgeInfoActivity extends NavDrawerActivity {
+class BadgeInfoActivity extends TypedActivity {
   override def onPostCreate(bundle: Bundle): Unit = {
     IO {
       super.onPostCreate(bundle)

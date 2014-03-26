@@ -21,7 +21,7 @@ import java.util.ArrayList // TODO: Do something about this.
 import java.util.TimeZone
 
 class UserActivity
-  extends NavDrawerActivity
+  extends TypedActivity
   //with PullToRefreshAttacher.OnRefreshListener
   with util.Views {
 
@@ -65,7 +65,7 @@ class UserActivity
 
   override def onPostCreate(bundle: Bundle) {
     super.onPostCreate(bundle)
-    setUpNav(R.layout.user_activity)
+    setContentView(R.layout.user_activity)
 
     showDemoWarning.unsafePerformIO
 

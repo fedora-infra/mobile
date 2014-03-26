@@ -27,10 +27,10 @@ import scala.io.{ Codec, Source }
   * to us, which gets gets routed to FedmsgConfirmationActivity, which is where
   * we tell FMN whether or not they accepted.
   */
-class FedmsgRegisterActivity extends NavDrawerActivity {
+class FedmsgRegisterActivity extends TypedActivity {
   override def onPostCreate(bundle: Bundle): Unit = {
     super.onPostCreate(bundle)
-    setUpNav(R.layout.fmn_register_activity)
+    setContentView(R.layout.fmn_register_activity)
 
     val intent = getIntent
     val uri    = Option(intent.getData)
