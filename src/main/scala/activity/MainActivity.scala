@@ -81,13 +81,13 @@ class MainActivity extends util.Views {
           R.drawable.ic_fedmsg,
           getString(R.string.register_fmn)),
         ActivityDelegation(
-          classOf[PreferencesActivity],
-          R.drawable.ic_preferences,
-          getString(R.string.preferences)),
-        ActivityDelegation(
           classOf[UserActivity],
           R.drawable.ic_preferences,
-          "Profile UI Demo")
+          "Profile UI Demo"),
+        FragmentDelegation(
+          classOf[PreferencesFragment],
+          R.drawable.ic_preferences,
+          getString(R.string.preferences))
       )
 
     val title = getTitle
