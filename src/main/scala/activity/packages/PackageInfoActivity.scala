@@ -1,9 +1,8 @@
 package org.fedoraproject.mobile
 
+import Pkgwat._
 import Implicits._
 import util.Hashing
-
-import Pkgwat._
 
 import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
@@ -25,7 +24,8 @@ class PackageInfoActivity extends TypedActivity with util.Views {
   override def onPostCreate(bundle: Bundle) {
     super.onPostCreate(bundle)
     setContentView(R.layout.package_info_activity)
-    val pkg = getIntent.getSerializableExtra("package").asInstanceOf[Package]
+    // TODO: Safe-cast
+    val pkg = getIntent.getSerializableExtra("package").asInstanceOf[FedoraPackage]
     val actionbar = getActionBar
     val iconView = findView(TR.icon)
 
@@ -91,7 +91,7 @@ class PackageInfoActivity extends TypedActivity with util.Views {
         // karma, and karma_icon. But for now, life isn't ideal.
         def stripHTML(s: String) = s.replaceAll("""<\/?.*?>""", "")
 
-        val apiResults = stripHTML(res).decodeEither[Pkgwat.APIResults[Release]]
+        val apiResults = stripHTML(res).decodeEither[Pkgwat.APIResults[FedoraRelease]]
 
         apiResults match {
           case \/-(r) => {

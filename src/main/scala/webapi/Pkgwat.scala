@@ -24,7 +24,7 @@ object Pkgwat {
     startRow: Int,
     rows: List[ResultType])
 
-  case class SubPackage(
+  case class FedoraSubPackage(
     icon: String,
     description: String,
     link: String,
@@ -33,17 +33,17 @@ object Pkgwat {
     upstreamURL: Option[String] = None,
     develOwner: Option[String] = None)
 
-  case class Package(
+  case class FedoraPackage(
     icon: String,
     description: String,
     link: String,
-    subPackages: List[SubPackage],
+    subPackages: List[FedoraSubPackage],
     summary: String,
     name: String,
     upstreamURL: Option[String] = None,
     develOwner: Option[String] = None) extends ResultType
 
-  case class Release(
+  case class FedoraRelease(
     release: String,
     stableVersion: String,
     testingVersion: String) extends ResultType
@@ -53,20 +53,20 @@ object Pkgwat {
   implicit def FilteredQueryCodecJson: CodecJson[FilteredQuery] =
     casecodec3(FilteredQuery.apply, FilteredQuery.unapply)("rows_per_page", "start_row", "filters")
 
-  implicit def ReleaseCodecJson: CodecJson[Release] =
-    casecodec3(Release.apply, Release.unapply)("release", "stable_version", "testing_version")
+  implicit def ReleaseCodecJson: CodecJson[FedoraRelease] =
+    casecodec3(FedoraRelease.apply, FedoraRelease.unapply)("release", "stable_version", "testing_version")
 
-  implicit def PackageCodecJson: CodecJson[Package] =
-    casecodec8(Package.apply, Package.unapply)("icon", "description", "link", "sub_pkgs", "summary", "name", "upstream_url", "devel_owner")
+  implicit def FedoraPackageCodecJson: CodecJson[FedoraPackage] =
+    casecodec8(FedoraPackage.apply, FedoraPackage.unapply)("icon", "description", "link", "sub_pkgs", "summary", "name", "upstream_url", "devel_owner")
 
-  implicit def SubPackageCodecJson: CodecJson[SubPackage] =
-    casecodec7(SubPackage.apply, SubPackage.unapply)("icon", "description", "link", "summary", "name", "upstream_url", "devel_owner")
+  implicit def FedoraSubPackageCodecJson: CodecJson[FedoraSubPackage] =
+    casecodec7(FedoraSubPackage.apply, FedoraSubPackage.unapply)("icon", "description", "link", "summary", "name", "upstream_url", "devel_owner")
 
-  implicit def PackageResultCodecJson: CodecJson[APIResults[Package]] =
-    casecodec5(APIResults.apply[Package], APIResults.unapply[Package])("visible_rows", "total_rows", "rows_per_page", "start_row", "rows")
+  implicit def APIResultsCodecJson: CodecJson[APIResults[FedoraPackage]] =
+    casecodec5(APIResults.apply[FedoraPackage], APIResults.unapply[FedoraPackage])("visible_rows", "total_rows", "rows_per_page", "start_row", "rows")
 
-  implicit def ReleaseResultCodecJson: CodecJson[APIResults[Release]] =
-    casecodec5(APIResults.apply[Release], APIResults.unapply[Release])("visible_rows", "total_rows", "rows_per_page", "start_row", "rows")
+  implicit def FedoraReleaseResultCodecJson: CodecJson[APIResults[FedoraRelease]] =
+    casecodec5(APIResults.apply[FedoraRelease], APIResults.unapply[FedoraRelease])("visible_rows", "total_rows", "rows_per_page", "start_row", "rows")
 
   // TODO: Move this... It's public because it's used by PackageInfoActivity
   def constructURL(path: String, query: FilteredQuery): String = {
@@ -87,10 +87,10 @@ object Pkgwat {
     Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
   }
 
-  def queryJson(q: FilteredQuery): Promise[String \/ APIResults[Package]] = promise {
+  def queryJson(q: FilteredQuery): Promise[String \/ APIResults[FedoraPackage]] = promise {
     query(q)
     .unsafePerformIO
     .replaceAll("""<\/?.*?>""", "")
-    .decodeEither[APIResults[Package]]
+    .decodeEither[APIResults[FedoraPackage]]
   }
 }

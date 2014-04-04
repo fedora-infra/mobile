@@ -1,8 +1,7 @@
 package org.fedoraproject.mobile
 
-import Implicits._
-
 import Pkgwat._
+import Implicits._
 
 import android.app.SearchManager
 import android.content.{ Context, Intent }
@@ -48,8 +47,8 @@ class PackageSearchActivity extends TypedActivity with util.Views {
           class PackageAdapter(
             context: Context,
             resource: Int,
-            items: Array[Package])
-            extends ArrayAdapter[Package](context, resource, items) {
+            items: Array[FedoraPackage])
+            extends ArrayAdapter[FedoraPackage](context, resource, items) {
             override def getView(position: Int, convertView: View, parent: ViewGroup): View = {
               val pkg = getItem(position)
 

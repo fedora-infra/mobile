@@ -2,6 +2,8 @@ package org.fedoraproject.mobile
 
 import util.Hashing
 
+import Pkgwat._
+
 import android.graphics.{ Bitmap, BitmapFactory }
 import android.net.Uri
 import android.util.Log
@@ -37,7 +39,7 @@ object BitmapFetch {
         BitmapFactory.decodeStream(is)
       }
 
-  def fromPackage(p: Pkgwat.Package) = Task {
+  def fromPackage(p: FedoraPackage) = Task {
     val icon = URLEncoder.encode(p.icon, "utf8")
     val connection =
        new URL(s"https://apps.fedoraproject.org/packages/images/icons/${icon}.png")
