@@ -24,13 +24,21 @@ object General {
       "com.github.chrisbanes.actionbarpulltorefresh" % "library" % "0.5",
       "org.scalacheck" %% "scalacheck" % "1.11.0" % "test"
     ),
-    scalacOptions         := Seq(
-      "-encoding", "utf8",
-      "-target:jvm-1.6",
-      "-feature",
-      "-unchecked",
+    scalacOptions ++= Seq(
       "-deprecation",
+      "-encoding", "UTF-8",
+      "-feature",
+      "-language:existentials",
+      "-language:higherKinds",
+      "-language:implicitConversions",
       "-optimise",
+      "-target:jvm-1.6",
+      "-unchecked",
+      "-Xfatal-warnings",
+      "-Xlint",
+      "-Yno-adapted-args",
+      "-Ywarn-dead-code",
+      "-Ywarn-numeric-widen",
       "-Ywarn-value-discard"
     ),
     javacOptions          ++= Seq(
