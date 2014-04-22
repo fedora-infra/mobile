@@ -90,7 +90,7 @@ class PackageSearchActivity extends TypedActivity with util.Views {
             val packagesView = findViewOpt(TR.packages).map(_.asInstanceOf[ListView])
             packagesView match {
               case Some(v) => {
-                v.setAdapter(adapter)
+                v.post(v.setAdapter(adapter))
                 v.setVisibility(View.VISIBLE)
                 v.setOnItemClickListener(new OnItemClickListener {
                   def onItemClick(parent: AdapterView[_], view: View, position: Int, id: Long) {
