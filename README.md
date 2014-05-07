@@ -1,6 +1,9 @@
 # Fedora Mobile
 
-<img src="http://shieldkins.elrod.me/fedora/fedora-mobile" alt="Fedora Mobile Status" />
+<a href="http://jenkins.cloud.fedoraproject.org/job/fedora-mobile/lastBuild/">
+<img src="http://shieldkins.elrod.me/fedora/fedora-mobile"
+     alt="Fedora Mobile Status" />
+</a>
 
 Fedora Mobile is a one-stop-shop application for interacting with the Fedora
 community you know and love, on the go.
