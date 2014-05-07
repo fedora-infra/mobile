@@ -86,23 +86,21 @@ class PackageSearchActivity extends TypedActivity with util.Views {
             findViewOpt(TR.progress).map(_.setVisibility(View.GONE))
           }
 
-          runOnUiThread {
-            val packagesView = findViewOpt(TR.packages).map(_.asInstanceOf[ListView])
-            packagesView match {
-              case Some(v) => {
-                v.post(v.setAdapter(adapter))
-                v.setVisibility(View.VISIBLE)
-                v.setOnItemClickListener(new OnItemClickListener {
-                  def onItemClick(parent: AdapterView[_], view: View, position: Int, id: Long) {
-                    val pkg = packages(position)
-                    val intent = new Intent(PackageSearchActivity.this, classOf[PackageInfoActivity])
-                    intent.putExtra("package", pkg)
-                    startActivity(intent)
-                  }
-                })
-              }
-              case None => // ...
+          val packagesView = findViewOpt(TR.packages).map(_.asInstanceOf[ListView])
+          packagesView match {
+            case Some(v) => {
+              runOnUiThread(v.post(v.setAdapter(adapter)))
+              runOnUiThread(v.setVisibility(View.VISIBLE))
+              runOnUiThread(v.setOnItemClickListener(new OnItemClickListener {
+                def onItemClick(parent: AdapterView[_], view: View, position: Int, id: Long) {
+                  val pkg = packages(position)
+                  val intent = new Intent(PackageSearchActivity.this, classOf[PackageInfoActivity])
+                  intent.putExtra("package", pkg)
+                  startActivity(intent)
+                }
+              }))
             }
+            case None => // ...
           }
         }
         case -\/(_) => {
