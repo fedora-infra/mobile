@@ -1,5 +1,7 @@
 # Fedora Mobile
 
+<img src="http://shieldkins.elrod.me/fedora/fedora-mobile" alt="Fedora Mobile Status" />
+
 Fedora Mobile is a one-stop-shop application for interacting with the Fedora
 community you know and love, on the go.
 
