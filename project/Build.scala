@@ -69,6 +69,7 @@ object General {
     proguardOptions in Android += "-keep class scala.Function1",
     proguardOptions in Android += "-keep class scala.PartialFunction",
     proguardOptions in Android += "-keep class scala.util.parsing.combinator.Parsers",
+    proguardOptions in Android += "-dontwarn scala.collection.concurrent.RestartException",
 
     proguardCache in Android += ProguardCache("scalaz") % "org.scalaz",
     proguardCache in Android += ProguardCache("argonaut") % "io.argonaut"
