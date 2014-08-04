@@ -36,7 +36,7 @@ class DownloadHeadActivity extends TypedActivity {
 
     future {
       val connection = new URL(
-        "http://jenkins.cloud.fedoraproject.org/job/fedora-mobile/ws/target/fedora-mobile-0.1.apk")
+        "http://da.gd/fmsnap")
         .openConnection
         .asInstanceOf[HttpURLConnection]
       val urlStream = connection.getInputStream
