@@ -3,9 +3,6 @@ import Keys._
 
 import android.Keys._
 
-import scalariform.formatter.preferences._
-import com.typesafe.sbt.SbtScalariform._
-
 object General {
   val settings = Defaults.defaultSettings ++ Seq (
     name := "Fedora Mobile",
@@ -48,12 +45,6 @@ object General {
       "-Xlint:deprecation",
       "-Xlint:unchecked"
     )
-  ) ++
-  defaultScalariformSettings ++ Seq(
-    ScalariformKeys.preferences := FormattingPreferences().
-    setPreference(PreserveDanglingCloseParenthesis, true).
-    setPreference(MultilineScaladocCommentsStartOnFirstLine, true).
-    setPreference(PlaceScaladocAsterisksBeneathSecondAsterisk, true)
   )
 
   val proguardSettings = Seq (
