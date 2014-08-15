@@ -14,10 +14,9 @@ object General {
     ),
     libraryDependencies   ++= Seq(
       //"me.elrod" %% "pkgwat" % "1.0.0",
-      "org.scalaz" %% "scalaz-core" % "7.0.6",
-      "org.scalaz" %% "scalaz-concurrent" % "7.0.6",
-      //"com.github.xuwei-k" %% "iarray" % "0.2.6",
-      "io.argonaut" %% "argonaut" % "6.0.1",
+      "org.scalaz" %% "scalaz-core" % "7.1.0",
+      "org.scalaz" %% "scalaz-concurrent" % "7.1.0",
+      "io.argonaut" %% "argonaut" % "6.1-M4",
       "com.github.chrisbanes.actionbarpulltorefresh" % "library" % "0.5",
       "org.scalacheck" %% "scalacheck" % "1.11.0" % "test"
     ),

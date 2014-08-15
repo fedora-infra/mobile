@@ -8,7 +8,7 @@ import android.util.Log
 import android.widget.RemoteViews
 
 import scalaz._, Scalaz._
-import scalaz.concurrent.Promise
+import scalaz.concurrent.Future
 
 import java.text.{ NumberFormat, SimpleDateFormat }
 import java.util.Date
@@ -16,8 +16,8 @@ import java.util.Date
 class FedmsgCountWidgetProvider extends AppWidgetProvider {
   override def onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: Array[Int]): Unit = {
     appWidgetIds.foreach(n => {
-      val mcPromise: Promise[String \/ Datagrepper.Messagecount] = Datagrepper.messagecount()
-      mcPromise map {
+      val mcFuture: Future[String \/ Datagrepper.Messagecount] = Datagrepper.messagecount()
+      mcFuture map {
         case -\/(err) => Log.e("FedmsgCountWidgetProvider", err)
         case \/-(mc) => {
           val views: RemoteViews = new RemoteViews(context.getPackageName, R.layout.widget_fedmsg_count)

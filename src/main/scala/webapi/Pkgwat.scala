@@ -5,8 +5,8 @@ import android.util.Log
 import argonaut._, Argonaut._
 
 import scalaz._, Scalaz._
-import scalaz.concurrent.Promise
-import scalaz.concurrent.Promise._
+import scalaz.concurrent.Future
+import scalaz.concurrent.Future._
 import scalaz.effect._
 
 import java.io.{ InputStreamReader }
@@ -87,7 +87,7 @@ object Pkgwat {
     Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
   }
 
-  def queryJson(q: FilteredQuery): Promise[String \/ APIResults[FedoraPackage]] = promise {
+  def queryJson(q: FilteredQuery): Future[String \/ APIResults[FedoraPackage]] = delay {
     query(q)
     .unsafePerformIO
     .replaceAll("""<\/?.*?>""", "")

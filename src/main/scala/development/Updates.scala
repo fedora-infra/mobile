@@ -10,8 +10,8 @@ import android.util.Log
 import argonaut._, Argonaut._
 
 import scalaz._, Scalaz._
-import scalaz.concurrent.Promise
-import scalaz.concurrent.Promise._
+import scalaz.concurrent.Future
+import scalaz.concurrent.Future._
 import scalaz.effect._
 
 import scala.io.{ Codec, Source }
@@ -51,10 +51,10 @@ object Updates {
     Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
   }
 
-  def compareVersion(context: Context): Promise[String \/ Boolean] = {
+  def compareVersion(context: Context): Future[String \/ Boolean] = {
     val version: String = context.getString(R.string.git_sha)
     val current: IO[String] = getLatestCommit()
-    promise {
+    delay {
       current.unsafePerformIO.decodeEither[Commit].map(_.sha == version)
     }
   }

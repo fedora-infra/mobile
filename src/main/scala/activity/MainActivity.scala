@@ -15,7 +15,7 @@ import android.view.{ LayoutInflater, MenuItem, View, ViewGroup }
 import android.widget.{ AdapterView, ArrayAdapter, TextView }
 
 import scalaz._, Scalaz._
-import scalaz.concurrent.Promise
+import scalaz.concurrent.Future
 import scalaz.effect.IO
 
 sealed trait Delegation {
@@ -142,7 +142,7 @@ class MainActivity extends util.Views {
 
     // If the user hasn't disabled updates...
     if (checkUpdates) {
-      val versionCompare: Promise[String \/ Boolean] = Updates.compareVersion(this)
+      val versionCompare: Future[String \/ Boolean] = Updates.compareVersion(this)
       versionCompare map {
         case \/-(b) if b == true =>
           Log.e("MainActivity", "We're up to date!")

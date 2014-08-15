@@ -11,7 +11,7 @@ import android.widget.AbsListView.OnScrollListener
 import android.widget.{ AbsListView, ArrayAdapter, Toast }
 
 import scalaz._, Scalaz._
-import scalaz.concurrent.Promise
+import scalaz.concurrent.Future
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
 
@@ -26,7 +26,7 @@ class FedmsgNewsfeedFragment
 
   private lazy val refreshAdapter = new PullToRefreshAttacher(activity)
 
-  private def getLatestMessages(before: Option[Long] = None): Promise[String \/ List[HRF.Result]] = {
+  private def getLatestMessages(before: Option[Long] = None): Future[String \/ List[HRF.Result]] = {
     val query = List(
       "delta" -> "7200",
       "order" -> "desc"
@@ -35,7 +35,7 @@ class FedmsgNewsfeedFragment
     HRF(query, TimeZone.getDefault)
   }
 
-  private def getMessagesSince(since: Long): Promise[String \/ List[HRF.Result]] =
+  private def getMessagesSince(since: Long): Future[String \/ List[HRF.Result]] =
     HRF(
       List(
         "start" -> (since + 1).toString,
@@ -45,12 +45,12 @@ class FedmsgNewsfeedFragment
 
   def onRefreshStarted(view: View): Unit = {
     val newsfeed = findView(TR.newsfeed)
-    val newestItem = \/.fromTryCatch(newsfeed.getAdapter.getItem(0))
+    val newestItem = \/.fromTryCatchNonFatal(newsfeed.getAdapter.getItem(0))
     newestItem match {
       case -\/(err) => updateNewsfeed()
       case \/-(item) => {
         val timestamp = item.asInstanceOf[HRF.Result].timestamp("epoch")
-        val messages: Promise[String \/ List[HRF.Result]] = getMessagesSince(timestamp.replace(".0", "").toLong)
+        val messages: Future[String \/ List[HRF.Result]] = getMessagesSince(timestamp.replace(".0", "").toLong)
         messages map {
           case \/-(res) => {
             val adapter = newsfeed.getAdapter.asInstanceOf[ArrayAdapter[HRF.Result]]
@@ -112,7 +112,7 @@ class FedmsgNewsfeedFragment
 
   private def updateNewsfeed(): Unit = {
     val newsfeed = findView(TR.newsfeed)
-    val messages: Promise[String \/ List[HRF.Result]] = getLatestMessages()
+    val messages: Future[String \/ List[HRF.Result]] = getLatestMessages()
     val arrayList = new ArrayList[HRF.Result]
     val adapter = new FedmsgAdapter(
       activity,

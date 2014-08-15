@@ -12,7 +12,7 @@ import android.view.View
 import android.widget.{ AbsListView, ArrayAdapter, Toast }
 
 import scalaz._, Scalaz._
-import scalaz.concurrent.Promise
+import scalaz.concurrent.Future
 import scalaz.effect.IO
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
@@ -50,7 +50,7 @@ class UserActivity
     *
     * @todo Paginate/endless scrolling/etc.
   */
-  private def getUserNewsfeed(/*since: Long*/): Promise[String \/ List[HRF.Result]] =
+  private def getUserNewsfeed(/*since: Long*/): Future[String \/ List[HRF.Result]] =
     HRF(
       List(
         //"start"    -> (since + 1).toString,
@@ -95,7 +95,7 @@ class UserActivity
     findView(TR.packages_count).setText("28")
 
     val newsfeed = findView(TR.user_newsfeed)
-    val messages: Promise[String \/ List[HRF.Result]] = getUserNewsfeed()
+    val messages: Future[String \/ List[HRF.Result]] = getUserNewsfeed()
     messages map {
       case -\/(err) => {
         Log.e("UserActivity", "Error updating newsfeed: " + err)

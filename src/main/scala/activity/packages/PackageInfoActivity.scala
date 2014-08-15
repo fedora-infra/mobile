@@ -14,8 +14,8 @@ import android.widget.{ TableRow, TextView, Toast }
 import argonaut._, Argonaut._
 
 import scalaz._, Scalaz._
-import scalaz.concurrent.Promise
-import scalaz.concurrent.Promise._
+import scalaz.concurrent.Future
+import scalaz.concurrent.Future._
 
 import scala.io.Source
 import scala.language.reflectiveCalls
@@ -72,7 +72,7 @@ class PackageInfoActivity extends TypedActivity with util.Views {
         0,
         Map("package" -> pkg.name)))
 
-    promise {
+    delay {
       Source.fromURL(jsonURL).mkString
     } map {
       case res: String => {

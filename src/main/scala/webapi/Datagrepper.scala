@@ -6,8 +6,8 @@ import android.util.Log
 import argonaut._, Argonaut._
 
 import scalaz._, Scalaz._
-import scalaz.concurrent.Promise
-import scalaz.concurrent.Promise._
+import scalaz.concurrent.Future
+import scalaz.concurrent.Future._
 import scalaz.effect._
 
 import scala.io.{ Codec, Source }
@@ -40,8 +40,8 @@ object HRF {
   implicit def ResultCodecJson: CodecJson[Result] =
     casecodec10(Result.apply, Result.unapply)("icon", "secondary_icon", "link", "objects", "packages", "repr", "subtitle", "timestamp", "title", "usernames")
 
-  def apply(query: List[(String, String)], timezone: TimeZone): Promise[String \/ List[Result]] =
-    promise {
+  def apply(query: List[(String, String)], timezone: TimeZone): Future[String \/ List[Result]] =
+    delay {
       get(query.map(x => s"${x._1}=${x._2}").mkString("&"), timezone.getID)
       .unsafePerformIO
       .decodeEither[Response]
@@ -93,7 +93,7 @@ object Datagrepper {
   implicit def MessagecountCodecJson: CodecJson[Messagecount] =
     casecodec1(Messagecount.apply, Messagecount.unapply)("messagecount")
 
-  def messagecount(): Promise[String \/ Messagecount] = {
+  def messagecount(): Future[String \/ Messagecount] = {
     def getMessageCount(): IO[String] = IO {
       val connection: HttpURLConnection =
         url
@@ -104,7 +104,7 @@ object Datagrepper {
       Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
     }
 
-    promise {
+    delay {
       getMessageCount().unsafePerformIO.decodeEither[Messagecount]
     }
   }
