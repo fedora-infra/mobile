@@ -19,10 +19,6 @@ import scala.io.{ Codec, Source }
 import java.io.{ DataOutputStream, InputStreamReader }
 import java.net.{ HttpURLConnection, URL, URLEncoder }
 
-sealed trait JenkinsBuildStatus
-case object Success extends JenkinsBuildStatus
-case object Failure extends JenkinsBuildStatus
-
 object Updates {
   case class CommitStats(total: Int, additions: Int, deletions: Int)
 
@@ -32,14 +28,17 @@ object Updates {
   implicit def CommitStatsCodecJson: CodecJson[CommitStats] =
     casecodec3(CommitStats.apply, CommitStats.unapply)("total", "additions", "deletions")
 
-
   implicit def CommitCodecJson: CodecJson[Commit] =
     casecodec2(Commit.apply, Commit.unapply)("sha", "stats")
+
+  sealed trait JenkinsBuildStatus
+  case object JenkinsSuccess extends JenkinsBuildStatus
+  case object JenkinsFailure extends JenkinsBuildStatus
 
   implicit def JenkinsBuildStatusJson: DecodeJson[JenkinsBuildStatus] =
     DecodeJson(c => for {
       result <- (c --\ "result").as[String]
-    } yield (if (result == "SUCCESS") Success else Failure))
+    } yield (if (result == "SUCCESS") JenkinsSuccess else JenkinsFailure))
 
   /** Get the latest build status from the Fedora Jenkins server. */
   def getJenkinsLastBuildStatus: Task[String \/ JenkinsBuildStatus] = delay {
