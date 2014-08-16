@@ -159,7 +159,7 @@ class MainActivity extends util.Views {
               ()
           }
         }))
-      x.run
+      x.runAsync(_ => ())
     }
   }
 
