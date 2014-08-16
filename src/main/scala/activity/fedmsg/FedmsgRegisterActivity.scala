@@ -11,8 +11,8 @@ import android.widget.Toast
 import com.google.android.gms.gcm.GoogleCloudMessaging
 
 import scalaz._, Scalaz._
-import scalaz.concurrent.Future
-import scalaz.concurrent.Future._
+import scalaz.concurrent.Task
+import scalaz.concurrent.Task._
 import scalaz.effect._
 
 import java.io.{ DataOutputStream, InputStreamReader }
@@ -81,7 +81,7 @@ class FedmsgRegisterActivity extends TypedActivity {
         }
       else
         IO {
-          val registrationID: Future[String] = getRegistrationID
+          val registrationID: Task[String] = getRegistrationID
           val fmnResponse = registrationID map {
             case id => sendIDToFMN(openid.get, apiKey.get, id)
           }
@@ -96,7 +96,7 @@ class FedmsgRegisterActivity extends TypedActivity {
   private def sendIDToFMN(
     openid: String,
     apiKey: String,
-    id: String): Future[String] = delay {
+    id: String): Task[String] = delay {
      val connection =
       new URL(
         "https://apps.fedoraproject.org/notifications/link-fedora-mobile/" ++
@@ -108,7 +108,7 @@ class FedmsgRegisterActivity extends TypedActivity {
     Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
   }
 
-  def getRegistrationID: Future[String] = delay {
+  def getRegistrationID: Task[String] = delay {
     val gcm = GoogleCloudMessaging.getInstance(this)
     gcm.register(getString(R.string.fmn_sender_id))
   }

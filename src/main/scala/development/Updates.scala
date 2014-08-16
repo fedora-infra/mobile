@@ -41,7 +41,7 @@ object Updates {
     } yield (if (result == "SUCCESS") JenkinsSuccess else JenkinsFailure))
 
   /** Get the latest build status from the Fedora Jenkins server. */
-  def getJenkinsLastBuildStatus: Task[String \/ JenkinsBuildStatus] = delay {
+  def getJenkinsLastBuildStatus: Task[String \/ JenkinsBuildStatus] = Task {
     val connection =
       new URL("http://jenkins.cloud.fedoraproject.org/job/fedora-mobile/lastBuild/api/json")
       .openConnection
@@ -60,7 +60,7 @@ object Updates {
     * instance). If they match, we do nothing. If they don't match, we pop up a
     * dialog, asking if the user wants to update.
     */
-  private def getLatestCommit: Task[String] = delay {
+  private def getLatestCommit: Task[String] = Task {
     Log.v("Updates", "Pinging GitHub API for latest commit info")
     val uri = Uri.parse("https://api.github.com/repos/fedora-infra/mobile/commits/HEAD")
     val connection = new URL(uri.toString)
@@ -72,9 +72,9 @@ object Updates {
 
   def compareVersion(context: Context): Task[String \/ Boolean] = {
     val version = context.getString(R.string.git_sha)
-    val current = getLatestCommit
-    // This can be cleaned up - Task is monadic.
-    delay(current.run.decodeEither[Commit].map(_.sha == version))
+    for {
+      current <- getLatestCommit
+    } yield current.decodeEither[Commit].map(_.sha == version)
   }
 
   def presentDialog(context: Context): Unit = {

@@ -6,8 +6,8 @@ import android.util.Log
 import argonaut._, Argonaut._
 
 import scalaz._, Scalaz._
-import scalaz.concurrent.Future
-import scalaz.concurrent.Future._
+import scalaz.concurrent.Task
+import scalaz.concurrent.Task._
 import scalaz.effect._
 
 import java.io.{ DataOutputStream, InputStreamReader }
@@ -66,15 +66,15 @@ object Badges {
     Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
   }
 
-  def info(id: String): Future[String] = delay {
+  def info(id: String): Task[String] = delay {
     query(s"/badge/${id}/json").unsafePerformIO
   }
 
-  def user(user: String): Future[String \/ User] = delay {
+  def user(user: String): Task[String \/ User] = delay {
     query(s"/badge/${user}/json").unsafePerformIO.decodeEither[User]
   }
 
-  def leaderboard(): Future[String \/ List[LeaderboardUser]] = delay {
+  def leaderboard(): Task[String \/ List[LeaderboardUser]] = delay {
     query("/leaderboard/json")
       .unsafePerformIO
       .decodeEither[Leaderboard]

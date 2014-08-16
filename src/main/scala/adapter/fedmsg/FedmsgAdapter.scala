@@ -50,7 +50,7 @@ class FedmsgAdapter(
       case None => BitmapFetch.fromURL(serviceIcon)
     }
 
-    // XXX: Move this to scalaz Future.
+    // XXX: Move this to scalaz Task.
     image runAsync {
       case -\/(err) => {
         Log.e("FedmsgAdapter", err.toString)

@@ -11,7 +11,7 @@ import android.widget.AbsListView.OnScrollListener
 import android.widget.{ AbsListView, ArrayAdapter, Toast }
 
 import scalaz._, Scalaz._
-import scalaz.concurrent.Future
+import scalaz.concurrent.Task
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
 
@@ -26,7 +26,8 @@ class FedmsgNewsfeedFragment
 
   private lazy val refreshAdapter = new PullToRefreshAttacher(activity)
 
-  private def getLatestMessages(before: Option[Long] = None): Future[String \/ List[HRF.Result]] = {
+  private def getLatestMessages(before: Option[Long] = None): Task[String \/ List[HRF.Result]] = {
+    Log.v("GETLATESTMESSAGES", "getLatestMessages")
     val query = List(
       "delta" -> "7200",
       "order" -> "desc"
@@ -35,13 +36,15 @@ class FedmsgNewsfeedFragment
     HRF(query, TimeZone.getDefault)
   }
 
-  private def getMessagesSince(since: Long): Future[String \/ List[HRF.Result]] =
+  private def getMessagesSince(since: Long): Task[String \/ List[HRF.Result]] = {
+        Log.v("GETMESSAGESSINCE", "getMessagesSince")
     HRF(
       List(
         "start" -> (since + 1).toString,
         "order" -> "desc"
       ),
       TimeZone.getDefault)
+  }
 
   def onRefreshStarted(view: View): Unit = {
     val newsfeed = findView(TR.newsfeed)
@@ -50,15 +53,26 @@ class FedmsgNewsfeedFragment
       case -\/(err) => updateNewsfeed()
       case \/-(item) => {
         val timestamp = item.asInstanceOf[HRF.Result].timestamp("epoch")
-        val messages: Future[String \/ List[HRF.Result]] = getMessagesSince(timestamp.replace(".0", "").toLong)
-        messages map {
-          case \/-(res) => {
-            val adapter = newsfeed.getAdapter.asInstanceOf[ArrayAdapter[HRF.Result]]
-            runOnUiThread(res.reverse.foreach(adapter.insert(_, 0)))
-            runOnUiThread(adapter.notifyDataSetChanged)
-            runOnUiThread(refreshAdapter.setRefreshComplete)
+        val messages: Task[String \/ List[HRF.Result]] = getMessagesSince(timestamp.replace(".0", "").toLong)
+        messages runAsync {
+          case \/-(res) => res match {
+            case \/-(xs) => {
+              val adapter = newsfeed.getAdapter.asInstanceOf[ArrayAdapter[HRF.Result]]
+              runOnUiThread(xs.reverse.foreach(adapter.insert(_, 0)))
+              runOnUiThread(adapter.notifyDataSetChanged)
+              runOnUiThread(refreshAdapter.setRefreshComplete)
+            }
+            case -\/(err) => {
+              // JSON parsing threw an error.
+              runOnUiThread(Toast.makeText(activity, R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
+              Log.e("FedmsgFeed", "Error refreshing: " + err)
+              runOnUiThread(refreshAdapter.setRefreshComplete)
+              ()
+            }
           }
           case -\/(err) => {
+            // The Task threw an error (as opposed to the JSON parsing).
+            // TODO: Abstract this.
             runOnUiThread(Toast.makeText(activity, R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
             Log.e("FedmsgFeed", "Error refreshing: " + err)
             runOnUiThread(refreshAdapter.setRefreshComplete)
@@ -112,7 +126,7 @@ class FedmsgNewsfeedFragment
 
   private def updateNewsfeed(): Unit = {
     val newsfeed = findView(TR.newsfeed)
-    val messages: Future[String \/ List[HRF.Result]] = getLatestMessages()
+    val messages: Task[String \/ List[HRF.Result]] = getLatestMessages()
     val arrayList = new ArrayList[HRF.Result]
     val adapter = new FedmsgAdapter(
       activity,
@@ -120,19 +134,33 @@ class FedmsgNewsfeedFragment
       arrayList)
     newsfeed.setAdapter(adapter)
 
-    messages map {
+    messages runAsync {
       case -\/(err) => {
+        // Something bad occurred in the Task
         Log.e("MainActivity", "Error updating newsfeed: " + err)
         runOnUiThread(
           Toast.makeText(
             activity,
             R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
+        throw err
       }
       case \/-(res) => {
-        res.foreach(arrayList.add(_))
-        runOnUiThread(newsfeed.setAdapter(adapter))
+        res match {
+          case -\/(err) => {
+            // JSON parsing didn't work
+            Log.e("MainActivity", "Error updating newsfeed: " + err)
+            runOnUiThread(
+              Toast.makeText(
+                activity,
+                R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
+          }
+          case \/-(xs) => {
+            xs.foreach(arrayList.add(_))
+            runOnUiThread(newsfeed.setAdapter(adapter))
+          }
+        }
       }
+      ()
     }
-    ()
   }
 }

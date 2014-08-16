@@ -10,8 +10,8 @@ import android.widget.Toast
 import com.google.android.gms.gcm.GoogleCloudMessaging
 
 import scalaz._, Scalaz._
-import scalaz.concurrent.Future
-import scalaz.concurrent.Future._
+import scalaz.concurrent.Task
+import scalaz.concurrent.Task._
 import scalaz.effect._
 
 import java.io.{ DataOutputStream, InputStreamReader }
@@ -43,7 +43,7 @@ class FedmsgConfirmationActivity extends TypedActivity {
     accepted: Boolean,
     openid: String,
     apiKey: String,
-    secret: String): Future[String] = delay {
+    secret: String): Task[String] = delay {
     val connection =
       new URL(
         "https://apps.fedoraproject.org/notifications/confirm/" ++
@@ -81,7 +81,7 @@ class FedmsgConfirmationActivity extends TypedActivity {
       }
     } else {
       IO {
-        val d: Future[String] =
+        val d: Task[String] =
           finalizeDecision(accepted, openid.get, apiKey.get, secret)
         d map {
           case _ => {

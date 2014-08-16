@@ -144,22 +144,38 @@ class MainActivity extends util.Views {
     if (checkUpdates) {
       // If the most recent build failed, there's no point in doing anything
       // else.
-      val x: Task[Unit] = Updates.getJenkinsLastBuildStatus >>=
-        ((x: String \/ Updates.JenkinsBuildStatus) => Task.delay(x match {
-          // Left happens if the JSON parse from Jenkins fails.
-          case -\/(err)                    => { Log.e("MainActivity", err); () }
-          case \/-(Updates.JenkinsFailure) => { Log.v("MainActivity", "Last Jenkins build failed. Skipping."); () }
+      Updates.getJenkinsLastBuildStatus runAsync {
+        // Error getting build status
+        case -\/(err) =>
+          Log.e("MainActivity", err.toString)
+          ()
+        case \/-(res) => res match {
+          // Error parsing JSON from Jenkins
+          case -\/(err) =>
+            Log.e("MainActivity", err.toString)
+            ()
+          case \/-(Updates.JenkinsFailure) =>
+            Log.v("MainActivity", "Last Jenkins build failed. Skipping update.")
+            ()
           case \/-(Updates.JenkinsSuccess) => {
-            Updates.compareVersion(this) >>=
-              ((y: String \/ Boolean) => Task.delay(y match {
-                case \/-(true)  => { Log.v("MainActivity", "Already up to date"); () }
-                case \/-(false) => { runOnUiThread(Updates.presentDialog(MainActivity.this)); () }
-                case -\/(err)   => { Log.e("MainActivity", err); () }
-              }))
-              ()
+            Log.v("MainActivity", "Last Jenkins build was successful.")
+            Updates.compareVersion(this) runAsync {
+              // Error getting GitHub info
+              case -\/(err) =>
+                Log.e("MainActivity", err.toString)
+                ()
+                case \/-(res) => res match {
+                  case \/-(true) =>
+                    Log.v("MainActivity", "Already up to date")
+                    ()
+                  case \/-(false) =>
+                    runOnUiThread(Updates.presentDialog(MainActivity.this))
+                    ()
+                }
+            }
           }
-        }))
-      x.runAsync(_ => ())
+        }
+      }
     }
   }
 

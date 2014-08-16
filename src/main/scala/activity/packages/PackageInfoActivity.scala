@@ -14,8 +14,8 @@ import android.widget.{ TableRow, TextView, Toast }
 import argonaut._, Argonaut._
 
 import scalaz._, Scalaz._
-import scalaz.concurrent.Future
-import scalaz.concurrent.Future._
+import scalaz.concurrent.Task
+import scalaz.concurrent.Task._
 
 import scala.io.Source
 import scala.language.reflectiveCalls

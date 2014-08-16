@@ -6,8 +6,8 @@ import android.util.Log
 import argonaut._, Argonaut._
 
 import scalaz._, Scalaz._
-import scalaz.concurrent.Future
-import scalaz.concurrent.Future._
+import scalaz.concurrent.Task
+import scalaz.concurrent.Task._
 import scalaz.effect._
 
 import scala.io.{ Codec, Source }
@@ -22,7 +22,7 @@ object HRF {
   case class Response(results: List[Result])
 
   case class Result(
-    icon: Option[String], // TODO: Make this a Option[Future[Bitmap]] instead using BitmapCache.
+    icon: Option[String], // TODO: Make this a Option[Task[Bitmap]] instead using BitmapCache.
     secondaryIcon: Option[String], // TODO: This too.
     link: Option[String],
     objects: List[String],
@@ -40,15 +40,12 @@ object HRF {
   implicit def ResultCodecJson: CodecJson[Result] =
     casecodec10(Result.apply, Result.unapply)("icon", "secondary_icon", "link", "objects", "packages", "repr", "subtitle", "timestamp", "title", "usernames")
 
-  def apply(query: List[(String, String)], timezone: TimeZone): Future[String \/ List[Result]] =
-    delay {
-      get(query.map(x => s"${x._1}=${x._2}").mkString("&"), timezone.getID)
-      .unsafePerformIO
-      .decodeEither[Response]
-      .map(_.results)
-    }
+  def apply(query: List[(String, String)], timezone: TimeZone): Task[String \/ List[Result]] =
+    get(query.map(x => s"${x._1}=${x._2}").mkString("&"), timezone.getID)
+    .map(_.decodeEither[Response])
+    .map(_.map(_.results))
 
-  def get(qs: String, timezone: String): IO[String] = IO {
+  def get(qs: String, timezone: String): Task[String] = Task {
     val getUrl: URL = new URL(url + "?timezone=" + URLEncoder.encode(timezone, "utf8") + "&" + qs)
     Log.v("HRF", "Beginning GET to " + getUrl)
     val connection: HttpURLConnection =
@@ -93,7 +90,7 @@ object Datagrepper {
   implicit def MessagecountCodecJson: CodecJson[Messagecount] =
     casecodec1(Messagecount.apply, Messagecount.unapply)("messagecount")
 
-  def messagecount(): Future[String \/ Messagecount] = {
+  def messagecount(): Task[String \/ Messagecount] = {
     def getMessageCount(): IO[String] = IO {
       val connection: HttpURLConnection =
         url
