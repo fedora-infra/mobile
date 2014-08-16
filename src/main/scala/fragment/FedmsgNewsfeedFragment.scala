@@ -27,7 +27,6 @@ class FedmsgNewsfeedFragment
   private lazy val refreshAdapter = new PullToRefreshAttacher(activity)
 
   private def getLatestMessages(before: Option[Long] = None): Task[String \/ List[HRF.Result]] = {
-    Log.v("GETLATESTMESSAGES", "getLatestMessages")
     val query = List(
       "delta" -> "7200",
       "order" -> "desc"
@@ -37,7 +36,6 @@ class FedmsgNewsfeedFragment
   }
 
   private def getMessagesSince(since: Long): Task[String \/ List[HRF.Result]] = {
-        Log.v("GETMESSAGESSINCE", "getMessagesSince")
     HRF(
       List(
         "start" -> (since + 1).toString,
