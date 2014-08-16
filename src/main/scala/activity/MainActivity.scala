@@ -15,7 +15,7 @@ import android.view.{ LayoutInflater, MenuItem, View, ViewGroup }
 import android.widget.{ AdapterView, ArrayAdapter, TextView }
 
 import scalaz._, Scalaz._
-import scalaz.concurrent.Future
+import scalaz.concurrent.Task
 import scalaz.effect.IO
 
 sealed trait Delegation {
@@ -142,16 +142,20 @@ class MainActivity extends util.Views {
 
     // If the user hasn't disabled updates...
     if (checkUpdates) {
-      val versionCompare: Future[String \/ Boolean] = Updates.compareVersion(this)
-      versionCompare map {
-        case \/-(b) if b == true =>
-          Log.e("MainActivity", "We're up to date!")
-        case \/-(b) if b == false =>
-          runOnUiThread(Updates.presentDialog(MainActivity.this))
-        case -\/(err) =>
-          Log.e("MainActivity", err.toString)
-      }
-      ()
+      // If the most recent build failed, there's no point in doing anything
+      // else.
+      val x: Task[Unit] = Updates.getJenkinsLastBuildStatus >>= ((_: String \/ JenkinsBuildStatus) match {
+        // Left happens if the JSON parse from Jenkins fails.
+        case -\/(err) => Task.delay { Log.e("MainActivity", err); () }
+        case \/-(Failure) => Task.delay { Log.v("MainActivity", "Last Jenkins build failed. Skipping."); () }
+        case \/-(Success) =>
+          Updates.compareVersion(this) >>= ((_: String \/ Boolean) match {
+            case \/-(true) => Task.delay { Log.v("MainActivity", "Already up to date"); () }
+            case \/-(false) => Task.delay { runOnUiThread(Updates.presentDialog(MainActivity.this)); () }
+            case -\/(err) => Task.delay { Log.e("MainActivity", err); () }
+          })
+      })
+      x.run
     }
   }
 

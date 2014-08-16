@@ -10,8 +10,8 @@ import android.util.Log
 import argonaut._, Argonaut._
 
 import scalaz._, Scalaz._
-import scalaz.concurrent.Future
-import scalaz.concurrent.Future._
+import scalaz.concurrent.Task
+import scalaz.concurrent.Task._
 import scalaz.effect._
 
 import scala.io.{ Codec, Source }
@@ -19,8 +19,11 @@ import scala.io.{ Codec, Source }
 import java.io.{ DataOutputStream, InputStreamReader }
 import java.net.{ HttpURLConnection, URL, URLEncoder }
 
-object Updates {
+sealed trait JenkinsBuildStatus
+case object Success extends JenkinsBuildStatus
+case object Failure extends JenkinsBuildStatus
 
+object Updates {
   case class CommitStats(total: Int, additions: Int, deletions: Int)
 
   /** Parse the response from GitHub, only pulling out fields we care about. */
@@ -33,6 +36,23 @@ object Updates {
   implicit def CommitCodecJson: CodecJson[Commit] =
     casecodec2(Commit.apply, Commit.unapply)("sha", "stats")
 
+  implicit def JenkinsBuildStatusJson: DecodeJson[JenkinsBuildStatus] =
+    DecodeJson(c => for {
+      result <- (c --\ "result").as[String]
+    } yield (if (result == "SUCCESS") Success else Failure))
+
+  /** Get the latest build status from the Fedora Jenkins server. */
+  def getJenkinsLastBuildStatus: Task[String \/ JenkinsBuildStatus] = delay {
+    val connection =
+      new URL("http://jenkins.cloud.fedoraproject.org/job/fedora-mobile/lastBuild/api/json")
+      .openConnection
+      .asInstanceOf[HttpURLConnection] // Note to self: Everything sucks.
+    connection.setRequestMethod("GET")
+    val str =
+      Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
+    str.decodeEither[JenkinsBuildStatus]
+  }
+
   /** Handle checking for updates when running in development mode.
     *
     * To do this successfully, we hit the GitHub API, and ask it for the shasum
@@ -41,7 +61,7 @@ object Updates {
     * instance). If they match, we do nothing. If they don't match, we pop up a
     * dialog, asking if the user wants to update.
     */
-  private def getLatestCommit(): IO[String] = IO {
+  private def getLatestCommit: Task[String] = delay {
     Log.v("Updates", "Pinging GitHub API for latest commit info")
     val uri = Uri.parse("https://api.github.com/repos/fedora-infra/mobile/commits/HEAD")
     val connection = new URL(uri.toString)
@@ -51,12 +71,11 @@ object Updates {
     Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
   }
 
-  def compareVersion(context: Context): Future[String \/ Boolean] = {
-    val version: String = context.getString(R.string.git_sha)
-    val current: IO[String] = getLatestCommit()
-    delay {
-      current.unsafePerformIO.decodeEither[Commit].map(_.sha == version)
-    }
+  def compareVersion(context: Context): Task[String \/ Boolean] = {
+    val version = context.getString(R.string.git_sha)
+    val current = getLatestCommit
+    // This can be cleaned up - Task is monadic.
+    delay(current.run.decodeEither[Commit].map(_.sha == version))
   }
 
   def presentDialog(context: Context): Unit = {
