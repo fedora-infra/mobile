@@ -147,7 +147,7 @@ class MainActivity extends util.Views {
       val x: Task[Unit] = Updates.getJenkinsLastBuildStatus >>=
         ((x: String \/ Updates.JenkinsBuildStatus) => Task.delay(x match {
           // Left happens if the JSON parse from Jenkins fails.
-          case -\/(err)     => { Log.e("MainActivity", err); () }
+          case -\/(err)                    => { Log.e("MainActivity", err); () }
           case \/-(Updates.JenkinsFailure) => { Log.v("MainActivity", "Last Jenkins build failed. Skipping."); () }
           case \/-(Updates.JenkinsSuccess) => {
             Updates.compareVersion(this) >>=
