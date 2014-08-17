@@ -56,7 +56,7 @@ object Badges {
     casecodec1(Leaderboard.apply, Leaderboard.unapply)("leaderboard")
 
   /** Returns JSON after completing the query. */
-  def query(path: String): IO[String] = IO {
+  def query(path: String): Task[String] = Task {
     Log.v("Badges", "Beginning query")
     val uri = Uri.parse(url + path.dropWhile(_ == '/'))
     val connection = new URL(uri.toString)
@@ -66,18 +66,13 @@ object Badges {
     Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
   }
 
-  def info(id: String): Task[String] = delay {
-    query(s"/badge/${id}/json").unsafePerformIO
-  }
+  def info(id: String): Task[String] =
+    query(s"/badge/${id}/json")
 
-  def user(user: String): Task[String \/ User] = delay {
-    query(s"/badge/${user}/json").unsafePerformIO.decodeEither[User]
-  }
+  def user(user: String): Task[String \/ User] =
+    query(s"/badge/${user}/json") ∘ (_.decodeEither[User])
 
-  def leaderboard(): Task[String \/ List[LeaderboardUser]] = delay {
-    query("/leaderboard/json")
-      .unsafePerformIO
-      .decodeEither[Leaderboard]
-      .map(_.leaderboard)
-  }
+  def leaderboard: Task[String \/ List[LeaderboardUser]] =
+    query("/leaderboard/json") ∘ (_.decodeEither[Leaderboard]) ∘ (_.map(_.leaderboard))
+
 }

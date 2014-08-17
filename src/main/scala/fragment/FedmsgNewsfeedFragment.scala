@@ -140,7 +140,6 @@ class FedmsgNewsfeedFragment
           Toast.makeText(
             activity,
             R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
-        throw err
       }
       case \/-(res) => {
         res match {
