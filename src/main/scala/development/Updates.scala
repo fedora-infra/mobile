@@ -72,9 +72,7 @@ object Updates {
 
   def compareVersion(context: Context): Task[String \/ Boolean] = {
     val version = context.getString(R.string.git_sha)
-    for {
-      current <- getLatestCommit
-    } yield current.decodeEither[Commit].map(_.sha == version)
+    getLatestCommit ∘ (_.decodeEither[Commit] ∘ (_.sha == version))
   }
 
   def presentDialog(context: Context): Unit = {
