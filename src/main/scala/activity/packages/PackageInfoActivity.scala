@@ -72,10 +72,13 @@ class PackageInfoActivity extends TypedActivity with util.Views {
         0,
         Map("package" -> pkg.name)))
 
-    delay {
+    // This should move to webapi/Pkgwat.scala
+    Task {
       Source.fromURL(jsonURL).mkString
-    } map {
-      case res: String => {
+    } runAsync(_.fold(
+      _ => Toast.makeText(this, R.string.packages_release_failure, Toast.LENGTH_LONG).show,
+      res => {
+        Log.v("PackageInfoActivity", "111111111")
         findViewOpt(TR.progress).map(v => runOnUiThread(v.setVisibility(View.GONE)))
 
         // This is *really* hacky, but blocked on
@@ -98,40 +101,46 @@ class PackageInfoActivity extends TypedActivity with util.Views {
           r => {
             val releasesTable = findViewOpt(TR.releases)
             val header = new TableRow(this)
-            header.addView(
-              new TextView(this).tap { obj =>
-                obj.setText(R.string.release)
-                obj.setTypeface(null, Typeface.BOLD)
-            })
-            header.addView(
-              new TextView(this).tap { obj =>
-                obj.setText(R.string.stable)
-                obj.setTypeface(null, Typeface.BOLD)
-            })
 
-            header.addView(
-              new TextView(this).tap { obj =>
-                obj.setText(R.string.testing)
-                obj.setTypeface(null, Typeface.BOLD)
-            })
+            // Okay, this is worthy of a sigh.
+            val releaseTV = new TextView(this)
+            releaseTV.setText(R.string.release)
+            releaseTV.setTypeface(null, Typeface.BOLD)
+            header.addView(releaseTV)
+
+            val stableTV = new TextView(this)
+            stableTV.setText(R.string.stable)
+            stableTV.setTypeface(null, Typeface.BOLD)
+            header.addView(stableTV)
+
+            val testingTV = new TextView(this)
+            testingTV.setText(R.string.testing)
+            testingTV.setTypeface(null, Typeface.BOLD)
+            header.addView(testingTV)
 
             runOnUiThread(releasesTable.foreach(_.addView(header)))
 
             r.rows.foreach { release =>
               val row = new TableRow(this)
-              row.addView(new TextView(this).tap(_.setText(stripHTML(release.release))))
-              row.addView(new TextView(this).tap(_.setText(stripHTML(release.stableVersion))))
-              row.addView(new TextView(this).tap(_.setText(stripHTML(release.testingVersion.split("<div").head)))) // HACK
+
+              val rowReleaseTV = new TextView(this)
+              rowReleaseTV.setText(stripHTML(release.release))
+              row.addView(rowReleaseTV)
+
+              val rowStableTV = new TextView(this)
+              rowStableTV.setText(stripHTML(release.stableVersion))
+              row.addView(rowStableTV)
+
+              val rowTestingTV = new TextView(this)
+              // TODO: unsafe call to head.
+              rowTestingTV.setText(stripHTML(release.testingVersion.split("<div").head))
+              row.addView(rowTestingTV)
               runOnUiThread(releasesTable.foreach(_.addView(row)))
             }
           }
         )
       }
-      case _ => {
-        // TODO: compose this with the above, remove duplicate code
-        Toast.makeText(this, R.string.packages_release_failure, Toast.LENGTH_LONG).show
-      }
-    }
+    ))
     ()
   }
 }
