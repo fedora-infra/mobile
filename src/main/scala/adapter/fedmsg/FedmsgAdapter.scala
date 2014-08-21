@@ -44,11 +44,10 @@ class FedmsgAdapter(
     val serviceIcon =
       item.icon.getOrElse("https://fedoraproject.org/static/images/fedora_infinity_64x64.png")
     val primaryUser = item.usernames.headOption
-    val image = primaryUser match {
-      case Some(username) =>
-        BitmapFetch.fromGravatarEmail(s"${username}@fedoraproject.org")
-      case None => BitmapFetch.fromURL(serviceIcon)
-    }
+    val image = primaryUser.cata(
+      username => BitmapFetch.fromGravatarEmail(s"${username}@fedoraproject.org"),
+      BitmapFetch.fromURL(serviceIcon)
+    )
 
     image.runAsync(_.fold(
       err => {

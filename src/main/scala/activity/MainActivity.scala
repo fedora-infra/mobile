@@ -207,12 +207,10 @@ class MainActivity extends util.Views {
   }
 
   override def onOptionsItemSelected(item: MenuItem): Boolean =
-    drawerToggle match {
-      case Some(t) =>
-        if (t.onOptionsItemSelected(item))
-          true
-        else
-          super.onOptionsItemSelected(item)
-      case None => super.onOptionsItemSelected(item)
-    }
+    drawerToggle.cata(
+      t => (if (t.onOptionsItemSelected(item))
+              true
+            else
+              super.onOptionsItemSelected(item)),
+      super.onOptionsItemSelected(item))
 }

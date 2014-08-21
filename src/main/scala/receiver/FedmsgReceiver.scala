@@ -52,21 +52,20 @@ class FedmsgReceiver extends BroadcastReceiver {
     def createIntent(
       accepted: Option[Boolean],
       secret: String): IO[PendingIntent] = IO {
-      val intent = accepted match {
-        case Some(a: Boolean) =>
+      val intent = accepted.cata(
+        a =>
           new Intent(context, classOf[FedmsgConfirmationActivity])
             .putExtra("org.fedoraproject.mobile.accepted", a)
             .putExtra("org.fedoraproject.mobile.secret", secret)
             // http://stackoverflow.com/q/3127957/1106202
             // http://stackoverflow.com/a/3140371/1106202
-            .setAction("FedmsgConfirmationActivity_" + System.currentTimeMillis)
-        case None =>
+            .setAction("FedmsgConfirmationActivity_" + System.currentTimeMillis),
           new Intent(context, classOf[FedmsgConfirmationActivity])
             .putExtra("org.fedoraproject.mobile.secret", secret)
             // http://stackoverflow.com/q/3127957/1106202
             // http://stackoverflow.com/a/3140371/1106202
             .setAction("FedmsgConfirmationActivity_" + System.currentTimeMillis)
-      }
+      )
       PendingIntent.getActivity(context, 0, intent, 0)
     }
 
@@ -108,26 +107,22 @@ class FedmsgReceiver extends BroadcastReceiver {
             Log.e("FedmsgReceiver", "error parsing JSON")
             None
           },
-          result =>
-            result match {
-              case None => {
-                Log.e("FedmsgReceiver", "Empty resultset from JSON")
-                None
-              }
-              case Some(r) => {
-                val compatBuilder =
-                  new NotificationCompat.Builder(context)
-                    .setContentTitle(r.subtitle)
-                    .setStyle(
-                      new NotificationCompat
-                        .BigTextStyle()
-                        .bigText(r.repr))
-                    .setContentText(r.repr)
-                    .setSmallIcon(R.drawable.fedoraicon)
-                    .setAutoCancel(true)
-                Some(compatBuilder)
-              }
+          result => result.cata(
+            r => Some(
+              new NotificationCompat.Builder(context)
+                .setContentTitle(r.subtitle)
+                .setStyle(
+                  new NotificationCompat
+                  .BigTextStyle()
+                  .bigText(r.repr))
+                .setContentText(r.repr)
+                .setSmallIcon(R.drawable.fedoraicon)
+                .setAutoCancel(true)),
+            {
+              Log.e("FedmsgReceiver", "Empty resultset from JSON")
+              None
             }
+          )
         ))
       }
     }

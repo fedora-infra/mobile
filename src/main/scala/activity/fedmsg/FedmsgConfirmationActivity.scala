@@ -29,13 +29,13 @@ class FedmsgConfirmationActivity extends TypedActivity {
         .getExtras
         .getBoolean("org.fedoraproject.mobile.accepted"))
 
-    val fromDecisionNotification  = accepted match {
-      case Some(decision) => decide(decision)
-      case None    => ??? // This probably means they tapped the notification
-                          // instead of answering it, or they are on an old
-                          // Android version. Show them the choices here
-                          // instead. TODO.
-    }
+    val fromDecisionNotification  = accepted.cata(
+      decision => decide(decision),
+      ??? // This probably means they tapped the notification
+          // instead of answering it, or they are on an old
+          // Android version. Show them the choices here
+          // instead. TODO.
+    )
     fromDecisionNotification.unsafePerformIO
   }
 

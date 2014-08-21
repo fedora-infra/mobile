@@ -25,8 +25,8 @@ class BadgesUserActivity
     super.onPostCreate(bundle)
     setContentView(R.layout.badges_user_activity)
 
-    Option(getIntent.getExtras.getString("nickname")) match {
-      case Some(nickname) => {
+    Option(getIntent.getExtras.getString("nickname")).cata(
+      nickname => {
         val actionbar = getActionBar
         actionbar.setTitle(nickname)
         BitmapFetch.fromGravatarEmail(s"${nickname}@fedoraproject.org").runAsync(_.fold(
@@ -43,16 +43,16 @@ class BadgesUserActivity
 
         val badges = findView(TR.user_badges)
         refreshAdapter.setRefreshableView(badges, this)
-      }
-      case None => {
+      },
+      {
         Log.e(
           "BadgesUserActivity",
           "No nickname given. Spawned without an Intent somehow?")
         Toast.makeText(this, R.string.badges_user_failure, Toast.LENGTH_LONG).show
         finish() // Nuke the activity.
       }
-    }
-  }.unsafePerformIO
+    )
+  }.unsafePerformIO // TODO: Blech.
 
   def onRefreshStarted(view: View): Unit = {
     updateBadges().unsafePerformIO
