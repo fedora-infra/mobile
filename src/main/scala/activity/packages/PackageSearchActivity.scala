@@ -40,8 +40,9 @@ class PackageSearchActivity extends TypedActivity with util.Views {
         0,
         Map("search" -> queryText))
 
-      Pkgwat.queryJson(queryObject) map {
-        case \/-(res) => {
+      Pkgwat.queryJson(queryObject).map(_.fold(
+        _ => Toast.makeText(this, R.string.packages_search_failure, Toast.LENGTH_LONG).show,
+        res => {
           val packages = res.rows.toArray
 
           class PackageAdapter(
@@ -60,13 +61,13 @@ class PackageSearchActivity extends TypedActivity with util.Views {
                 .findViewById(R.id.icon)
                 .asInstanceOf[ImageView]
 
-              BitmapFetch.fromPackage(pkg) runAsync {
-                case -\/(err) => {
+              BitmapFetch.fromPackage(pkg).runAsync(_.fold(
+                err => {
                   Log.e("PackageSearchActivity", err.toString)
                   runOnUiThread(iconView.setImageResource(R.drawable.ic_search))
-                }
-                case \/-(icon) => runOnUiThread(iconView.setImageBitmap(icon))
-              }
+                },
+                icon => runOnUiThread(iconView.setImageBitmap(icon))
+              ))
 
               layout
                 .findViewById(R.id.title)
@@ -87,8 +88,8 @@ class PackageSearchActivity extends TypedActivity with util.Views {
           }
 
           val packagesView = findViewOpt(TR.packages).map(_.asInstanceOf[ListView])
-          packagesView match {
-            case Some(v) => {
+          packagesView.cata(
+            v => {
               runOnUiThread(v.post(v.setAdapter(adapter)))
               runOnUiThread(v.setVisibility(View.VISIBLE))
               runOnUiThread(v.setOnItemClickListener(new OnItemClickListener {
@@ -99,14 +100,11 @@ class PackageSearchActivity extends TypedActivity with util.Views {
                   startActivity(intent)
                 }
               }))
-            }
-            case None => // ...
-          }
+            },
+            ()
+          )
         }
-        case -\/(_) => {
-          Toast.makeText(this, R.string.packages_search_failure, Toast.LENGTH_LONG).show
-        }
-      }
+      ))
     }
     ()
   }

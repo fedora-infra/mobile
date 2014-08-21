@@ -29,41 +29,41 @@ class PackageInfoActivity extends TypedActivity with util.Views {
     val actionbar = getActionBar
     val iconView = findView(TR.icon)
 
-    BitmapFetch.fromPackage(pkg) runAsync {
-      case -\/(err) => {
+    BitmapFetch.fromPackage(pkg).runAsync(_.fold(
+      err => {
         Log.e("PackageInfoActivity", err.toString)
         ()
-      }
-      case \/-(icon) => {
+      },
+      icon => {
         runOnUiThread(actionbar.setIcon(new BitmapDrawable(getResources, icon)))
         ()
       }
-    }
+    ))
 
     actionbar.setTitle(pkg.name)
     actionbar.setSubtitle(pkg.summary)
 
     findView(TR.description).setText(pkg.description.replaceAll("\n", " "))
 
-    pkg.develOwner match {
-      case Some(owner) => {
+    pkg.develOwner.cata(
+      owner => {
         val ownerView = findView(TR.owner)
         ownerView.setText(owner)
-        BitmapFetch.fromGravatarEmail(s"${owner}@fedoraproject.org") runAsync {
-          case -\/(err) => {
+        BitmapFetch.fromGravatarEmail(s"${owner}@fedoraproject.org").runAsync(_.fold(
+          err => {
             Log.e("PackageInfoActivity", err.toString)
             ()
-          }
-          case \/-(gravatar) => {
+          },
+          gravatar => {
             runOnUiThread(
               ownerView.setCompoundDrawablesWithIntrinsicBounds(
                 new BitmapDrawable(getResources, gravatar), null, null, null))
             ()
           }
-        }
-      }
-      case None => // TODO: Show "no owner" in the UI or something.
-    }
+        ))
+      },
+      ()
+    )
 
     val jsonURL = constructURL(
       "bodhi/query/query_active_releases",
@@ -93,8 +93,9 @@ class PackageInfoActivity extends TypedActivity with util.Views {
 
         val apiResults = stripHTML(res).decodeEither[Pkgwat.APIResults[FedoraRelease]]
 
-        apiResults match {
-          case \/-(r) => {
+        apiResults.fold(
+          _ => Toast.makeText(this, R.string.packages_release_failure, Toast.LENGTH_LONG).show,
+          r => {
             val releasesTable = findViewOpt(TR.releases)
             val header = new TableRow(this)
             header.addView(
@@ -124,9 +125,7 @@ class PackageInfoActivity extends TypedActivity with util.Views {
               runOnUiThread(releasesTable.foreach(_.addView(row)))
             }
           }
-          case -\/(r) =>
-            Toast.makeText(this, R.string.packages_release_failure, Toast.LENGTH_LONG).show
-        }
+        )
       }
       case _ => {
         // TODO: compose this with the above, remove duplicate code

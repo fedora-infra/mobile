@@ -31,26 +31,26 @@ class BadgeInfoActivity extends TypedActivity {
       val badgeCast = BadgeSerializableCast.unsafeCastBadge(
         getIntent.getSerializableExtra("badge"))
 
-      badgeCast.x match {
-        case -\/(_) => Log.d("BadgeInfoActivity", "Unable to deserialize badge")
-        case \/-(badge) => {
+      badgeCast.x.fold(
+        _ => Log.d("BadgeInfoActivity", "Unable to deserialize badge"),
+        badge => {
           val actionbar = getActionBar
           actionbar.setTitle(badge.name)
 
           val badgeImage = BitmapFetch.fromURL(badge.image)
 
-          badgeImage runAsync {
-            case -\/(err) => {
+          badgeImage.runAsync(_.fold(
+            err => {
               Log.e("BadgeInfoActivity", "Unable to fetch badge image")
               ()
-            }
-            case \/-(image) => {
+            },
+            image => {
               runOnUiThread(findView(TR.icon).setImageBitmap(image))
               runOnUiThread(
                 actionbar.setIcon(new BitmapDrawable(getResources, image)))
               ()
             }
-          }
+          ))
 
           findView(TR.name).setText(badge.name)
           findView(TR.description).setText(badge.description)
@@ -68,8 +68,8 @@ class BadgeInfoActivity extends TypedActivity {
             findView(TR.issued).setText(earned)
           }
         }
-      }
-    }.unsafePerformIO
+      )
+    }.unsafePerformIO // TODO: Blech. And this should be Task, anyway.
     ()
   }
 }

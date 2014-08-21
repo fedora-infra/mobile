@@ -29,17 +29,17 @@ class BadgesUserActivity
       case Some(nickname) => {
         val actionbar = getActionBar
         actionbar.setTitle(nickname)
-        BitmapFetch.fromGravatarEmail(s"${nickname}@fedoraproject.org") runAsync {
-          case -\/(err) => {
+        BitmapFetch.fromGravatarEmail(s"${nickname}@fedoraproject.org").runAsync(_.fold(
+          err => {
             Log.e("BadgesUserActivity", err.toString)
             ()
-          }
-          case \/-(image) => {
+          },
+          image => {
             runOnUiThread(
               actionbar.setIcon(new BitmapDrawable(getResources, image)))
             ()
           }
-        }
+        ))
 
         val badges = findView(TR.user_badges)
         refreshAdapter.setRefreshableView(badges, this)
@@ -61,30 +61,30 @@ class BadgesUserActivity
   }
 
   def updateBadges(): IO[Unit] = IO {
-    Option(getIntent.getExtras.getString("nickname")) match {
-      case Some(nickname) => {
-        Badges.user(nickname) map {
-          case \/-(res) => {
+    Option(getIntent.getExtras.getString("nickname")).cata(
+      nickname => {
+        Badges.user(nickname).map(_.fold(
+          err => {
+            runOnUiThread(Toast.makeText(this, R.string.badges_user_failure, Toast.LENGTH_LONG).show)
+            Log.e("BadgesUserActivity", err.toString)
+          },
+          res => {
             val adapter = new BadgesUserAdapter(
               this,
               android.R.layout.simple_list_item_1,
               res.assertions.toArray)
             findViewOpt(TR.user_badges).map(v => runOnUiThread(v.setAdapter(adapter)))
           }
-          case -\/(err) => {
-            runOnUiThread(Toast.makeText(this, R.string.badges_user_failure, Toast.LENGTH_LONG).show)
-            Log.e("BadgesUserActivity", err.toString)
-          }
-        }
-      }
-      case None => {
+        ))
+      },
+      {
         Log.e(
           "BadgesUserActivity",
           "No nickname given. Spawned without an Intent somehow?")
         Toast.makeText(this, R.string.badges_user_failure, Toast.LENGTH_LONG).show
         finish() // Nuke the activity.
       }
-    }
+    )
     ()
   }
 }

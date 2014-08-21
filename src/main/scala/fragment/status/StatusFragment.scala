@@ -56,9 +56,9 @@ class StatusFragment
       runOnUiThread(progress.setVisibility(View.GONE))
       result match {
         case Success(e) => {
-          e.decodeEither[StatusesResponse] match {
-            case -\/(err) => Log.e("StatusFragment", err.toString)
-            case \/-(parsed) => {
+          e.decodeEither[StatusesResponse].fold(
+            err => Log.e("StatusFragment", err.toString),
+            parsed => {
               val adapter = new StatusAdapter(
                 activity,
                 android.R.layout.simple_list_item_1,
@@ -74,7 +74,7 @@ class StatusFragment
                 }
               }
             }
-          }
+          )
         }
         case Failure(e) =>
           runOnUiThread(Toast.makeText(activity, R.string.status_failure, Toast.LENGTH_LONG).show)

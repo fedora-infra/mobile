@@ -47,37 +47,37 @@ class FedmsgNewsfeedFragment
   def onRefreshStarted(view: View): Unit = {
     val newsfeed = findView(TR.newsfeed)
     val newestItem = \/.fromTryCatchNonFatal(newsfeed.getAdapter.getItem(0))
-    newestItem match {
-      case -\/(err) => updateNewsfeed()
-      case \/-(item) => {
+    newestItem.fold(
+      err => updateNewsfeed(),
+      item => {
         val timestamp = item.asInstanceOf[HRF.Result].timestamp("epoch")
         val messages: Task[String \/ List[HRF.Result]] = getMessagesSince(timestamp.replace(".0", "").toLong)
-        messages runAsync {
-          case \/-(res) => res match {
-            case \/-(xs) => {
-              val adapter = newsfeed.getAdapter.asInstanceOf[ArrayAdapter[HRF.Result]]
-              runOnUiThread(xs.reverse.foreach(adapter.insert(_, 0)))
-              runOnUiThread(adapter.notifyDataSetChanged)
-              runOnUiThread(refreshAdapter.setRefreshComplete)
-            }
-            case -\/(err) => {
-              // JSON parsing threw an error.
-              runOnUiThread(Toast.makeText(activity, R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
-              Log.e("FedmsgFeed", "Error refreshing: " + err)
-              runOnUiThread(refreshAdapter.setRefreshComplete)
-              ()
-            }
-          }
-          case -\/(err) => {
+        messages.runAsync(_.fold(
+          err => {
             // The Task threw an error (as opposed to the JSON parsing).
             // TODO: Abstract this.
             runOnUiThread(Toast.makeText(activity, R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
             Log.e("FedmsgFeed", "Error refreshing: " + err)
             runOnUiThread(refreshAdapter.setRefreshComplete)
-          }
-        }
+          },
+          res => res.fold(
+            err => {
+              // JSON parsing threw an error.
+              runOnUiThread(Toast.makeText(activity, R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
+              Log.e("FedmsgFeed", "Error refreshing: " + err)
+              runOnUiThread(refreshAdapter.setRefreshComplete)
+              ()
+            },
+            xs => {
+              val adapter = newsfeed.getAdapter.asInstanceOf[ArrayAdapter[HRF.Result]]
+              runOnUiThread(xs.reverse.foreach(adapter.insert(_, 0)))
+              runOnUiThread(adapter.notifyDataSetChanged)
+              runOnUiThread(refreshAdapter.setRefreshComplete)
+            }
+          )
+        ))
       }
-    }
+    )
     ()
   }
 
@@ -132,32 +132,29 @@ class FedmsgNewsfeedFragment
       arrayList)
     newsfeed.setAdapter(adapter)
 
-    messages runAsync {
-      case -\/(err) => {
+    messages.runAsync(_.fold(
+      err => {
         // Something bad occurred in the Task
         Log.e("MainActivity", "Error updating newsfeed: " + err)
         runOnUiThread(
           Toast.makeText(
             activity,
             R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
-      }
-      case \/-(res) => {
-        res match {
-          case -\/(err) => {
-            // JSON parsing didn't work
-            Log.e("MainActivity", "Error updating newsfeed: " + err)
-            runOnUiThread(
-              Toast.makeText(
-                activity,
-                R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
-          }
-          case \/-(xs) => {
-            xs.foreach(arrayList.add(_))
-            runOnUiThread(newsfeed.setAdapter(adapter))
-          }
+      },
+      res => res.fold(
+        err => {
+          // JSON parsing didn't work
+          Log.e("MainActivity", "Error updating newsfeed: " + err)
+          runOnUiThread(
+            Toast.makeText(
+              activity,
+              R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
+        },
+        xs => {
+          xs.foreach(arrayList.add(_))
+          runOnUiThread(newsfeed.setAdapter(adapter))
         }
-      }
-      ()
-    }
+      )
+    ))
   }
 }

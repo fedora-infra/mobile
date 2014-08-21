@@ -39,21 +39,21 @@ class BadgesLeaderboardFragment
       findViewOpt(TR.progress).map(_.setVisibility(View.VISIBLE))
     }
 
-    Badges.leaderboard runAsync {
-      case -\/(err) => {
+    Badges.leaderboard.runAsync(_.fold(
+      err => {
         // Something bad happened when making the request
         runOnUiThread(Toast.makeText(activity, R.string.badges_lb_failure, Toast.LENGTH_LONG).show)
         Log.e("BadgesLeaderboardActivity", err.toString)
         ()
-      }
-      case \/-(res) => res match {
-        case -\/(err) => {
+      },
+      res => res.fold(
+        err => {
           // Something bad happened when parsing the JSON response
           runOnUiThread(Toast.makeText(activity, R.string.badges_lb_failure, Toast.LENGTH_LONG).show)
           Log.e("BadgesLeaderboardActivity", err)
           ()
-        }
-        case \/-(xs) => {
+        },
+        xs => {
           val adapter = new BadgesLeaderboardAdapter(
             activity,
             android.R.layout.simple_list_item_1,
@@ -65,8 +65,7 @@ class BadgesLeaderboardFragment
           findViewOpt(TR.leaderboard).map(v => runOnUiThread(v.setAdapter(adapter)))
           ()
         }
-      }
-    }
-    ()
+      )
+    ))
   }
 }

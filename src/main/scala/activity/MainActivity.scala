@@ -144,38 +144,46 @@ class MainActivity extends util.Views {
     if (checkUpdates) {
       // If the most recent build failed, there's no point in doing anything
       // else.
-      Updates.getJenkinsLastBuildStatus runAsync {
+      Updates.getJenkinsLastBuildStatus.runAsync(_.fold(
         // Error getting build status
-        case -\/(err) =>
+        err => {
           Log.e("MainActivity", err.toString)
           ()
-        case \/-(res) => res match {
+        },
+        res => res.fold(
           // Error parsing JSON from Jenkins
-          case -\/(err) =>
+          err => {
             Log.e("MainActivity", err.toString)
             ()
-          case \/-(Updates.JenkinsFailure) =>
-            Log.v("MainActivity", "Last Jenkins build failed. Skipping update.")
-            ()
-          case \/-(Updates.JenkinsSuccess) => {
-            Log.v("MainActivity", "Last Jenkins build was successful.")
-            Updates.compareVersion(this) runAsync {
-              // Error getting GitHub info
-              case -\/(err) =>
-                Log.e("MainActivity", err.toString)
-                ()
-                case \/-(res) => res match {
-                  case \/-(true) =>
+          },
+          x => x match {
+            case Updates.JenkinsFailure => {
+              Log.v("MainActivity", "Last Jenkins build failed. Skipping update.")
+              ()
+            }
+            case Updates.JenkinsSuccess => {
+              Log.v("MainActivity", "Last Jenkins build was successful.")
+              Updates.compareVersion(this).runAsync(_.fold(
+                // Error getting GitHub info
+                err => {
+                  Log.e("MainActivity", err.toString)
+                  ()
+                },
+                res => res.fold(
+                  t => {
                     Log.v("MainActivity", "Already up to date")
                     ()
-                  case \/-(false) =>
+                  },
+                  f => {
                     runOnUiThread(Updates.presentDialog(MainActivity.this))
                     ()
-                }
+                  }
+                )
+              ))
             }
           }
-        }
-      }
+        )
+      ))
     }
   }
 

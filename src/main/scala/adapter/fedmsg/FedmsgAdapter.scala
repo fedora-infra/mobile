@@ -50,18 +50,17 @@ class FedmsgAdapter(
       case None => BitmapFetch.fromURL(serviceIcon)
     }
 
-    // XXX: Move this to scalaz Task.
-    image runAsync {
-      case -\/(err) => {
+    image.runAsync(_.fold(
+      err => {
         Log.e("FedmsgAdapter", err.toString)
         ()
-      }
-      case \/-(img) => {
+      },
+      img => {
         val rounded = BitmapTransformations.roundCorners(img, 5)
         activity.runOnUiThread(iconView.setImageBitmap(rounded))
         ()
       }
-    }
+    ))
 
     layout
       .findViewById(R.id.title)

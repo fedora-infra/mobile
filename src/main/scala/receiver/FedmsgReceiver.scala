@@ -103,12 +103,12 @@ class FedmsgReceiver extends BroadcastReceiver {
           hrf <- HRF.fromJsonString(bundle.getString("message"))
         } yield hrf
 
-        hrf map {
-          case -\/(error) => {
+        hrf.map(_.fold(
+          error => {
             Log.e("FedmsgReceiver", "error parsing JSON")
             None
-          }
-          case \/-(result) =>
+          },
+          result =>
             result match {
               case None => {
                 Log.e("FedmsgReceiver", "Empty resultset from JSON")
@@ -127,8 +127,8 @@ class FedmsgReceiver extends BroadcastReceiver {
                     .setAutoCancel(true)
                 Some(compatBuilder)
               }
-          }
-        }
+            }
+        ))
       }
     }
     builder.map(_.map(b => notificationManager.x.map(_.notify(1, b.build))))

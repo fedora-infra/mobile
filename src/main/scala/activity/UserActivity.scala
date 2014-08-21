@@ -79,16 +79,16 @@ class UserActivity
 
     val profilePic = findView(TR.profile_pic)
 
-    BitmapFetch.fromGravatarEmail("codeblock@fedoraproject.org") runAsync {
-      case -\/(err) => {
+    BitmapFetch.fromGravatarEmail("codeblock@fedoraproject.org").runAsync(_.fold(
+      err => {
         Log.e("UserActivity", err.toString)
         ()
-      }
-      case \/-(img) => {
+      },
+      img => {
         runOnUiThread(profilePic.setImageBitmap(img))
         ()
       }
-    }
+    ))
 
     findView(TR.badge_count).setText("43")
     findView(TR.fas_groups_count).setText("24")
@@ -96,15 +96,15 @@ class UserActivity
 
     val newsfeed = findView(TR.user_newsfeed)
     val messages: Task[String \/ List[HRF.Result]] = getUserNewsfeed()
-    messages map {
-      case -\/(err) => {
+    messages.map(_.fold(
+      err => {
         Log.e("UserActivity", "Error updating newsfeed: " + err)
         runOnUiThread(
           Toast.makeText(
             this,
             R.string.newsfeed_failure, Toast.LENGTH_LONG).show)
-      }
-      case \/-(res) => {
+      },
+      res => {
         val arrayList = new ArrayList[HRF.Result]
         res.foreach(arrayList.add(_))
         val adapter = new FedmsgAdapter(
@@ -113,7 +113,7 @@ class UserActivity
           arrayList)
         runOnUiThread(newsfeed.setAdapter(adapter))
       }
-    }
+    ))
     ()
   }
 }

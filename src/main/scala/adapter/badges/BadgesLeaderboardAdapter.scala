@@ -40,16 +40,16 @@ class BadgesLeaderboardAdapter(
     // If there's a user associated with it, pull from gravatar.
     // Otherwise, just use the icon if it exists.
     val email = s"${item.nickname}@fedoraproject.org"
-    BitmapFetch.fromGravatarEmail(email) runAsync {
-      case -\/(err) => {
+    BitmapFetch.fromGravatarEmail(email).runAsync(_.fold(
+      err => {
         Log.e("BadgesLeaderboardAdapter", err.toString)
         ()
-      }
-      case \/-(image) => {
+      },
+      image => {
         activity.runOnUiThread(iconView.setImageBitmap(image))
         ()
       }
-    }
+    ))
 
     layout
       .findViewById(R.id.nickname)
