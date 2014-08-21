@@ -40,70 +40,73 @@ class PackageSearchActivity extends TypedActivity with util.Views {
         0,
         Map("search" -> queryText))
 
-      Pkgwat.queryJson(queryObject).map(_.fold(
+      Pkgwat.queryJson(queryObject).runAsync(_.fold(
         _ => Toast.makeText(this, R.string.packages_search_failure, Toast.LENGTH_LONG).show,
-        res => {
-          val packages = res.rows.toArray
+        right => right.fold(
+          _ => Toast.makeText(this, R.string.packages_search_failure, Toast.LENGTH_LONG).show,
+          res => {
+            val packages = res.rows.toArray
 
-          class PackageAdapter(
-            context: Context,
-            resource: Int,
-            items: Array[FedoraPackage])
-            extends ArrayAdapter[FedoraPackage](context, resource, items) {
-            override def getView(position: Int, convertView: View, parent: ViewGroup): View = {
-              val pkg = getItem(position)
+            class PackageAdapter(
+              context: Context,
+              resource: Int,
+              items: Array[FedoraPackage])
+              extends ArrayAdapter[FedoraPackage](context, resource, items) {
+              override def getView(position: Int, convertView: View, parent: ViewGroup): View = {
+                val pkg = getItem(position)
 
-              val layout = LayoutInflater.from(context)
-                .inflate(R.layout.package_list_item, parent, false)
-                .asInstanceOf[LinearLayout]
+                val layout = LayoutInflater.from(context)
+                  .inflate(R.layout.package_list_item, parent, false)
+                  .asInstanceOf[LinearLayout]
 
-              val iconView = layout
-                .findViewById(R.id.icon)
-                .asInstanceOf[ImageView]
+                val iconView = layout
+                  .findViewById(R.id.icon)
+                  .asInstanceOf[ImageView]
 
-              BitmapFetch.fromPackage(pkg).runAsync(_.fold(
-                err => {
-                  Log.e("PackageSearchActivity", err.toString)
-                  runOnUiThread(iconView.setImageResource(R.drawable.ic_search))
-                },
-                icon => runOnUiThread(iconView.setImageBitmap(icon))
-              ))
+                BitmapFetch.fromPackage(pkg).runAsync(_.fold(
+                  err => {
+                    Log.e("PackageSearchActivity", err.toString)
+                    runOnUiThread(iconView.setImageResource(R.drawable.ic_search))
+                  },
+                  icon => runOnUiThread(iconView.setImageBitmap(icon))
+                ))
 
-              layout
-                .findViewById(R.id.title)
-                .asInstanceOf[TextView]
-                .setText(pkg.name)
+                layout
+                  .findViewById(R.id.title)
+                  .asInstanceOf[TextView]
+                  .setText(pkg.name)
 
-              layout
+                layout
+              }
             }
+
+            val adapter = new PackageAdapter(
+              this,
+              android.R.layout.simple_list_item_1,
+              packages)
+
+            runOnUiThread {
+              findViewOpt(TR.progress).map(_.setVisibility(View.GONE))
+            }
+
+            val packagesView = findViewOpt(TR.packages).map(_.asInstanceOf[ListView])
+            packagesView.cata(
+              v => {
+                runOnUiThread(v.post(v.setAdapter(adapter)))
+                runOnUiThread(v.setVisibility(View.VISIBLE))
+                runOnUiThread(v.setOnItemClickListener(new OnItemClickListener {
+                  def onItemClick(parent: AdapterView[_], view: View, position: Int, id: Long) {
+                    val pkg = packages(position)
+                    val intent = new Intent(PackageSearchActivity.this, classOf[PackageInfoActivity])
+                    intent.putExtra("package", pkg)
+                    startActivity(intent)
+                  }
+                }))
+              },
+              ()
+            )
           }
-
-          val adapter = new PackageAdapter(
-            this,
-            android.R.layout.simple_list_item_1,
-            packages)
-
-          runOnUiThread {
-            findViewOpt(TR.progress).map(_.setVisibility(View.GONE))
-          }
-
-          val packagesView = findViewOpt(TR.packages).map(_.asInstanceOf[ListView])
-          packagesView.cata(
-            v => {
-              runOnUiThread(v.post(v.setAdapter(adapter)))
-              runOnUiThread(v.setVisibility(View.VISIBLE))
-              runOnUiThread(v.setOnItemClickListener(new OnItemClickListener {
-                def onItemClick(parent: AdapterView[_], view: View, position: Int, id: Long) {
-                  val pkg = packages(position)
-                  val intent = new Intent(PackageSearchActivity.this, classOf[PackageInfoActivity])
-                  intent.putExtra("package", pkg)
-                  startActivity(intent)
-                }
-              }))
-            },
-            ()
-          )
-        }
+        )
       ))
     }
     ()
