@@ -78,7 +78,7 @@ object Pkgwat {
       URLEncoder.encode(json, "utf8")).mkString("/")
   }
 
-  private def query(query: FilteredQuery): IO[String] = IO {
+  private def query(query: FilteredQuery): Task[String] = Task {
     Log.v("Pkgwat", "Beginning query")
     val connection = new URL(constructURL("xapian/query/search_packages", query))
       .openConnection
@@ -87,10 +87,6 @@ object Pkgwat {
     Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
   }
 
-  def queryJson(q: FilteredQuery): Task[String \/ APIResults[FedoraPackage]] = delay {
-    query(q)
-    .unsafePerformIO
-    .replaceAll("""<\/?.*?>""", "")
-    .decodeEither[APIResults[FedoraPackage]]
-  }
+  def queryJson(q: FilteredQuery): Task[String \/ APIResults[FedoraPackage]] =
+    query(q) ∘ (_.replaceAll("""<\/?.*?>""", "").decodeEither[APIResults[FedoraPackage]])
 }
