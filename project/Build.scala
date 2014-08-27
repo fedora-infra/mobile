@@ -9,7 +9,7 @@ object General {
     version := "0.1",
     scalaVersion := "2.10.3",
     resolvers             ++= Seq(
-      "relrod @ FedoraPeople" at "http://codeblock.fedorapeople.org/maven/",
+      "relrod @ FedoraPeople" at "https://codeblock.fedorapeople.org/maven/",
       "sonatype-s" at "http://oss.sonatype.org/content/repositories/snapshots"
     ),
     libraryDependencies   ++= Seq(
