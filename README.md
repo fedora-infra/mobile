@@ -151,9 +151,16 @@ Close out of the Android Virtual Device Manager.
 
 ## Getting SBT
 
-There's an SBT RPM in my (@CodeBlock) FedoraPeople repo. Throw
-[this repo file](http://repos.fedorapeople.org/repos/codeblock/sbt/sbt.repo) in
-`/etc/yum.repos.d/sbt.repo` and run `sudo yum install sbt `.
+We make use of the `sbt` buildsystem (and android-sdk-plugin).
+`sbt` is packaged in Fedora, but there is a nicer fork of the launch script by
+Paul Phillips. I've packaged the script in a copr, and suggest using it
+instead.
+
+To set up sbt, just do:
+
+```
+sudo dnf copr enable codeblock/sbt-extras && sudo dnf install sbt-extras
+```
 
 ## Getting the code and getting started
 
@@ -181,16 +188,18 @@ The advantage of using the console is not having to wait for JVM to start up,
 every time you want to run an SBT command.
 
 All of the following assume you're in the SBT shell. You can do the same things
-from your shell prompt by doing `sbt <the command>`, but it's slower that way.
+from your shell prompt by doing `sbt <the command>`, but it's slower that way
+due to JVM startup times.
 
-Run `android:emulator-start android-4.2` to start up your AVD. A window should
-open with your emulator. It might take a while to boot up.
+Start your emulator (or connect your physical device using `adb`). Make sure
+you can access the device (emulated or not) via `adb shell` before proceeding.
+If you can't, fix that. :)
 
-Run `android:install-emulator` to compile the application and install it into
-your emulator.
+Run `android:install` in the SBT shell to compile the application and install
+it into your device.
 
 In most cases, you can make your changes, then just do
-`android:install-emulator` to compile and run. Rarely, you might need to clean
+`android:install` to compile and run. Rarely, you might need to clean
 the project of old build artifacts, and you can do that with the `clean`
 command.
 
@@ -198,9 +207,8 @@ To compile without installing to the emulator, use `compile`. This is
 sometimes quicker just for making sure syntax is fine and everything
 typechecks.
 
-To just obtain an APK (without installing into the emulator), use
-`android:package-debug` or `android:package-release`. You can install that APK
-to a physical device.
+To just obtain an APK (without installing into the device), use
+`android:packageDebug`. You can install that APK to a physical device.
 
 ## Debugging
 
