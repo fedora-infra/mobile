@@ -7,10 +7,11 @@ object General {
   val settings = Defaults.defaultSettings ++ Seq (
     name := "Fedora Mobile",
     version := "0.1",
-    scalaVersion := "2.11.2",
+    scalaVersion := "2.11.3-typelevel",
     resolvers             ++= Seq(
       "relrod @ FedoraPeople" at "https://codeblock.fedorapeople.org/maven/",
-      "sonatype-s" at "http://oss.sonatype.org/content/repositories/snapshots"
+      "sonatype-s" at "http://oss.sonatype.org/content/repositories/snapshots",
+      Resolver.mavenLocal
     ),
     libraryDependencies   ++= Seq(
       //"me.elrod" %% "pkgwat" % "1.0.0",
