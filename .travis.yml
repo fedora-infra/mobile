@@ -1,4 +1,6 @@
 language: android
+env:
+  - JAVA_OPTS="-Xms512m -Xmx512m -XX:MaxPermSize=256m"
 android:
   components:
     - platform-tools
