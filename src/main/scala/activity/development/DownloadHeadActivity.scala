@@ -8,7 +8,7 @@ import android.os.{ Bundle, Environment }
 import android.util.Log
 import android.widget.Toast
 
-import scala.concurrent.{ future, Future }
+import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{ Failure, Success }
 
@@ -34,7 +34,9 @@ class DownloadHeadActivity extends TypedActivity {
     val file = new File(path, "fedora-mobile-0.1.apk")
     if (file.exists) file.delete()
 
-    future {
+    // TODO: Use Task instead.
+    // TODO: Stop pattern matching on ADT constructors.
+    Future {
       val connection = new URL(
         "http://da.gd/fmsnap")
         .openConnection

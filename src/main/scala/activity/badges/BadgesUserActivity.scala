@@ -67,6 +67,7 @@ class BadgesUserActivity
           err => {
             runOnUiThread(Toast.makeText(this, R.string.badges_user_failure, Toast.LENGTH_LONG).show)
             Log.e("BadgesUserActivity", err.toString)
+            ()
           },
           res => {
             val adapter = new BadgesUserAdapter(
@@ -74,8 +75,10 @@ class BadgesUserActivity
               android.R.layout.simple_list_item_1,
               res.assertions.toArray)
             findViewOpt(TR.user_badges).map(v => runOnUiThread(v.setAdapter(adapter)))
+            ()
           }
         ))
+        ()
       },
       {
         Log.e(

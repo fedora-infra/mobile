@@ -32,7 +32,10 @@ class BadgeInfoActivity extends TypedActivity {
         getIntent.getSerializableExtra("badge"))
 
       badgeCast.x.fold(
-        _ => Log.d("BadgeInfoActivity", "Unable to deserialize badge"),
+        _ => {
+          Log.d("BadgeInfoActivity", "Unable to deserialize badge")
+          ()
+        },
         badge => {
           val actionbar = getActionBar
           actionbar.setTitle(badge.name)
@@ -67,9 +70,9 @@ class BadgeInfoActivity extends TypedActivity {
               getResources.getString(R.string.badges_earned_on).format(t)
             findView(TR.issued).setText(earned)
           }
-        }
-      )
+
+          ()
+        })
     }.unsafePerformIO // TODO: Blech. And this should be Task, anyway.
-    ()
   }
 }

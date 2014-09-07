@@ -18,7 +18,10 @@ class FedmsgCountWidgetProvider extends AppWidgetProvider {
     appWidgetIds.foreach(n => {
       val mcTask: Task[String \/ Datagrepper.Messagecount] = Datagrepper.messagecount()
       mcTask.map(_.fold(
-        err => Log.e("FedmsgCountWidgetProvider", err),
+        err => {
+          Log.e("FedmsgCountWidgetProvider", err)
+          ()
+        },
         mc => {
           val views: RemoteViews = new RemoteViews(context.getPackageName, R.layout.widget_fedmsg_count)
           val time: String = new SimpleDateFormat("h:mm a").format(new Date)

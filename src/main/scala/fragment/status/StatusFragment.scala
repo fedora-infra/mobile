@@ -14,7 +14,7 @@ import scalaz._, Scalaz._
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
 
-import scala.concurrent.future
+import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 import scala.util.{ Failure, Try, Success }
@@ -99,14 +99,19 @@ class StatusFragment
     val progress = findView(TR.progress)
     progress.setVisibility(View.VISIBLE)
 
-    future {
+    // TODO: Rework 100% of this to use Task.
+    // TODO: Stop pattern matching on the ADT constructors.
+    Future {
       Source.fromURL("http://status.fedoraproject.org/statuses.json").mkString
     }.onComplete { result =>
       runOnUiThread(progress.setVisibility(View.GONE))
       result match {
         case Success(e) => {
           e.decodeEither[Status.StatusesResponse].fold(
-            err => Log.e("StatusFragment", err.toString),
+            err => {
+              Log.e("StatusFragment", err.toString)
+              ()
+            },
             parsed => {
               val adapter = new StatusAdapter(
                 activity,
