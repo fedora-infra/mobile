@@ -17,12 +17,12 @@ import scala.io.{ Codec, Source }
 object Pkgwat {
   sealed trait ResultType
 
-  case class APIResults[ResultType](
+  case class APIResults[T](
     visibleRows: Int,
     totalRows: Int,
     rowsPerPage: Int,
     startRow: Int,
-    rows: List[ResultType])
+    rows: List[T])
 
   case class FedoraSubPackage(
     icon: String,
