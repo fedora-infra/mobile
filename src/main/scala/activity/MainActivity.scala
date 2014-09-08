@@ -15,7 +15,6 @@ import android.view.{ LayoutInflater, MenuItem, View, ViewGroup }
 import android.widget.{ AdapterView, ArrayAdapter, TextView }
 
 import scalaz._, Scalaz._
-import scalaz.concurrent.Task
 import scalaz.effect.IO
 
 sealed trait Delegation {
