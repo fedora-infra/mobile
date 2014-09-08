@@ -8,9 +8,10 @@ import android.os.{ Bundle, Environment }
 import android.util.Log
 import android.widget.Toast
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{ Failure, Success }
+import scalaz._, Scalaz._
+import scalaz.concurrent.Task
+import scalaz.concurrent.Task._
+import scalaz.effect._
 
 import java.io.{ File, BufferedOutputStream, FileOutputStream }
 import java.net.{ HttpURLConnection, URL }
@@ -36,7 +37,7 @@ class DownloadHeadActivity extends TypedActivity {
 
     // TODO: Use Task instead.
     // TODO: Stop pattern matching on ADT constructors.
-    Future {
+    Task {
       val connection = new URL(
         "http://da.gd/fmsnap")
         .openConnection
@@ -48,17 +49,17 @@ class DownloadHeadActivity extends TypedActivity {
         .takeWhile(_ != -1)
         .foreach(outputStream.write)
       outputStream.flush
-    } onComplete {
-      case Success(_) => {
+    }.runAsync(_.fold(
+      err => {
+        runOnUiThread(Toast.makeText(this, R.string.update_failure, Toast.LENGTH_LONG).show)
+        Log.e("DownloadHeadActivity", err.toString)
+        ()
+      },
+      _ => {
         val intent = new Intent(Intent.ACTION_VIEW)
         intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive")
         startActivity(intent)
       }
-      case Failure(err) => {
-        runOnUiThread(Toast.makeText(this, R.string.update_failure, Toast.LENGTH_LONG).show)
-        Log.e("DownloadHeadActivity", err.toString)
-      }
-    }
+    ))
   }
-
 }
