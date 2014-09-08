@@ -16,6 +16,11 @@ android:
 install:
   - sudo curl -o /usr/bin/sbt https://raw.githubusercontent.com/paulp/sbt-extras/master/sbt
   - sudo chmod +x /usr/bin/sbt
+  - pushd ~
+  - git clone https://github.com/typelevel/scala.git typelevel-scala
+  - cd typelevel-scala
+  - ant publish-local-opt -Dmaven.version.suffix="-typelevel"
+  - popd
 script:
   - sbt update
   - sbt android:package-debug
