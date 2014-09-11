@@ -65,17 +65,19 @@ class PackageInfoActivity extends TypedActivity with util.Views {
       ()
     )
 
-    val jsonURL = constructURL(
-      "bodhi/query/query_active_releases",
-      FilteredQuery(
-        20,
-        0,
-        Map("package" -> pkg.name)))
-
     // This should move to webapi/Pkgwat.scala
-    Task {
-      Source.fromURL(jsonURL).mkString
-    } runAsync(_.fold(
+    val queryResult: Task[String] = for {
+      url <- constructURL(
+        "bodhi/query/query_active_releases",
+        FilteredQuery(
+          20,
+          0,
+          Map("package" -> pkg.name)),
+        getApplicationContext)
+      res <- Task(Source.fromURL(url).mkString) // TODO: This feels hacky.
+    } yield res
+
+    queryResult.runAsync(_.fold(
       _ => Toast.makeText(this, R.string.packages_release_failure, Toast.LENGTH_LONG).show,
       res => {
         Log.v("PackageInfoActivity", "111111111")
