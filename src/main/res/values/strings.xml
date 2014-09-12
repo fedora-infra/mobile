@@ -6,6 +6,7 @@
   <string name="register_fmn">Fedmsg Notifications (beta)</string>
   <string name="preferences">Preferences</string>
 
+  <!-- Global-ish words, found often throughout the app. -->
   <string name="app_name">Fedora Mobile</string>
   <string name="search">Search</string>
   <string name="open">Open</string>
@@ -20,6 +21,9 @@
   <string name="pkgs_owned">Pkgs Owned</string>
   <string name="fas_groups">FAS Groups</string>
   <string name="badges">Badges</string>
+
+  <!-- Misc. errors -->
+  <string name="android_getview_error">Something tried to spawn a fragment that doesn\'t exist!</string>
 
   <string name="update_available">Update available</string>
   <string name="update_available_desc">A new commit has been made to Fedora Mobile. Would you like to update to it? (You can disable auto-checking via Preferences)</string>

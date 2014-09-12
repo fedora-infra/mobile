@@ -12,7 +12,7 @@ import android.support.v4.app.ActionBarDrawerToggle
 import android.support.v4.view.GravityCompat
 import android.util.Log
 import android.view.{ LayoutInflater, MenuItem, View, ViewGroup }
-import android.widget.{ AdapterView, ArrayAdapter, TextView }
+import android.widget.{ AdapterView, ArrayAdapter, TextView, Toast }
 
 import scalaz._, Scalaz._
 import scalaz.effect.IO
@@ -34,18 +34,25 @@ sealed case class FragmentDelegation(
 sealed class NavAdapter(
   context: Context,
   resource: Int,
-  delegations: List[Delegation])
-  extends ArrayAdapter[String](context, resource, delegations.map(_.name).toArray) {
+  delegations: NonEmptyList[Delegation])
+  extends ArrayAdapter[String](context, resource, delegations.map(_.name).list.toArray) {
     override def getView(position: Int, convertView: View, parent: ViewGroup): View = {
-      val delegation: Delegation = delegations(position)
-
+      val delegation: Option[Delegation] = delegations.index(position)
       val layout = LayoutInflater.from(context)
         .inflate(R.layout.drawer_list_item, parent, false)
-        .asInstanceOf[TextView]
+        .asInstanceOf[TextView] // TODO: asInstanceOf
 
-      layout.setCompoundDrawablesWithIntrinsicBounds(delegation.icon, 0, 0, 0)
-      layout.setText(delegation.name)
-      layout
+      // TODO: purify this.
+      delegation.cata(
+        delegation => {
+          layout.setCompoundDrawablesWithIntrinsicBounds(delegation.icon, 0, 0, 0)
+          layout.setText(delegation.name)
+          layout
+        },
+        {
+          // The delegation doesn't exist, so return the empty TextView.
+          layout
+        })
     }
   }
 
@@ -57,8 +64,8 @@ class MainActivity extends util.Views {
     super.onPostCreate(bundle)
     setContentView(R.layout.navdrawer)
 
-    val navMap: List[Delegation] =
-      List(
+    val navMap: NonEmptyList[Delegation] =
+      NonEmptyList(
         FragmentDelegation(
           classOf[FedmsgNewsfeedFragment],
           R.drawable.ic_status,
@@ -127,14 +134,14 @@ class MainActivity extends util.Views {
 
     drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener {
       def onItemClick(parent: AdapterView[_], view: View, position: Int, id: Long) {
-        spawn(navMap(position)).unsafePerformIO // TODO
+        spawn(navMap.index(position)).unsafePerformIO // TODO
         drawerList.setItemChecked(position, true)
         drawerLayout.closeDrawer(drawerList)
       }
     })
 
     // Default fragment
-    spawn(navMap.head).unsafePerformIO // TODO
+    spawn(Some(navMap.head)).unsafePerformIO // TODO
 
     val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
     val checkUpdates = sharedPref.getBoolean("check_updates", true)
@@ -186,20 +193,26 @@ class MainActivity extends util.Views {
     }
   }
 
-  private def spawn(x: Delegation): IO[Unit] = IO {
+  // TODO: Task instead of IO?
+  private def spawn(x: Option[Delegation]): IO[Unit] = IO {
     x match {
-      case ActivityDelegation(c, i, s) => {
+      case Some(ActivityDelegation(c, i, s)) => {
         val intent = new Intent(MainActivity.this, c)
         getActionBar.setTitle(s)
         startActivity(intent)
       }
-      case FragmentDelegation(c, i, s) => {
+      case Some(FragmentDelegation(c, i, s)) => {
         getActionBar.setTitle(s)
         val fragment = c.newInstance
         val fragmentManager = getFragmentManager
         fragmentManager.beginTransaction
          .replace(R.id.content_frame, fragment)
          .commit()
+      }
+      case _ => {
+          Toast.makeText(
+            MainActivity.this,
+            R.string.android_getview_error, Toast.LENGTH_LONG).show
       }
     }
     ()
