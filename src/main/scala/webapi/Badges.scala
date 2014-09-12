@@ -15,8 +15,9 @@ import java.net.{ HttpURLConnection, URL, URLEncoder }
 
 import scala.io.{ Codec, Source }
 
-object Badges {
-  val url = "https://badges.fedoraproject.org/"
+object Badges extends Webapi {
+  val prodUrl = "https://badges.fedoraproject.org/"
+  override val stagingUrl = Some("https://badges.stg.fedoraproject.org/")
 
   case class Badge(
     id: String,
@@ -56,23 +57,31 @@ object Badges {
     casecodec1(Leaderboard.apply, Leaderboard.unapply)("leaderboard")
 
   /** Returns JSON after completing the query. */
-  def query(path: String): Task[String] = Task {
-    Log.v("Badges", "Beginning query")
-    val uri = Uri.parse(url + path.dropWhile(_ == '/'))
-    val connection = new URL(uri.toString)
-      .openConnection
-      .asInstanceOf[HttpURLConnection]
-    connection setRequestMethod "GET"
-    Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
+  def query(context: Task[android.content.Context], path: String): Task[String] = {
+    def perform(url: String): Task[String] = Task {
+      val uri = Uri.parse(url + path.dropWhile(_ == '/'))
+      val connection = new URL(uri.toString)
+        .openConnection
+        .asInstanceOf[HttpURLConnection]
+      connection setRequestMethod "GET"
+      Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
+    }
+
+    for {
+      _ <- Pure.logV("Badges", "Beginning query")
+      ctx <- context
+      url <- appUrl(ctx)
+      res <- perform(url)
+    } yield res
   }
 
-  def info(id: String): Task[String] =
-    query(s"/badge/${id}/json")
+  def info(id: String)(implicit context: Task[android.content.Context]): Task[String] =
+    query(context, s"/badge/${id}/json")
 
-  def user(user: String): Task[String \/ User] =
-    query(s"/badge/${user}/json") ∘ (_.decodeEither[User])
+  def user(user: String)(implicit context: Task[android.content.Context]): Task[String \/ User] =
+    query(context, s"/badge/${user}/json") ∘ (_.decodeEither[User])
 
-  def leaderboard: Task[String \/ List[LeaderboardUser]] =
-    query("/leaderboard/json") ∘ (_.decodeEither[Leaderboard]) ∘ (_.map(_.leaderboard))
+  def leaderboard(implicit context: Task[android.content.Context]): Task[String \/ List[LeaderboardUser]] =
+    query(context, "/leaderboard/json") ∘ (_.decodeEither[Leaderboard]) ∘ (_.map(_.leaderboard))
 
 }

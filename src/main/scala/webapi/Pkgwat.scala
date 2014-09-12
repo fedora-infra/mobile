@@ -14,7 +14,10 @@ import java.net.{ HttpURLConnection, URL, URLEncoder }
 
 import scala.io.{ Codec, Source }
 
-object Pkgwat {
+object Pkgwat extends Webapi {
+  val prodUrl = "https://apps.fedoraproject.org/packages/fcomm_connector"
+  override val stagingUrl = Some("https://apps.stg.fedoraproject.org/packages/fcomm_connector")
+
   sealed trait ResultType
 
   case class APIResults[T](
@@ -68,25 +71,28 @@ object Pkgwat {
   implicit def FedoraReleaseResultCodecJson: CodecJson[APIResults[FedoraRelease]] =
     casecodec5(APIResults.apply[FedoraRelease], APIResults.unapply[FedoraRelease])("visible_rows", "total_rows", "rows_per_page", "start_row", "rows")
 
-  // TODO: Move this... It's public because it's used by PackageInfoActivity
-  def constructURL(path: String, query: FilteredQuery): String = {
-    val json: String = query.asJson.nospaces
-    Seq(
-      "https://apps.fedoraproject.org/packages/",
-      "fcomm_connector",
-      path,
-      URLEncoder.encode(json, "utf8")).mkString("/")
+  def constructURL(path: String, query: FilteredQuery, ctx: android.content.Context): Task[String] = for {
+    json <- query.asJson.nospaces.pure[Task]
+    url <- appUrl(ctx)
+  } yield url + URLEncoder.encode(json, "utf8")
+
+  private def query(query: FilteredQuery, context: Task[android.content.Context]): Task[String] = {
+    def perform(url: String): Task[String] = Task {
+      val connection = new URL(url)
+        .openConnection
+        .asInstanceOf[HttpURLConnection]
+      connection setRequestMethod "GET"
+      Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
+    }
+
+    for {
+      _ <- Pure.logV("Pkgwat", "Beginning query")
+      ctx <- context
+      url <- constructURL("xapian/query/search_packages", query, ctx)
+      res <- perform(url)
+    } yield res
   }
 
-  private def query(query: FilteredQuery): Task[String] = Task {
-    Log.v("Pkgwat", "Beginning query")
-    val connection = new URL(constructURL("xapian/query/search_packages", query))
-      .openConnection
-      .asInstanceOf[HttpURLConnection]
-    connection setRequestMethod "GET"
-    Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
-  }
-
-  def queryJson(q: FilteredQuery): Task[String \/ APIResults[FedoraPackage]] =
-    query(q) ∘ (_.replaceAll("""<\/?.*?>""", "").decodeEither[APIResults[FedoraPackage]])
+  def queryJson(q: FilteredQuery)(implicit context: Task[android.content.Context]): Task[String \/ APIResults[FedoraPackage]] =
+    query(q, context) ∘ (_.replaceAll("""<\/?.*?>""", "").decodeEither[APIResults[FedoraPackage]])
 }

@@ -1,6 +1,10 @@
 package org.fedoraproject.mobile.util
 
+import android.content.Context
+
 import org.fedoraproject.mobile.{ TypedActivity, TypedResource }
+
+import scalaz.concurrent.Task
 
 // This really isn't an activity, but it lets us access findView.
 trait Views extends TypedActivity {
@@ -14,4 +18,9 @@ trait Views extends TypedActivity {
     * with moving this to be implicit.
     */
   def findViewOpt[T](tr: TypedResource[T]) = Option(findView(tr))
+
+  // Rather than passing context around manually everywhere, just make it
+  // implicit here.
+  implicit val ctxTask: Task[Context] =
+    Task { getApplicationContext }
 }

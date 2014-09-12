@@ -6,6 +6,7 @@
   <string name="register_fmn">Fedmsg Notifications (beta)</string>
   <string name="preferences">Preferences</string>
 
+  <!-- Global-ish words, found often throughout the app. -->
   <string name="app_name">Fedora Mobile</string>
   <string name="search">Search</string>
   <string name="open">Open</string>
@@ -20,6 +21,9 @@
   <string name="pkgs_owned">Pkgs Owned</string>
   <string name="fas_groups">FAS Groups</string>
   <string name="badges">Badges</string>
+
+  <!-- Misc. errors -->
+  <string name="android_getview_error">Something tried to spawn a fragment that doesn\'t exist!</string>
 
   <string name="update_available">Update available</string>
   <string name="update_available_desc">A new commit has been made to Fedora Mobile. Would you like to update to it? (You can disable auto-checking via Preferences)</string>
@@ -49,16 +53,19 @@
   <!-- Preferences -->
   <string name="pref_fas">Fedora Account System (FAS)</string>
   <string name="pref_fas_username_summary">Currently only used for Badges integration.</string>
-  <string name="check_updates">Check for updates</string>
-  <string name="pref_check_updates_summary">Call out to GitHub on application start, to see if we are running the latest commit.</string>
+
+  <string name="fmn_openid">Fedmsg Notifications OpenID</string>
+  <string name="pref_fmn_openid_summary">The OpenID account used to authenticate with the Fedmsg Notifications system.</string>
 
   <string name="pref_fmn">Fedmsg Notifications</string>
   <string name="fmn_apikey">Fedmsg Notifications API Key</string>
   <string name="pref_fmn_apikey_summary">The API used to authenticate with the Fedmsg Notifications system.</string>
-  <string name="fmn_openid">Fedmsg Notifications OpenID</string>
-  <string name="pref_fmn_openid_summary">The OpenID account used to authenticate with the Fedmsg Notifications system.</string>
 
   <string name="pref_development">Development Options</string>
+  <string name="check_updates">Check for updates</string>
+  <string name="pref_check_updates_summary">Call out to GitHub on application start, to see if we are running the latest commit.</string>
+  <string name="use_staging">Use staging apps</string>
+  <string name="pref_use_staging_summary">Use staging versions of applications with which we interact, for applications which have a staging instance.</string>
 
   <!-- Badges -->
   <string name="fedora_badges">Fedora Badges</string>
