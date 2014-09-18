@@ -101,6 +101,7 @@ class StatusFragment
 
     // TODO: Rework 100% of this to use Task.
     // TODO: Stop pattern matching on the ADT constructors.
+    // TODO: Stop using Source.fromURL
     Future {
       Source.fromURL("http://status.fedoraproject.org/statuses.json").mkString
     }.onComplete { result =>
