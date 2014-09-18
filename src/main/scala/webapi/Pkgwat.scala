@@ -95,4 +95,14 @@ object Pkgwat extends Webapi {
 
   def queryJson(q: FilteredQuery)(implicit context: Task[android.content.Context]): Task[String \/ APIResults[FedoraPackage]] =
     query(q, context) ∘ (_.replaceAll("""<\/?.*?>""", "").decodeEither[APIResults[FedoraPackage]])
+
+  def queryActiveReleasesRaw(ctx: android.content.Context, pkg: FedoraPackage): Task[String] = for {
+    url <- constructURL(
+      "bodhi/query/query_active_releases",
+      FilteredQuery(
+        20,
+        0,
+        Map("package" -> pkg.name)),
+      ctx)
+    } yield (Source.fromURL(url).mkString) // TODO: I don't like Source.fromURL.
 }

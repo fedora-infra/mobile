@@ -66,17 +66,9 @@ class PackageInfoActivity extends TypedActivity with util.Views {
     )
 
     // This should move to webapi/Pkgwat.scala
-    val queryResult: Task[String] = for {
-      url <- constructURL(
-        "bodhi/query/query_active_releases",
-        FilteredQuery(
-          20,
-          0,
-          Map("package" -> pkg.name)),
-        getApplicationContext)
-      res <- Task(Source.fromURL(url).mkString) // TODO: This feels hacky.
-    } yield res
+    val queryResult = queryActiveReleasesRaw(this, pkg)
 
+    // TODO: runAsync effectively acts as unsafePerformIO here. Purify this.
     queryResult.runAsync(_.fold(
       _ => Toast.makeText(this, R.string.packages_release_failure, Toast.LENGTH_LONG).show,
       res => {
