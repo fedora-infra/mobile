@@ -27,9 +27,6 @@ class StatusFragment
     val progress = findView(TR.progress)
     progress.setVisibility(View.VISIBLE)
 
-    // TODO: Rework 100% of this to use Task.
-    // TODO: Stop pattern matching on the ADT constructors.
-    // TODO: Stop using Source.fromURL
     Status.statuses(getActivity.getApplicationContext).runAsync(_.fold(
       err =>
         runOnUiThread(Toast.makeText(activity, R.string.status_failure, Toast.LENGTH_LONG).show),
