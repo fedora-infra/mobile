@@ -26,4 +26,12 @@ trait Webapi {
     for {
       url <- appUrl(context)
     } yield (new URL(url).openConnection.asInstanceOf[HttpURLConnection])
+
+  def connectionPath(context: Context, path: String): Task[HttpURLConnection] =
+    for {
+      url <- appUrl(context)
+    } yield (
+      new URL(url + path.dropWhile(_ == '/'))
+      .openConnection
+      .asInstanceOf[HttpURLConnection])
 }

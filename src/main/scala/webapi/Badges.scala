@@ -11,7 +11,7 @@ import scalaz.concurrent.Task._
 import scalaz.effect._
 
 import java.io.{ DataOutputStream, InputStreamReader }
-import java.net.{ HttpURLConnection, URL, URLEncoder }
+import java.net.HttpURLConnection
 
 import scala.io.{ Codec, Source }
 
@@ -58,20 +58,20 @@ object Badges extends Webapi {
 
   /** Returns JSON after completing the query. */
   def query(context: Task[android.content.Context], path: String): Task[String] = {
-    def perform(url: String): Task[String] = Task {
-      val uri = Uri.parse(url + path.dropWhile(_ == '/'))
-      val connection = new URL(uri.toString)
-        .openConnection
-        .asInstanceOf[HttpURLConnection]
-      connection setRequestMethod "GET"
-      Source.fromInputStream(connection.getInputStream)(Codec.UTF8).mkString
+    val connection = for {
+      ctx <- context
+      c <- connectionPath(ctx, path)
+    } yield (c)
+
+    def perform(c: HttpURLConnection): Task[String] = Task {
+      c.setRequestMethod("GET")
+      Source.fromInputStream(c.getInputStream)(Codec.UTF8).mkString
     }
 
     for {
       _ <- Pure.logV("Badges", "Beginning query")
-      ctx <- context
-      url <- appUrl(ctx)
-      res <- perform(url)
+      c <- connection
+      res <- perform(c)
     } yield res
   }
 
