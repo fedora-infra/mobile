@@ -7,6 +7,8 @@ import scalaz._, Scalaz._
 import scalaz.concurrent.Task
 import scalaz.concurrent.Task._
 
+import java.net.{ HttpURLConnection, URL, URLEncoder }
+
 trait Webapi {
   def prodUrl: String
   def stagingUrl: Option[String] = None
@@ -19,4 +21,9 @@ trait Webapi {
       prodUrl
     )
   }
+
+  def connection(context: Context): Task[HttpURLConnection] =
+    for {
+      url <- appUrl(context)
+    } yield (new URL(url).openConnection.asInstanceOf[HttpURLConnection])
 }
