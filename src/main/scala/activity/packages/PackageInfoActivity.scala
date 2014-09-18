@@ -80,7 +80,6 @@ class PackageInfoActivity extends TypedActivity with util.Views {
     queryResult.runAsync(_.fold(
       _ => Toast.makeText(this, R.string.packages_release_failure, Toast.LENGTH_LONG).show,
       res => {
-        Log.v("PackageInfoActivity", "111111111")
         findViewOpt(TR.progress).map(v => runOnUiThread(v.setVisibility(View.GONE)))
 
         // This is *really* hacky, but blocked on
