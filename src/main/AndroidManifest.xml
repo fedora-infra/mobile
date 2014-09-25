@@ -1,6 +1,7 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.fedoraproject.mobile">
+    package="org.fedoraproject.mobile"
+    android:versionCode="1">
 
   <application
       android:icon="@drawable/fedoraicon"
