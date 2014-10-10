@@ -18,7 +18,6 @@ import scalaz.effect.IO
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
 
 import java.util.ArrayList // TODO: Do something about this.
-import java.util.TimeZone
 
 class UserActivity
   extends TypedActivity
@@ -57,8 +56,8 @@ class UserActivity
         "start"    -> "0",
         "user"     -> "codeblock",
         "order"    -> "desc"
-      ),
-      TimeZone.getDefault)
+      )
+    )
 
   private def updateNewsfeed() {
   }

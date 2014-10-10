@@ -61,10 +61,10 @@ class FedmsgAdapter(
       }
     ))
 
-    layout
+    /*layout
       .findViewById(R.id.title)
       .asInstanceOf[TextView]
-      .setText(item.title)
+      .setText(item.title)*/
 
     layout
       .findViewById(R.id.subtitle)
@@ -74,7 +74,7 @@ class FedmsgAdapter(
     layout
       .findViewById(R.id.timestamp)
       .asInstanceOf[TextView]
-      .setText(item.timestamp("ago"))
+      .setText(item.date)
 
     layout.setOnClickListener(new OnClickListener() {
       override def onClick(view: View): Unit = {

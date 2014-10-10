@@ -114,8 +114,8 @@ class FedmsgReceiver extends BroadcastReceiver {
                 .setStyle(
                   new NotificationCompat
                   .BigTextStyle()
-                  .bigText(r.repr))
-                .setContentText(r.repr)
+                  .bigText(r.subtitle)) // TODO: Fix when fmn.consumser#34 closes.
+                .setContentText(r.subtitle)
                 .setSmallIcon(R.drawable.fedoraicon)
                 .setAutoCancel(true)),
             {

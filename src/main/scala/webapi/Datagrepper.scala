@@ -17,7 +17,7 @@ import java.net.{ HttpURLConnection, URL, URLEncoder }
 import java.util.TimeZone
 
 object HRF {
-  val url = "http://hrf.cloud.fedoraproject.org/all"
+  val url = "https://apps.fedoraproject.org/datagrepper/raw/?grouped=true"
 
   case class Response(results: List[Result])
 
@@ -25,28 +25,27 @@ object HRF {
     icon: Option[String], // TODO: Make this a Option[Task[Bitmap]] instead using BitmapCache.
     secondaryIcon: Option[String], // TODO: This too.
     link: Option[String],
-    objects: List[String],
     packages: List[String],
-    repr: String,
     subtitle: String,
-    timestamp: Map[String, String],
-    title: String,
-    usernames: List[String] // TODO: When we have FAS integration, make this a List[FAS.User] or similar.
+    timestamp: Double,
+    usernames: List[String], // TODO: When we have FAS integration, make this a List[FAS.User] or similar.
+    messageIds: List[String],
+    date: String
   )
 
   implicit def ResponseCodecJson: CodecJson[Response] =
-    casecodec1(Response.apply, Response.unapply)("results")
+    casecodec1(Response.apply, Response.unapply)("raw_messages")
 
   implicit def ResultCodecJson: CodecJson[Result] =
-    casecodec10(Result.apply, Result.unapply)("icon", "secondary_icon", "link", "objects", "packages", "repr", "subtitle", "timestamp", "title", "usernames")
+    casecodec9(Result.apply, Result.unapply)("icon", "secondary_icon", "link", "packages", "subtitle", "timestamp", "usernames", "msg_ids", "date")
 
-  def apply(query: List[(String, String)], timezone: TimeZone): Task[String \/ List[Result]] =
-    get(query.map(x => s"${x._1}=${x._2}").mkString("&"), timezone.getID)
+  def apply(query: List[(String, String)]): Task[String \/ List[Result]] =
+    get(query.map(x => s"${x._1}=${x._2}").mkString("&"))
     .map(_.decodeEither[Response])
     .map(_.map(_.results))
 
-  def get(qs: String, timezone: String): Task[String] = Task {
-    val getUrl: URL = new URL(url + "?timezone=" + URLEncoder.encode(timezone, "utf8") + "&" + qs)
+  def get(qs: String): Task[String] = Task {
+    val getUrl: URL = new URL(url + "&" + qs)
     Log.v("HRF", "Beginning GET to " + getUrl)
     val connection: HttpURLConnection =
       getUrl

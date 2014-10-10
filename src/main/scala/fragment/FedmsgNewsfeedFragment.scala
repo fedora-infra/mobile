@@ -18,7 +18,6 @@ import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher
 import scala.io.Source
 
 import java.util.ArrayList // TODO: Do something about this.
-import java.util.TimeZone
 
 class FedmsgNewsfeedFragment
   extends TypedFragment
@@ -32,7 +31,7 @@ class FedmsgNewsfeedFragment
       "order" -> "desc"
     ) ::: (if (before.isDefined) List("start" -> before.get.toString) else Nil)
 
-    HRF(query, TimeZone.getDefault)
+    HRF(query)
   }
 
   private def getMessagesSince(since: Long): Task[String \/ List[HRF.Result]] = {
@@ -40,8 +39,8 @@ class FedmsgNewsfeedFragment
       List(
         "start" -> (since + 1).toString,
         "order" -> "desc"
-      ),
-      TimeZone.getDefault)
+      )
+    )
   }
 
   def onRefreshStarted(view: View): Unit = {
@@ -50,8 +49,8 @@ class FedmsgNewsfeedFragment
     newestItem.fold(
       err => updateNewsfeed(),
       item => {
-        val timestamp = item.asInstanceOf[HRF.Result].timestamp("epoch")
-        val messages: Task[String \/ List[HRF.Result]] = getMessagesSince(timestamp.replace(".0", "").toLong)
+        val timestamp = item.asInstanceOf[HRF.Result].timestamp.toLong
+        val messages: Task[String \/ List[HRF.Result]] = getMessagesSince(timestamp)
         messages.runAsync(_.fold(
           err => {
             // The Task threw an error (as opposed to the JSON parsing).
