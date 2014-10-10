@@ -4,3 +4,4 @@
 /test/target
 /test/project
 *.class
+local.properties
