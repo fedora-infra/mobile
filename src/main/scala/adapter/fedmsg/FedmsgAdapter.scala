@@ -71,10 +71,20 @@ class FedmsgAdapter(
       .asInstanceOf[TextView]
       .setText(item.subtitle)
 
+    val timestamp =
+      if (item.date === "seconds ago")
+        ((System.currentTimeMillis / 1000) - item.timestamp).toInt match {
+          case 1 => "one second ago"
+          case n => n.toString |+| " seconds ago"
+        }
+      else
+        item.date
+
+
     layout
       .findViewById(R.id.timestamp)
       .asInstanceOf[TextView]
-      .setText(item.date)
+      .setText(timestamp)
 
     layout.setOnClickListener(new OnClickListener() {
       override def onClick(view: View): Unit = {
