@@ -61,11 +61,6 @@ class FedmsgAdapter(
       }
     ))
 
-    /*layout
-      .findViewById(R.id.title)
-      .asInstanceOf[TextView]
-      .setText(item.title)*/
-
     layout
       .findViewById(R.id.subtitle)
       .asInstanceOf[TextView]

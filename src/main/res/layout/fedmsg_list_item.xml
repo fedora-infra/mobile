@@ -29,13 +29,6 @@
         android:orientation="vertical">
 
       <TextView
-          android:id="@+id/title"
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:textStyle="bold"
-          android:textSize="15sp" />
-
-      <TextView
           android:id="@+id/subtitle"
           android:layout_width="fill_parent"
           android:layout_height="wrap_content" />
